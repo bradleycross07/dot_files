@@ -1,0 +1,7 @@
+{{if eq .chezmoi.os "linux"}}
+Documents/
+{{end}}
+
+{{if eq .chezmoi.os "windows"}}
+dot_config/sway/
+{{end}}
