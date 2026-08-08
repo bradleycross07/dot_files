@@ -69,7 +69,7 @@ sudo pacman -S --needed --noconfirm \
     ntfs-3g \
     tlp tlp-rdw lm_sensors \
     imv mpv \
-    gtk-engine-murrine gnome-themes-extra papirus-icon-theme nwg-look \
+    gnome-themes-extra papirus-icon-theme nwg-look \
     gamescope devtools \
     easyeffects pavucontrol \
     lazygit github-cli
@@ -92,8 +92,9 @@ if ! command -v yay &> /dev/null; then
     rm -rf /tmp/yay-install
 fi
 
-echo "installing aur packages - discord, spotify, pixel font and obsidian"
+echo "installing aur packages - discord, spotify, pixel font, obsidian and GTK theme dependencies"
 yay -S --needed --noconfirm \
+    gtk-engine-murrine \
     discord \
     spotify \
     otf-departure-mono otf-departure-mono-nerd \

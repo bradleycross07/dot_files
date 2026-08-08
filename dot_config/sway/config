@@ -35,6 +35,8 @@ for_window [app_id="firefox" title="^Library$"] floating enable
 for_window [app_id="xdg-desktop-portal-gtk"] floating enable
 # Thunar
 for_window [app_id="thunar"] floating enable
+# Volume Control
+for_window [app_id="org.pulseaudio.pavucontrol"] floating enable
 # Floating windows use normal border
 for_window [floating] border normal
 
