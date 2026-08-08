@@ -1,0 +1,111 @@
+{{ if eq .chezmoi.osRelease.id "arch" -}}
+
+#!/bin/bash
+set -e
+
+echo "are you ready? (this is for arch based distros)"
+read -p "press enter to continue"
+
+echo "install reflector to find fastest mirrors"
+sudo pacman -S --needed --noconfirm reflector rsync
+sudo reflector --country GB --latest 10 --sort rate --save /etc/pacman.d/mirrorlist
+
+echo "then update the system"
+sudo pacman -Syu --noconfirm
+
+echo "enable multilib repo if it already hasn't (for steam 32 bit packages etc.)"
+sudo sed -i "/\[multilib\]/,/Include/"'s/^#//' /etc/pacman.conf
+
+sudo pacman -Sy
+
+echo "installing needed official repo packages"
+sudo pacman -S --needed --noconfirm \
+    base-devel git \
+    mesa lib32-mesa lib32-fontconfig \
+    alsa-utils pipewire pipewire-alsa pipewire-pulse pipewire-jack wireplumber rtkit alsa-card-profiles \
+    networkmanager iw \
+    bluez bluez-utils \
+    xdg-user-dirs xdg-desktop-portal xdg-desktop-portal-wlr xdg-desktop-portal-gtk \
+    gvfs udisks2 upower \
+    noto-fonts noto-fonts-emoji ttf-liberation ttf-dejavu \
+    pciutils \
+    neovim
+
+echo "installing sway window manager and extras"
+sudo pacman -S --needed --noconfirm \
+    sway swaybg swaylock swayidle swaync \
+    waybar foot wofi grim slurp \
+    brightnessctl playerctl \
+    polkit-gnome seatd xorg-xwayland \
+    wl-clipboard
+
+echo "installing GUI file manager thunar and plugins"
+sudo pacman -S --needed --noconfirm \
+    thunar thunar-volman thunar-archive-plugin tumbler ffmpegthumbnailer
+
+echo "detecting GPU and installing drivers"
+GPU=$(lspci | grep -E "VGA|3D controller")
+
+if echo "$GPU" | grep -qi "AMD\|ATI\|Radeon"; then
+    echo "installing AMD GPU/iGPU drivers"
+    sudo pacman -S --needed --noconfirm vulkan-radeon lib32-vulkan-radeon libva-mesa-driver
+
+elif echo "$GPU" | grep -qi "Intel"; then
+    echo "installing Intel GPU drivers"
+    sudo pacman -S --needed --noconfirm vulkan-intel lib32-vulkan-intel intel-media-driver
+
+elif echo "$GPU" | grep -qi "NVIDIA"; then
+    echo "installing NVIDIA GPU drivers"
+    sudo pacman -S --needed --noconfirm nvidia nvidia-utils lib32-nvidia-utils nvidia-settings
+
+else
+    echo "warning: couldn't detect GPU, install drivers manually"
+fi
+
+echo "installing optional utilities (comment out any lines you don't want)"
+sudo pacman -S --needed --noconfirm \
+    btop ripgrep fd fzf bat eza unzip zip \
+    pacman-contrib less \
+    ntfs-3g \
+    tlp tlp-rdw lm_sensors \
+    imv mpv \
+    gtk-engine-murrine gnome-themes-extra papirus-icon-theme nwg-look \
+    gamescope devtools \
+    easyeffects pavucontrol \
+    lazygit github-cli
+
+echo "enabling core services - bluetooth, network, timers, i/o and power"
+sudo systemctl enable --now bluetooth
+sudo systemctl enable --now NetworkManager
+sudo systemctl enable --now tlp
+sudo systemctl enable --now seatd
+sudo systemctl enable --now rtkit-daemon
+sudo systemctl enable --now fstrim.timer
+sudo systemctl enable --now paccache.timer
+
+echo "installing yay if it isn't present"
+if ! command -v yay &> /dev/null; then
+    git clone https://aur.archlinux.org/yay.git /tmp/yay-install
+    cd /tmp/yay-install
+    makepkg -si --noconfirm
+    cd -
+    rm -rf /tmp/yay-install
+fi
+
+echo "installing aur packages - discord, spotify, pixel font and obsidian"
+yay -S --needed --noconfirm \
+    discord \
+    spotify \
+    otf-departure-mono otf-departure-mono-nerd \
+    obsidian
+
+echo "enabling audio services"
+systemctl --user enable --now pipewire pipewire-pulse wireplumber
+
+echo "a last system-wide upgrade for official and AUR packages"
+yay -Syu --noconfirm
+
+echo "set up zram manually and then restart machine"
+read -p "press enter to exit"
+
+{{ end -}}

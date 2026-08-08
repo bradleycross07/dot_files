@@ -8,3 +8,8 @@
 [user]
 	email = 182443649+bradleycross07@users.noreply.github.com
 	name = bradleycross07
+	signingkey = /home/Bradley/.ssh/id_ed25519.pub
+[gpg]
+	format = ssh
+[commit]
+	gpgsign = true
