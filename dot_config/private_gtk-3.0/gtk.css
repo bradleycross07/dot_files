@@ -1,0 +1,12 @@
+/* Custom colours */
+
+*:selected {
+    background-color: #A0785A;
+    color: #F5E6CA;
+}
+
+/* Selection when window loses focus */
+*:selected:backdrop {
+    background-color: shade(#A0785A, 0.6);
+    color: #F5E6CA;
+}

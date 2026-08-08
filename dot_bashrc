@@ -1,0 +1,32 @@
+#
+# ~/.bashrc
+#
+
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+PS1='[\u@\h \W]\$ '
+
+source /usr/share/fzf/key-bindings.bash
+source /usr/share/fzf/completion.bash
+
+# output file
+alias cat='bat'
+
+# lists
+alias ls='eza --icons --group-directories-first'
+alias ll='eza -l --icons --group-directories-first'
+alias la='eza -la --icons --group-directories-first'
+alias lt='eza --tree --icons --level=2'
+
+# neovim
+alias nano='nvim'
+export EDITOR='nvim'
+export VISUAL='nvim'
+
+export PATH=$PATH:/home/Bradley/.spicetify
+
+# yay
+alias yay='yay --noconfirm'

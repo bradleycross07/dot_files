@@ -1,0 +1,140 @@
+* {
+    font-family: DepartureMono Nerd Font Mono;
+    /* font-size: 11px; */
+    min-height: 0;
+}
+
+window#waybar {
+    background-color: #000000;
+    border-bottom: 2px solid #A0785A;
+    color: #F5E6CA;
+}
+
+button {
+    /* Use box-shadow instead of border so the text isn't offset */
+    box-shadow: inset 0 -3px transparent;
+    /* Avoid rounded borders under each button name */
+    border: none;
+    border-radius: 0;
+}
+
+/* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
+button:hover {
+    background: inherit;
+    box-shadow: inset 0 0px #ffffff;
+}
+
+/* Workspaces */
+#workspaces button {
+    padding: 0 10px;
+    font-size: 14px;
+    background-color: transparent;
+    color: #A0785A;
+    border-bottom: 2px solid transparent;
+}
+
+#workspaces button:hover {
+    background: rgba(160, 120, 90, 0.15);
+    color: #F5E6CA;
+}
+
+#workspaces button.focused, 
+#workspaces button.active {
+    color: #C9A177;
+    border-bottom: 2px solid #C9A177;
+}
+
+#workspaces button.urgent {
+    background-color: #E06C75;
+    border-bottom: 2px solid #E06C75;
+}
+
+#mode {
+    background-color: #64727D;
+    box-shadow: inset 0 -3px #ffffff;
+}
+
+#clock,
+#battery,
+#cpu,
+#memory,
+#tray,
+#temperature {
+    padding: 0 10px;
+    margin: 4px 2px;
+    background-color: #0d0d0d;
+    font-size: 14px;
+    border-radius: 6px;
+}
+
+/* Center Window Title */
+#window {
+    color: #F5E6CA;
+    font-size: 18px;
+}
+
+#cpu,
+#memory {
+   color: #F5E6CA;
+}
+
+#temperature,
+#temperature.warning,
+#temperature.critical {
+   color: #F5E6CA;
+   background-color: #0d0d0d;
+}
+
+/* If workspaces is the leftmost module, omit left margin */
+.modules-left > widget:first-child > #workspaces {
+    margin-left: 0;
+}
+
+/* If workspaces is the rightmost module, omit right margin */
+.modules-right > widget:last-child > #workspaces {
+    margin-right: 0;
+}
+
+#battery {
+   color: #F5E6CA;
+}
+
+#battery.charging, #battery.plugged {
+   color: #ffffff;
+   background-color: #26A65B;
+}
+
+@keyframes blink {
+    to {
+        background-color: #ffffff;
+        color: #000000;
+    }
+}
+
+/* Using steps() instead of linear as a timing function to limit cpu usage */
+#battery.critical:not(.charging) {
+    background-color: #f53c3c;
+    color: #ffffff;
+    animation-name: blink;
+    animation-duration: 0.5s;
+    animation-timing-function: steps(12);
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+}
+
+label:focus {
+    background-color: #000000;
+}
+
+#network,
+#network.disconnected {
+   font-size: 14px;
+}
+
+#network {
+   background-color: #2980b9;
+}
+
+#network.disconnected {
+   background-color: #f53c3c;
+}
