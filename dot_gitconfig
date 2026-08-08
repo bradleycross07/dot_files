@@ -1,0 +1,10 @@
+[credential]
+	helper = 
+	helper = /usr/bin/git-credential-manager
+	credentialStore = secretservice
+	guiPrompt = false
+[credential "https://dev.azure.com"]
+	useHttpPath = true
+[user]
+	email = 182443649+bradleycross07@users.noreply.github.com
+	name = bradleycross07
