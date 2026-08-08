@@ -30,3 +30,6 @@ export PATH=$PATH:/home/Bradley/.spicetify
 
 # yay
 alias yay='yay --noconfirm'
+
+# fastfetch
+alias fastfetch='ff'
