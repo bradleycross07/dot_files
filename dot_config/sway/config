@@ -41,6 +41,8 @@ for_window [app_id="org.pulseaudio.pavucontrol"] floating enable
 for_window [app_id="mpv"] floating enable
 # imv Image Viewer
 for_window [app_id="imv"] floating enable
+# Firefox Popup Dialogs
+for_window [app_id="firefox" title="(?i)(sign in|log in|oauth|authorize)"] floating enable
 # Floating windows use normal border
 for_window [floating] border normal
 
