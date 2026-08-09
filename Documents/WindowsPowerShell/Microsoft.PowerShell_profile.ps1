@@ -1,1 +1,0 @@
-Set-Alias ff fastfetch
