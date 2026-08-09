@@ -32,7 +32,7 @@ export PATH=$PATH:/home/Bradley/.spicetify
 alias yay='yay --noconfirm'
 
 # fastfetch
-alias fastfetch='ff'
+alias ff='fastfetch'
 
 # sysctl
 alias syctl='sudo sysctl'
