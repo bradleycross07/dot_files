@@ -1,12 +1,81 @@
-/* Custom colours */
+/* custom colours - pompompurin/coffee brown */
 
 *:selected {
     background-color: #A0785A;
     color: #F5E6CA;
 }
 
-/* Selection when window loses focus */
+/* selection when window loses focus */
 *:selected:backdrop {
     background-color: shade(#A0785A, 0.6);
     color: #F5E6CA;
+}
+
+/* button hover/active*/
+button:hover {
+    background-color: shade(#A0785A, 0.4);
+}
+
+button:active,
+button:checked {
+    background-color: #A0785A;
+    color: #F5E6CA;
+}
+
+/* scrollbar*/
+scrollbar slider {
+    background-color: #A0785A;
+    border-radius: 6px;
+}
+
+scrollbar slider:hover {
+    background-color: #F0C242;
+}
+
+/* focus outline */
+entry:focus,
+button:focus {
+    border-color: #F0C242;
+}
+
+/* when checkboxes/radio buttons are checked */
+check:checked,
+radio:checked {
+    background-color: transparent;
+    border-color: #A0785A;
+    color: #A0785A;
+    box-shadow: none;
+    outline: none;
+}
+
+check:checked:focus,
+radio:checked:focus,
+check:focus,
+radio:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+check:checked:focus,
+radio:checked:focus,
+check:focus,
+radio:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+/* any hyperlinks */
+*.link,
+a {
+    color: #F0C242;
+}
+
+/* progress bars */
+progressbar progress {
+    background-image: linear-gradient(to right, #A0785A, #F0C242);
+}
+
+/* switches when checked */
+switch:checked {
+    background-color: #A0785A;
 }

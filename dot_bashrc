@@ -7,7 +7,7 @@
 
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
-PS1='[\u@\h \W]\$ '
+PS1='\[\033[38;2;160;120;90m\][\u@\h \W]\[\033[0m\]\$ '
 
 source /usr/share/fzf/key-bindings.bash
 source /usr/share/fzf/completion.bash

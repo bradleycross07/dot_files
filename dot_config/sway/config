@@ -50,17 +50,23 @@ for_window [floating] border normal
 # More backgrounds are available in /usr/share/backgrounds/sway/
 exec_always swaybg -c '#000000'
 
+# window border colors
+# class            border     background    text        indicator     child_border
+client.focused     #F6F2AF    #F6F2AF       #000000     #F6F2AF       #F6F2AF 
+client.unfocused   #684E3A    #684E3A       #F5E6CA     #684E3A       #684E3A
+
+
 # Keyring Daemon
 exec /usr/bin/gnome-keyring-daemon --start --components=secrets 
 
 # Pixel border
-default_border pixel 2
+default_border pixel 3
 
 # Mouse focus disabled
 focus_follows_mouse no
 
 # Gaps
-gaps inner 12
+gaps inner 10
 gaps outer 4
 
 # Smart gaps

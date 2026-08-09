@@ -5,26 +5,34 @@
     "source": "~/.config/fastfetch/logo.txt" // pompompurin ASCII art
   },
   "display": {
-    "separator": " - "
+    "color": {
+      "title": "#F6F2AF"
+    },
+    "percent": {
+      "color": {
+        "green": "#B8D4A0"
+      }
+    },
+    "separator": " -> "
   },
   "modules": [
     "title",
     "separator",
-    { "type": "os", "keyColor": "#A0785A" },
-    { "type": "host", "keyColor": "#A0785A" },
-    { "type": "kernel", "keyColor": "#A57D58" },
-    { "type": "uptime", "keyColor": "#AB8256" },
-    { "type": "display", "keyColor": "#B18754" },
-    { "type": "de", "keyColor": "#B68D53" },
-    { "type": "wm", "keyColor": "#BC9251" },
-    { "type": "wmtheme", "keyColor": "#C2974F" },
-    { "type": "theme", "keyColor": "#C89D4E" },
-    { "type": "font", "keyColor": "#CDA24C" },
-    { "type": "terminal", "keyColor": "#D3A74A" },
-    { "type": "terminalfont", "keyColor": "#D9AC48" },
-    { "type": "cpu", "keyColor": "#DEB247" },
-    { "type": "gpu", "keyColor": "#E4B745" },
-    { "type": "memory", "keyColor": "#EABC43" },
+    { "type": "os", "keyColor": "#B8916B" },
+    { "type": "host", "keyColor": "#B8916B" },
+    { "type": "kernel", "keyColor": "#BD9769" },
+    { "type": "uptime", "keyColor": "#C29D67" },
+    { "type": "display", "keyColor": "#C6A365" },
+    { "type": "de", "keyColor": "#CBA863" },
+    { "type": "wm", "keyColor": "#D0AE61" },
+    { "type": "wmtheme", "keyColor": "#D5B45E" },
+    { "type": "theme", "keyColor": "#DABA5C" },
+    { "type": "font", "keyColor": "#DFC05A" },
+    { "type": "terminal", "keyColor": "#E4C558" },
+    { "type": "terminalfont", "keyColor": "#E9CB56" },
+    { "type": "cpu", "keyColor": "#EED154" },
+    { "type": "gpu", "keyColor": "#F0C242" },
+    { "type": "memory", "keyColor": "#F0C242" },
     { "type": "swap", "keyColor": "#F0C242" },
     { "type": "disk", "keyColor": "#F0C242" },
     { "type": "poweradapter", "keyColor": "#F0C242" },
