@@ -2,8 +2,8 @@
 Type=Application
 Name=JDownloader
 Icon=jdownloader
-TryExec=JDownloader
-Exec=env _JAVA_AWT_WM_NONREPARENTING=1 JAVA_TOOL_OPTIONS="-Dswing.aatext=true -Dawt.useSystemAAFontSettings=gasp" JDownloader
+TryExec=/usr/bin/JDownloader
+Exec=/bin/sh -c '_JAVA_AWT_WM_NONREPARENTING=1 JAVA_TOOL_OPTIONS="-Dswing.aatext=true -Dawt.useSystemAAFontSettings=gasp" /usr/bin/JDownloader'
 Terminal=false
 Categories=Application;Network;
 StartupWMClass=jd-Main

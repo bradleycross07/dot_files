@@ -1,44 +1,14 @@
 -- lazy.neovim load
 vim.opt.rtp:prepend(vim.fn.stdpath('data') .. '/lazy/lazy.nvim')
 
+-- allow termguicolors
+vim.opt.termguicolors = true
+
 -- plugins
 require('lazy').setup({
-  {
-    'ellisonleao/gruvbox.nvim', -- theme
-    priority = 1000,
-    config = function()
-      vim.cmd.colorscheme('gruvbox') -- colours
-    end,
-  },
-  {
-  'nvim-treesitter/nvim-treesitter',
-  branch = 'main',
-  build = ':TSUpdate',
-  config = function()
-    require('nvim-treesitter').install({ 'lua', 'bash', 'vim', 'markdown' })
-    vim.api.nvim_create_autocmd('FileType', {
-      pattern = { 'lua', 'bash', 'vim', 'markdown' },
-      callback = function()
-        vim.treesitter.start()
-      end,
-     })
-  end,
-  },
-  {
-    'lewis6991/gitsigns.nvim',
-    config = function()
-      require('gitsigns').setup()
-    end,
-  },
-  {
-    'nvim-lualine/lualine.nvim',
-    dependencies = { 'nvim-tree/nvim-web-devicons' },
-    config = function()
-      require('lualine').setup({
-        options = { theme = 'gruvbox' },
-      })
-    end,
-  },
+  spec = {
+     { import = 'plugins' },
+   },
 })
 
 -- change in specific colour overrides
