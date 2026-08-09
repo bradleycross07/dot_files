@@ -14,9 +14,11 @@ dot_config/waybar/
 dot_config/foot/
 dot_config/wofi/
 dot_config/private_gtk-3.0/
+dot_config/gtk-4.0/
 dot_config/Vencord/
 dot_config/spicetify/
 dot_config/wireplumber/
 dot_local/share/applications/
+dot_bashrc
 
 {{end}}
