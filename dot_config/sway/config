@@ -43,9 +43,11 @@ for_window [app_id="mpv"] floating enable
 for_window [app_id="imv"] floating enable
 # Firefox Popup Dialogs
 for_window [app_id="firefox" title="(?i)(sign in|log in|oauth|authorize)"] floating enable
+# Steam settings
+for_window [class="steam" title="Steam Settings"] floating enable
+
 # Floating windows use normal border
 for_window [floating] border normal
-
 
 ### Output configuration
 #
@@ -57,6 +59,8 @@ exec_always swaybg -c '#000000'
 client.focused     #F6F2AF    #F6F2AF       #000000     #F6F2AF       #F6F2AF 
 client.unfocused   #684E3A    #684E3A       #F5E6CA     #684E3A       #684E3A
 
+# xwayland apps allow tearing
+for_window [shell="xwayland"] allow-tearing yes
 
 # Keyring Daemon
 exec /usr/bin/gnome-keyring-daemon --start --components=secrets 
@@ -84,14 +88,17 @@ seat seat0 xcursor_theme "Bibata-Modern-Classic" 24
 output eDP-1 {
     resolution 1920x1080@60Hz
     scale 1.5
-    position 2560,720
 }
 
 # Second Monitor
 output HDMI-A-1 {
-    resolution 2560x1440@120Hz
+    resolution 3840x2160@60Hz
     adaptive_sync off
-    position 0,0
+    position 2160,0
+    scale 2.0
+    max_render_time 2
+    render_bit_depth 10
+    hdr on
 }
 
 ### Idle configuration

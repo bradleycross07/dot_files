@@ -1,0 +1,8 @@
+#
+# ~/.bash_profile
+#
+
+[[ -f ~/.bashrc ]] && . ~/.bashrc
+
+export PATH=$PATH:/home/Bradley/.spicetify
+export WLR_RENDERER=vulkan
