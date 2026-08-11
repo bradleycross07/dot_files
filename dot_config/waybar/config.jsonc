@@ -48,17 +48,17 @@
     "cpu": {
         "format": "{usage}%",
         "tooltip": false,
-	"on-click": "foot -a btop-float --window-size-chars=90x28 -e btop"
+	"on-click": "foot -a btop-float --window-size-chars=140x50 -e btop"
     },
     "memory": {
         "format": "{}%",
-	"on-click": "foot -a btop-float --window-size-chars=90x28 -e btop"
+	"on-click": "foot -a btop-float --window-size-chars=140x50 -e btop"
     },
     "temperature": {
         "hwmon-path": "/sys/class/hwmon/hwmon4/temp1_input",
         "critical-threshold": 80,
         "format": "{temperatureC}°C",
-	"on-click": "foot -a btop-float --window-size-chars=90x28 -e btop"
+	"on-click": "foot -a btop-float --window-size-chars=140x50 -e btop"
     },
     "battery": {
         "states": {
