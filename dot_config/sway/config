@@ -43,15 +43,19 @@ for_window [app_id="mpv"] floating enable
 for_window [app_id="imv"] floating enable
 # Firefox Popup Dialogs
 for_window [app_id="firefox" title="(?i)(sign in|log in|oauth|authorize)"] floating enable
+# HK: Silksong
+for_window [class="steam_app_1030300"] floating enable
+# Endcord
+for_window [app_id="endcord-float"] floating enable
 # Steam settings
 for_window [class="steam" title="Steam Settings"] floating enable
 
-# Floating windows use normal border
+# floating windows use normal border
 for_window [floating] border normal
 
 ### Output configuration
 #
-# More backgrounds are available in /usr/share/backgrounds/sway/
+# more backgrounds are available in /usr/share/backgrounds/sway/
 exec_always swaybg -c '#000000'
 
 # window border colors
@@ -60,76 +64,80 @@ client.focused     #F6F2AF    #F6F2AF       #000000     #F6F2AF       #F6F2AF
 client.unfocused   #684E3A    #684E3A       #F5E6CA     #684E3A       #684E3A
 
 # xwayland apps allow tearing
-for_window [shell="xwayland"] allow-tearing yes
+for_window [shell="xwayland"] allow_tearing yes
 
-# Keyring Daemon
+# keyring daemon
 exec /usr/bin/gnome-keyring-daemon --start --components=secrets 
 
-# Pixel border
-default_border pixel 4
+# pixel border
+default_border pixel 2
+default_floating_border pixel 2
 
 # Mouse focus disabled
 focus_follows_mouse no
 
-# Gaps
+# gaps
 gaps inner 10
 gaps outer 4
 
-# Smart gaps
+# smart gaps
 smart_gaps on
 
-# Hide edge borders
+# hide edge borders
 hide_edge_borders smart
 
-# Cursor theme
+# cursor theme
 seat seat0 xcursor_theme "Bibata-Modern-Classic" 24
 
-# Laptop Monitor
+# laptop Monitor
 output eDP-1 {
     resolution 1920x1080@60Hz
     scale 1.5
+    adaptive_sync off
+    max_render_time 6
+    render_bit_depth 8
+    scale_filter nearest
 }
 
-# Second Monitor
+# OLED second monitor
 output HDMI-A-1 {
     resolution 1920x1080@120Hz
     adaptive_sync off
     position 1920,0
     scale 1
-    max_render_time 3
+    max_render_time 6
     render_bit_depth 8
+    scale_filter nearest
     hdr off
 }
 
-### Idle configuration
+### idle configuration
 
 exec swayidle -w \
     timeout 600 'swaylock -f -c 000000' \
     timeout 1800 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
     before-sleep 'swaylock -f -c 000000' 
     
-# Screen lock on lid close
+# screen lock on lid close
 bindswitch --reload lid:on exec swaylock -f -c 000000
 
-# Screen lock
+# screen lock
 bindsym $mod+Escape exec swaylock -f -c 000000
 
-### Input configuration
+### input configuration
 
 input type:touchpad {
-   xkb_options caps:escape
    dwt enabled
    tap enabled
    natural_scroll enabled
    middle_emulation enabled
-   dwt = disable-while-typing
 }
 
 input type:keyboard {
    xkb_layout "gb"
    xkb_options caps:escape
-   repeat_delay 250
-   repeat_rate 50
+   repeat_delay 225
+   repeat_rate 65
 }
 
 input "1008:911:HP,_Inc_HyperX_Alloy_Origins_65" {
@@ -162,16 +170,16 @@ input "1008:911:HP,_Inc_HyperX_Alloy_Origins_65" {
     # Exit sway (logs you out of your Wayland session)
     bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
    
-    # Screenshotting
+    # screenshotting
     bindsym Print exec grim ~/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png
     bindsym $mod+Print exec grim -g"$(slurp)" ~/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png
     bindsym $mod+Shift+S exec grim -g"$(slurp)" - | wl-copy --type image/png
 
-   # File Managers
+   # file Managers
    bindsym $mod+e exec thunar
    bindsym $mod+f exec foot -e yazi
 
-   # Firefox
+   # firefox
    bindsym $mod+b exec firefox
 #
 # Moving around:
