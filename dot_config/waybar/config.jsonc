@@ -43,22 +43,22 @@
     "clock": {
         "timezone": "Europe/London",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-        "format-alt": "{:%Y-%m-%d}"
+        "format-alt": "{:%d-%m-%Y}"
     },
     "cpu": {
         "format": "{usage}%",
         "tooltip": false,
-	"on-click": "foot -a btop-float --window-size-chars=140x50 -e btop"
+	"on-click": "foot -a btop-float -e btop"
     },
     "memory": {
         "format": "{}%",
-	"on-click": "foot -a btop-float --window-size-chars=140x50 -e btop"
+	"on-click": "foot -a btop-float -e btop"
     },
     "temperature": {
         "hwmon-path": "/sys/class/hwmon/hwmon4/temp1_input",
         "critical-threshold": 80,
         "format": "{temperatureC}°C",
-	"on-click": "foot -a btop-float --window-size-chars=140x50 -e btop"
+	"on-click": "foot -a btop-float -e btop"
     },
     "battery": {
         "states": {

@@ -1,12 +1,13 @@
 #
-# ~/.bashrc
+### ~/.bashrc
 #
 
-# If not running interactively, don't do anything
+# if not running interactively, don't do anything
 [[ $- != *i* ]] && return
 
 alias ls='ls --color=auto'
 alias grep='grep --color=auto'
+
 PS1='\[\033[38;2;160;120;90m\][\u@\h \W]\[\033[0m\]\$ '
 
 source /usr/share/fzf/key-bindings.bash
@@ -26,6 +27,7 @@ alias nano='nvim'
 export EDITOR='nvim'
 export VISUAL='nvim'
 
+# spicetify
 export PATH=$PATH:/home/Bradley/.spicetify
 
 # yay
@@ -36,3 +38,6 @@ alias ff='fastfetch'
 
 # sysctl
 alias syctl='sudo sysctl'
+
+# sway reload & clear
+alias sreload='swaymsg reload; sleep 1; clear; sleep 2; clear'

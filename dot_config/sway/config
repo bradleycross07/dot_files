@@ -11,52 +11,52 @@ set $right l
 set $term foot
 # Your preferred application launcher
 set $menu fuzzel
+# Start waybar service
+exec systemctl --user start waybar.service
 
+#
 ### Idle Rules for Playback
 #
-# Idle Firefox
+# Firefox
 for_window [app_id="firefox"] inhibit_idle fullscreen
-# Idle mpv
+# mpv
 for_window [app_id="mpv"] inhibit_idle fullscreen
-# Audio limit
+# night light
+exec_always "pkill gammastep;gammastep >/dev/null 2>&1"
+# audio limit
 exec wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 80%
 
-### Floating
 #
-# Foot
-for_window [app_id="btop-float"] floating enable
+### floating
+#
 # GTK/Qt-Based Dialogs
 for_window [window_type="dialog"] floating enable
-# Specifically for Obsidian
+# obisidan settings
 for_window [app_id="md.Obsidian" title="^Settings"] floating enable
 # Firefox Library (History, Downloads, Bookmarks etc.)
 for_window [app_id="firefox" title="^Library$"] floating enable
-# Floating Windows for all xdg-dialogs
+# all xdg-dialogs
 for_window [app_id="xdg-desktop-portal-gtk"] floating enable
-# Thunar
-for_window [app_id="thunar"] floating enable
-# Volume Control
+# volume control
 for_window [app_id="org.pulseaudio.pavucontrol"] floating enable
-# mpv Video Player
+# mpv
 for_window [app_id="mpv"] floating enable
-# imv Image Viewer
+# imv
 for_window [app_id="imv"] floating enable
-# Firefox Popup Dialogs
+# Firefox popup dialogs
 for_window [app_id="firefox" title="(?i)(sign in|log in|oauth|authorize)"] floating enable
 # HK: Silksong
 for_window [class="steam_app_1030300"] floating enable
-# Endcord
-for_window [app_id="endcord-float"] floating enable
 # Steam settings
 for_window [class="steam" title="Steam Settings"] floating enable
+# SumatraPDF
+for_window [class="sumatrapdf.exe"] floating enable, move position center
 
-# floating windows use normal border
-for_window [floating] border normal
-
+#
 ### Output configuration
 #
 # more backgrounds are available in /usr/share/backgrounds/sway/
-exec_always swaybg -c '#000000'
+exec_always "pkill swaybg;swaybg -c '#000000' >/dev/null 2>&1"
 
 # window border colors
 # class            border     background    text        indicator     child_border
@@ -73,11 +73,11 @@ exec /usr/bin/gnome-keyring-daemon --start --components=secrets
 default_border pixel 2
 default_floating_border pixel 2
 
-# Mouse focus disabled
+# mouse focus disabled
 focus_follows_mouse no
 
 # gaps
-gaps inner 10
+gaps inner 6
 gaps outer 4
 
 # smart gaps
@@ -106,25 +106,32 @@ output HDMI-A-1 {
     position 1920,0
     scale 1
     max_render_time 6
-    render_bit_depth 8
+    render_bit_depth 10
     scale_filter nearest
     hdr off
 }
 
-### idle configuration
-
+#
+### Idle configuration
+#
 exec swayidle -w \
     timeout 600 'swaylock -f -c 000000' \
     timeout 1800 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
-    before-sleep 'swaylock -f -c 000000' 
-    
+    timeout 10800 'systemctl poweroff' \
+    before-sleep 'swaylock -f -c 000000'
+
+# any Steam game
+for_window [class="^steam_app_"] inhibit_idle visible
+
 # screen lock on lid close
 bindswitch --reload lid:on exec swaylock -f -c 000000
 
 # screen lock
 bindsym $mod+Escape exec swaylock -f -c 000000
 
-### input configuration
+#
+### Input configuration
+#
 
 input type:touchpad {
    dwt enabled
@@ -136,7 +143,6 @@ input type:touchpad {
 
 input type:keyboard {
    xkb_layout "gb"
-   xkb_options caps:escape
    repeat_delay 225
    repeat_rate 65
 }
@@ -145,176 +151,168 @@ input "1008:911:HP,_Inc_HyperX_Alloy_Origins_65" {
   xkb_layout "us"
 }
 
-### Key bindings
+input "1356:3302:Sony_Interactive_Entertainment_DualSense_Wireless_Controller_Touchpad" {
+    events disabled
+}
+
 #
-# Basics:
+### key bindings
 #
-    # Start a terminal
-    bindsym $mod+Return exec $term
 
-    # Kill focused window
-    bindsym $mod+Shift+q kill
+# start foot
+bindsym $mod+Return exec $term
 
-    # Start your launcher
-    bindsym $mod+d exec $menu
+# kill focused window
+bindsym $mod+Shift+q kill
 
-    # Drag floating windows by holding down $mod and left mouse button.
-    # Resize them with right mouse button + $mod.
-    # Despite the name, also works for non-floating windows.
-    # Change normal to inverse to use left mouse button for resizing and right
-    # mouse button for dragging.
-    floating_modifier $mod normal
+# start launcher
+bindsym $mod+d exec $menu
 
-    # Reload the configuration file
-    bindsym $mod+Shift+c reload
+# Drag floating windows by holding down $mod and left mouse button.
+# Resize them with right mouse button + $mod.
+# Despite the name, also works for non-floating windows.
+# Change normal to inverse to use left mouse button for resizing and right mouse button for dragging.
+floating_modifier $mod normal
 
-    # Exit sway (logs you out of your Wayland session)
-    bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
-   
-    # screenshotting
-    bindsym Print exec grim ~/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png
-    bindsym $mod+Print exec grim -g"$(slurp)" ~/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png
-    bindsym $mod+Shift+S exec grim -g"$(slurp)" - | wl-copy --type image/png
+# Reload the configuration file    
+bindsym $mod+Shift+c reload
 
-   # file Managers
-   bindsym $mod+e exec thunar
-   bindsym $mod+f exec foot -e yazi
+# Exit sway (logs you out of your Wayland session)
+bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
 
-   # firefox
-   bindsym $mod+b exec firefox
+# screenshotting
+bindsym Print exec grim ~/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png
+bindsym $mod+Print exec sh -c 'g=$(slurp) && grim -g "$g" ~/Pictures/Screenshots/$(date +'\''%Y-%m-%d_%H-%M-%S'\'').png'
+bindsym $mod+Shift+S exec sh -c 'g=$(slurp) && grim -g "$g" - | wl-copy --type image/png'
+
+# file Managers
+bindsym $mod+e exec thunar
+bindsym $mod+f exec foot -e yazi
+
+# firefox
+bindsym $mod+b exec firefox
+
+# start discord
+bindsym $mod+Shift+p exec gtk-launch discord
+
 #
-# Moving around:
+### Moving around:
 #
-    # Move your focus around
-    bindsym $mod+$left focus left
-    bindsym $mod+$down focus down
-    bindsym $mod+$up focus up
-    bindsym $mod+$right focus right
-    # Or use $mod+[up|down|left|right]
-    bindsym $mod+Left focus left
-    bindsym $mod+Down focus down
-    bindsym $mod+Up focus up
-    bindsym $mod+Right focus right
+# Move your focus around
+bindsym $mod+$left focus left
+bindsym $mod+$down focus down
+bindsym $mod+$up focus up
+bindsym $mod+$right focus right
 
-    # Move the focused window with the same, but add Shift
-    bindsym $mod+Shift+$left move left
-    bindsym $mod+Shift+$down move down
-    bindsym $mod+Shift+$up move up
-    bindsym $mod+Shift+$right move right
-    # Ditto, with arrow keys
-    bindsym $mod+Shift+Left move left
-    bindsym $mod+Shift+Down move down
-    bindsym $mod+Shift+Up move up
-    bindsym $mod+Shift+Right move right
+# Or use $mod+[up|down|left|right]
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
+# Move the focused window with the same, but add Shift
+bindsym $mod+Shift+$left move left
+bindsym $mod+Shift+$down move down
+bindsym $mod+Shift+$up move up
+bindsym $mod+Shift+$right move right
+
+# Ditto, with arrow keys
+bindsym $mod+Shift+Left move left
+bindsym $mod+Shift+Down move down
+bindsym $mod+Shift+Up move up
+bindsym $mod+Shift+Right move right
+
 #
-# Workspaces:
+### Workspaces:
 #
-#    Switch to workspace
 
-    bindsym $mod+1 workspace number 1
-    bindsym $mod+2 workspace number 2
-#    bindsym $mod+3 workspace number 3
-#    bindsym $mod+4 workspace number 4
-#    bindsym $mod+5 workspace number 5
-#    bindsym $mod+6 workspace number 6
-#    bindsym $mod+7 workspace number 7
-#    bindsym $mod+8 workspace number 8
-#    bindsym $mod+9 workspace number 9
-#    bindsym $mod+0 workspace number 10
+# Switch to workspace
+bindsym $mod+1 workspace number 1
+bindsym $mod+2 workspace number 2
 
-#    Move focused container to workspace
+# Move focused container to workspace
+bindsym $mod+Shift+1 move container to workspace number 1
+bindsym $mod+Shift+2 move container to workspace number 2
 
-#    bindsym $mod+Shift+1 move container to workspace number 1
-#    bindsym $mod+Shift+2 move container to workspace number 2
-#    bindsym $mod+Shift+3 move container to workspace number 3
-#    bindsym $mod+Shift+4 move container to workspace number 4
-#    bindsym $mod+Shift+5 move container to workspace number 5
-#    bindsym $mod+Shift+6 move container to workspace number 6
-#    bindsym $mod+Shift+7 move container to workspace number 7
-#    bindsym $mod+Shift+8 move container to workspace number 8
-#    bindsym $mod+Shift+9 move container to workspace number 9
-#    bindsym $mod+Shift+0 move container to workspace number 10
 #
+### Layout stuff:
 #
-# Layout stuff:
 
-    # Make the current focus fullscreen
-    bindsym $mod+shift+f fullscreen
+# Make the current focus fullscreen
+bindsym $mod+shift+f fullscreen
 
-    # Toggle the current focus between tiling and floating mode
-    bindsym $mod+Shift+space floating toggle
+# Toggle the current focus between tiling and floating mode
+bindsym $mod+Shift+space floating toggle
 
-    # Swap focus between the tiling area and the floating area
-    bindsym $mod+space focus mode_toggle
+# Swap focus between the tiling area and the floating area
+bindsym $mod+space focus mode_toggle
 
-    # Move focus to the parent container
-    bindsym $mod+a focus parent
+# Move focus to the parent container
+bindsym $mod+a focus parent
+
 #
-# Scratchpad:
+### Scratchpad:
 #
-    # Sway has a "scratchpad", which is a bag of holding for windows.
-    # You can send windows there and get them back later.
+# Sway has a "scratchpad", which is a bag of holding for windows.
+# You can send windows there and get them back later.
 
-    # Move the currently focused window to the scratchpad
-#    bindsym $mod+Shift+minus move scratchpad
+# Move the currently focused window to the scratchpad
+# bindsym $mod+Shift+minus move scratchpad
 
-    # Show the next scratchpad window or hide the focused scratchpad window.
-    # If there are multiple scratchpad windows, this command cycles through them.
-#    bindsym $mod+minus scratchpad show
+# Show the next scratchpad window or hide the focused scratchpad window.
+# If there are multiple scratchpad windows, this command cycles through them.
+# bindsym $mod+minus scratchpad show
+
 #
-# Resizing containers:
+### Resizing containers:
 #
 mode "resize" {
-    # left will shrink the containers width
-    # right will grow the containers width
-    # up will shrink the containers height
-    # down will grow the containers height
-    bindsym $left resize shrink width 10px
-    bindsym $down resize grow height 10px
-    bindsym $up resize shrink height 10px
-    bindsym $right resize grow width 10px
+	# left will shrink the containers width
+	# right will grow the containers width
+	# up will shrink the containers height
+	# down will grow the containers height
+	bindsym $left resize shrink width 10px
+	bindsym $down resize grow height 10px
+	bindsym $up resize shrink height 10px
+	bindsym $right resize grow width 10px
 
-    # Ditto, with arrow keys
-    bindsym Left resize shrink width 10px
-    bindsym Down resize grow height 10px
-    bindsym Up resize shrink height 10px
-    bindsym Right resize grow width 10px
+	# Ditto, with arrow keys
+	bindsym Left resize shrink width 10px
+	bindsym Down resize grow height 10px
+	bindsym Up resize shrink height 10px
+	bindsym Right resize grow width 10px
 
-    # Return to default mode
-    bindsym Return mode "default"
-    bindsym Escape mode "default"
+	# Return to default mode
+	bindsym Return mode "default"
+	bindsym Escape mode "default"
 }
+
 bindsym $mod+r mode "resize"
+
 #
-# Utilities:
+### Utilities:
 #
-    # Special keys to adjust volume via PulseAudio
-    bindsym --locked XF86AudioMute exec pactl set-sink-mute \@DEFAULT_SINK@ toggle
-    bindsym --locked XF86AudioLowerVolume exec pactl set-sink-volume \@DEFAULT_SINK@ -5%
-    bindsym --locked XF86AudioRaiseVolume exec pactl set-sink-volume \@DEFAULT_SINK@ +5%
-    bindsym --locked XF86AudioMicMute exec pactl set-source-mute \@DEFAULT_SOURCE@ toggle
+# special keys to adjust volume via PulseAudio
+bindsym --locked XF86AudioMute exec pactl set-sink-mute \@DEFAULT_SINK@ toggle
+bindsym --locked XF86AudioLowerVolume exec pactl set-sink-volume \@DEFAULT_SINK@ -5%
+bindsym --locked XF86AudioRaiseVolume exec pactl set-sink-volume \@DEFAULT_SINK@ +5%
+bindsym --locked XF86AudioMicMute exec pactl set-source-mute \@DEFAULT_SOURCE@ toggle
 
-    # Special keys to control media via playerctl
-    bindsym --locked XF86AudioPlay exec playerctl play-pause
-    bindsym --locked XF86AudioPause exec playerctl play-pause
-    bindsym --locked XF86AudioPrev exec playerctl previous
-    bindsym --locked XF86AudioNext exec playerctl next
-    bindsym --locked XF86AudioStop exec playerctl stop
+# special keys to control media via playerctl
+bindsym --locked XF86AudioPlay exec playerctl play-pause
+bindsym --locked XF86AudioPause exec playerctl play-pause
+bindsym --locked XF86AudioPrev exec playerctl previous
+bindsym --locked XF86AudioNext exec playerctl next
+bindsym --locked XF86AudioStop exec playerctl stop
 
-    # Special keys to adjust brightness via brightnessctl
-    bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
-    bindsym --locked XF86MonBrightnessUp exec brightnessctl set 5%+
+# special keys to adjust brightness via brightnessctl
+bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-
+bindsym --locked XF86MonBrightnessUp exec brightnessctl set 5%+
 
-### Waybar
-
-exec_always "pkill waybar;waybar"
-
-### Notifications
-
-exec_always "pkill swaync;swaync"
+### notifications if needed
+# exec_always "pkill swaync;swaync"
 
 ### GUI Prompts
-
 exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1
 
 include /etc/sway/config.d/*

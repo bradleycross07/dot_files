@@ -4,5 +4,10 @@
 
 [[ -f ~/.bashrc ]] && . ~/.bashrc
 
+if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
+    exec sway
+fi
+
 export PATH=$PATH:/home/Bradley/.spicetify
-export WLR_RENDERER=vulkan
+export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=lcd -Dswing.aatext=true'
+# export WLR_RENDERER=vulkan
