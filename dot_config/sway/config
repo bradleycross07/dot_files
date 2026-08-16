@@ -92,21 +92,21 @@ seat seat0 xcursor_theme "Bibata-Modern-Classic" 24
 # laptop Monitor
 output eDP-1 {
     resolution 1920x1080@60Hz
-    scale 1.5
+    scale 1
     adaptive_sync off
-    max_render_time 6
+    max_render_time off
     render_bit_depth 8
     scale_filter nearest
 }
 
 # OLED second monitor
 output HDMI-A-1 {
-    resolution 1920x1080@120Hz
+    mode 1920x1080@240.001Hz
     adaptive_sync off
     position 1920,0
     scale 1
-    max_render_time 6
-    render_bit_depth 10
+    max_render_time off
+    render_bit_depth 8
     scale_filter nearest
     hdr off
 }
