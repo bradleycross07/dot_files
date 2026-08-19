@@ -41,3 +41,4 @@ alias syctl='sudo sysctl'
 
 # sway reload & clear
 alias sreload='swaymsg reload; sleep 1; clear; sleep 2; clear'
+export _JAVA_AWT_WM_NONREPARENTING=1

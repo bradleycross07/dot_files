@@ -1,4 +1,22 @@
 /* custom colours - pompompurin/coffee brown */
+@define-color theme_selected_bg_color #A0785A;
+@define-color theme_selected_fg_color #F5E6CA;
+
+/* force selection colors specifically in list/tree views*/
+treeview.view:selected,
+treeview.view row:selected,
+treeview.view row:selected:focus,
+row:selected {
+    background-color: #A0785A;
+    color: #F5E6CA;
+}
+
+/* fix secondary/dimmed text (size, date columns) */
+row:selected .dim-label,
+treeview.view:selected .dim-label {
+    color: #F5E6CA;
+    opacity: 1;
+}
 
 *:selected {
     background-color: #A0785A;
@@ -29,13 +47,13 @@ scrollbar slider {
 }
 
 scrollbar slider:hover {
-    background-color: #F0C242;
+    background-color: #2b1a0f;
 }
 
 /* focus outline */
 entry:focus,
 button:focus {
-    border-color: #F0C242;
+    border-color: #2b1a0f;
 }
 
 /* when checkboxes/radio buttons are checked */
@@ -67,12 +85,12 @@ radio:focus {
 /* any hyperlinks */
 *.link,
 a {
-    color: #F0C242;
+    color: #2b1a0f;
 }
 
 /* progress bars */
 progressbar progress {
-    background-image: linear-gradient(to right, #A0785A, #F0C242);
+    background-image: linear-gradient(to right, #A0785A, #2b1a0f);
 }
 
 /* switches when checked */
