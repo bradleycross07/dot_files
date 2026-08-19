@@ -1,6 +1,6 @@
 * {
     font-family: DepartureMono Nerd Font Mono;
-    /* font-size: 11px; */
+    /* font-size: 22px; */
     min-height: 0;
 }
 
@@ -27,7 +27,7 @@ button:hover {
 /* Workspaces */
 #workspaces button {
     padding: 0 10px;
-    font-size: 14px;
+    font-size: 11px;
     background-color: transparent;
     color: #A0785A;
     border-bottom: 2px solid transparent;
@@ -60,17 +60,17 @@ button:hover {
 #memory,
 #tray,
 #temperature {
-    padding: 0 10px;
-    margin: 4px 2px;
+    padding: 0 8px;
+    margin: 2px 2px;
     background-color: #0d0d0d;
-    font-size: 14px;
-    border-radius: 6px;
+    font-size: 11px;
+    border-radius: 3px;
 }
 
 /* Center Window Title */
 #window {
     color: #F5E6CA;
-    font-size: 18px;
+    font-size: 22px;
 }
 
 #cpu,
@@ -101,7 +101,7 @@ button:hover {
 
 #battery.charging, #battery.plugged {
    color: #ffffff;
-   background-color: #26A65B;
+   /* background-color: #26A65B; */
 }
 
 @keyframes blink {
@@ -128,7 +128,7 @@ label:focus {
 
 #network,
 #network.disconnected {
-   font-size: 14px;
+   font-size: 11px;
 }
 
 #network {

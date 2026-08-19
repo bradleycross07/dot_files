@@ -47,6 +47,8 @@ for_window [app_id="imv"] floating enable
 for_window [app_id="firefox" title="(?i)(sign in|log in|oauth|authorize)"] floating enable
 # HK: Silksong
 for_window [class="steam_app_1030300"] floating enable
+# HK
+for_window [title="Hollow Knight"] floating enable
 # Steam settings
 for_window [class="steam" title="Steam Settings"] floating enable
 # SumatraPDF
@@ -92,7 +94,7 @@ seat seat0 xcursor_theme "Bibata-Modern-Classic" 24
 # laptop Monitor
 output eDP-1 {
     resolution 1920x1080@60Hz
-    scale 1
+    scale 1.5
     adaptive_sync off
     max_render_time off
     render_bit_depth 8
@@ -101,12 +103,12 @@ output eDP-1 {
 
 # OLED second monitor
 output HDMI-A-1 {
-    mode 1920x1080@240.001Hz
+    mode 2560x1440@144Hz
     adaptive_sync off
-    position 1920,0
+    position 2560,360
     scale 1
     max_render_time off
-    render_bit_depth 8
+    render_bit_depth 10
     scale_filter nearest
     hdr off
 }
@@ -120,8 +122,11 @@ exec swayidle -w \
     timeout 10800 'systemctl poweroff' \
     before-sleep 'swaylock -f -c 000000'
 
-# any Steam game
+# any steam game
 for_window [class="^steam_app_"] inhibit_idle visible
+
+# hk & silksong
+for_window [title="(?i)(hollow knight|silksong)"] inhibit_idle open
 
 # screen lock on lid close
 bindswitch --reload lid:on exec swaylock -f -c 000000
