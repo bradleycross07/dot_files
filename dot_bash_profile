@@ -8,5 +8,14 @@ if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
     exec sway
 fi
 
+# PATH
 export PATH=$PATH:/home/Bradley/.spicetify
-export _JAVA_OPTIONS='-Dawt.useSystemAAFontSettings=gasp -Dswing.aatext=true'
+
+# default applications
+export EDITOR='nvim'
+export VISUAL='nvim'
+export BROWSER=firefox
+
+# java font rendering
+export _java_options='-dawt.usesystemaafontsettings=gasp -dswing.aatext=true'
+export _JAVA_AWT_WM_NONREPARENTING=1

@@ -1,0 +1,25 @@
+#!/bin/bash
+# scx_loader hash: {{ include "dot_config/system-configs/scx_loader-config.toml" | sha256sum }}
+# swappiness hash: {{ include "dot_config/system-configs/99-zram-swappiness.conf" | sha256sum }}
+# zram-generator hash: {{ include "dot_config/system-configs/zram-generator.conf" | sha256sum }}
+# journald hash: {{ include "dot_config/system-configs/journald-size.conf" | sha256sum }}
+set -euo pipefail
+
+echo "deploying system tuning configs"
+
+sudo mkdir -p /etc/scx_loader
+sudo cp "{{ .chezmoi.sourceDir }}/dot_config/system-configs/scx_loader-config.toml" /etc/scx_loader/config.toml
+
+sudo cp "{{ .chezmoi.sourceDir }}/dot_config/system-configs/99-zram-swappiness.conf" /etc/sysctl.d/99-zram-swappiness.conf
+
+sudo cp "{{ .chezmoi.sourceDir }}/dot_config/system-configs/zram-generator.conf" /etc/systemd/zram-generator.conf
+
+sudo mkdir -p /etc/systemd/journald.conf.d
+sudo cp "{{ .chezmoi.sourceDir }}/dot_config/system-configs/journald-size.conf" /etc/systemd/journald.conf.d/size.conf
+
+sudo sysctl --system
+sudo systemctl daemon-reload
+sudo systemctl restart systemd-journald
+sudo systemctl restart scx_loader
+
+echo "system tuning configs applied"
