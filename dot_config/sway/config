@@ -13,6 +13,10 @@ set $term foot
 set $menu fuzzel
 # Start waybar service
 exec systemctl --user start waybar.service
+# Toggle waybar
+bindsym $mod+ctrl+shift+b exec killall -SIGUSR1 waybar
+# Start easyffects service
+exec sh -c 'pgrep -x easyeffects || easyeffects --gapplication-service'
 
 #
 ### Idle Rules for Playback
@@ -49,8 +53,12 @@ for_window [app_id="firefox" title="(?i)(sign in|log in|oauth|authorize)"] float
 for_window [class="steam_app_1030300"] floating enable
 # HK
 for_window [title="Hollow Knight"] floating enable
+# Wallpaper Engine
+for_window [class="steam_app_431960"] floating enable
 # Steam settings
 for_window [class="steam" title="Steam Settings"] floating enable
+# qBitTorrent
+for_window [app_id="org.qbittorrent.qBittorrent"] floating enable
 # SumatraPDF
 for_window [class="sumatrapdf.exe"] floating enable, move position center
 
@@ -79,8 +87,8 @@ default_floating_border pixel 2
 focus_follows_mouse no
 
 # gaps
-gaps inner 6
-gaps outer 4
+gaps inner 3
+gaps outer 3
 
 # smart gaps
 smart_gaps on
@@ -93,8 +101,9 @@ seat seat0 xcursor_theme "Bibata-Modern-Classic" 24
 
 # laptop Monitor
 output eDP-1 {
-    resolution 1920x1080@60Hz
-    scale 1.5
+    mode 1920x1080@60Hz
+    scale 1
+    position 1920,0
     adaptive_sync off
     max_render_time off
     render_bit_depth 8
@@ -103,9 +112,9 @@ output eDP-1 {
 
 # OLED second monitor
 output HDMI-A-1 {
-    mode 2560x1440@144Hz
+    mode 1920x1080@240Hz
     adaptive_sync off
-    position 2560,360
+    position 0,0
     scale 1
     max_render_time off
     render_bit_depth 10
@@ -234,10 +243,17 @@ bindsym $mod+Shift+Right move right
 # Switch to workspace
 bindsym $mod+1 workspace number 1
 bindsym $mod+2 workspace number 2
+bindsym $mod+3 workspace number 3
+bindsym $mod+4 workspace number 4
+bindsym $mod+5 workspace number 5
+
 
 # Move focused container to workspace
 bindsym $mod+Shift+1 move container to workspace number 1
 bindsym $mod+Shift+2 move container to workspace number 2
+bindsym $mod+Shift+3 move container to workspace number 3
+bindsym $mod+Shift+4 move container to workspace number 4
+bindsym $mod+Shift+5 move container to workspace number 5
 
 #
 ### Layout stuff:

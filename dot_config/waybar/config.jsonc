@@ -3,9 +3,9 @@
     // "layer": "top", // Waybar at top layer
     // "position": "bottom", // Waybar position (top|bottom|left|right)
     "height": 36, // Waybar height
-    "margin-top": 6,
-    "spacing": 6, // Gaps between modules
-
+    "margin-top": 0,
+    "spacing": 8, // Gaps between modules
+    "on-sigusr1": "toggle",
     "modules-left": [
         "sway/workspaces"
     ],
