@@ -21,7 +21,6 @@ alias la='eza -la --icons --group-directories-first'
 alias lt='eza --tree --icons --level=2'
 
 # outputs
-alias ls='ls --color=auto'
 alias grep='grep --color=auto'
 
 # editor
@@ -32,3 +31,7 @@ alias yay='yay --noconfirm'
 
 # fastfetch
 alias ff='fastfetch'
+
+# torrent searching
+alias torrents-on='sudo systemctl start jackett flaresolverr'
+alias torrents-off='sudo systemctl stop jackett flaresolverr'

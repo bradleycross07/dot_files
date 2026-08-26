@@ -101,23 +101,29 @@ seat seat0 xcursor_theme "Bibata-Modern-Classic" 24
 
 # laptop Monitor
 output eDP-1 {
-    mode 1920x1080@60Hz
+    modeline 133.32 1920 1928 1960 2000 1080 1097 1105 1111 +hsync -vsync
     scale 1
-    position 1920,0
+    position 2560,0
     adaptive_sync off
     max_render_time off
     render_bit_depth 8
     scale_filter nearest
+    hdr off
 }
 
 # OLED second monitor
 output HDMI-A-1 {
-    mode 1920x1080@240Hz
-    adaptive_sync off
-    position 0,0
+    modeline 586.586 2560 2568 2600 2640 1440 1529 1537 1543 +hsync -vsync
+    # 1440p @ 144hz (CVT-RBv2)
+    #modeline 583.20 1920 1928 1960 2000 1080 1201 1209 1215 +hsync -vsync
+    # 1080p @ 240hz (CVT-RBv2)
+    #modeline 422.524 1280 1288 1320 1360 720 849 857 863 +hsync -vsync
+    # 720p @ 360hz (CVT-RBv2)
     scale 1
+    position 0,0
+    adaptive_sync off
     max_render_time off
-    render_bit_depth 10
+    render_bit_depth 8
     scale_filter nearest
     hdr off
 }
