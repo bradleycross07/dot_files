@@ -1,0 +1,5 @@
+font_family JetBrainsMono NerdFont
+bold_font JetBrainsMono NerdFont Bold
+italic_font JetBrainsMono NerdFont Italic
+bold_italic_font JetBrainsMono NerdFont Bold Italic
+font_size 12.0
