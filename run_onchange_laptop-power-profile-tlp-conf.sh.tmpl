@@ -1,8 +1,0 @@
-#!/bin/bash
-# tlp.conf hash: {{ include "dot_config/system-configs/tlp.conf" | sha256sum }}
-set -euo pipefail
-
-echo "copying config to /etc/tlp.conf"
-sudo cp "{{ .chezmoi.sourceDir }}/dot_config/system-configs/tlp.conf" /etc/tlp.conf
-sudo systemctl restart tlp
-echo "laptop profile config applied and the service restarted"
