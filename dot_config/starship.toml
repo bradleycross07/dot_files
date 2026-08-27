@@ -50,7 +50,7 @@ style = "bg:#6F4E37"
 disabled = true # Disabled by default
 
 [directory]
-style = "bg:#D9A62E fg:#6F4E37"
+style = "bg:#D9A62E fg:#1A1108"
 format = "[ $path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
@@ -95,11 +95,11 @@ format = '[ $symbol ($version) ]($style)'
 
 [git_branch]
 symbol = ""
-style = "bg:#EAD9B8"
+style = "bg:#EAD9B8 fg:#1A1108"
 format = '[ $symbol $branch ]($style)'
 
 [git_status]
-style = "bg:#EAD9B8"
+style = "bg:#EAD9B8 fg:#1A1108"
 format = '[$all_status$ahead_behind ]($style)'
 
 [golang]

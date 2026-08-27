@@ -1,0 +1,1768 @@
+[1mdiff --git a/.config/Vencord b/.config/Vencord
+new file mode 40755
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+--- /dev/null
++++ b/.config/Vencord[m
+[1mdiff --git a/.config/Vencord/settings b/.config/Vencord/settings
+new file mode 40755
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+--- /dev/null
++++ b/.config/Vencord/settings[m
+[1mdiff --git a/.config/Vencord/settings/quickCss.css b/.config/Vencord/settings/quickCss.css
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+--- /dev/null
++++ b/.config/Vencord/settings/quickCss.css[m
+[1mdiff --git a/.config/Vencord/settings/settings.json b/.config/Vencord/settings/settings.json
+new file mode 100644
+index 0000000000000000000000000000000000000000..ea79196abe374ae3ba7c157f49aea7c9b88eab5d
+--- /dev/null
++++ b/.config/Vencord/settings/settings.json[m
+[36m@@ -0,0 +1,632 @@[m
+[32m+{[m
+[32m+    "autoUpdate": true,[m
+[32m+    "autoUpdateNotification": true,[m
+[32m+    "useQuickCss": false,[m
+[32m+    "themeLinks": [],[m
+[32m+    "eagerPatches": false,[m
+[32m+    "enabledThemes": [],[m
+[32m+    "enableReactDevtools": false,[m
+[32m+    "frameless": false,[m
+[32m+    "transparent": false,[m
+[32m+    "winCtrlQ": false,[m
+[32m+    "windowsMaterial": "none",[m
+[32m+    "disableMinSize": false,[m
+[32m+    "winNativeTitleBar": false,[m
+[32m+    "plugins": {[m
+[32m+        "ChatInputButtonAPI": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "CommandsAPI": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "DynamicImageModalAPI": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "MemberListDecoratorsAPI": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "MessageAccessoriesAPI": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "MessageDecorationsAPI": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "MessageEventsAPI": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "MessagePopoverAPI": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "MessageUpdaterAPI": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ServerListAPI": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "UserSettingsAPI": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "AccountPanelServerProfile": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "AlwaysAnimate": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "AlwaysExpandRoles": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "AlwaysTrust": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "AnonymiseFileNames": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "AppleMusicRichPresence": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "AutoDNDWhilePlaying": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "BetterFolders": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "BetterGifAltText": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "BetterGifPicker": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "BetterNotesBox": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "BetterRoleContext": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "BetterRoleDot": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "BetterSessions": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "BetterSettings": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "BetterUploadButton": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "BiggerStreamPreview": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "BlurNSFW": {[m
+[32m+            "enabled": true,[m
+[32m+            "blurAmount": 10[m
+[32m+        },[m
+[32m+        "CallTimer": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ClearURLs": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "ClientTheme": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ColorSighted": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ConsoleJanitor": {[m
+[32m+            "enabled": true,[m
+[32m+            "disableLoggers": false,[m
+[32m+            "disableSpotifyLogger": true,[m
+[32m+            "whitelistedLoggers": "GatewaySocket; Routing/Utils"[m
+[32m+        },[m
+[32m+        "ConsoleShortcuts": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "CopyEmojiMarkdown": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "CopyFileContents": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "CopyStickerLinks": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "CopyUserURLs": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "CrashHandler": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "CtrlEnterSend": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "CustomCommands": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "CustomIdle": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "CustomRPC": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "Dearrow": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "Decor": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "DisableCallIdle": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "DontRoundMyTimestamps": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "Experiments": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ExpressionCloner": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "F8Break": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "FakeNitro": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "FakeProfileThemes": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "FavoriteEmojiFirst": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "FavoriteGifSearch": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "FixCodeblockGap": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "FixImagesQuality": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "FixSpotifyEmbeds": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "FixYoutubeEmbeds": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "ForceOwnerCrown": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "FriendInvites": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "FriendsSince": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "FullSearchContext": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "FullUserInChatbox": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "GameActivityToggle": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "GifPaste": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "GreetStickerPicker": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "HideMedia": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "iLoveSpam": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "IgnoreActivities": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ImageFilename": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ImageLink": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ImageZoom": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ImplicitRelationships": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "IrcColors": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "KeepCurrentChannel": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "LoadingQuotes": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "MemberCount": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "MentionAvatars": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "MessageClickActions": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "MessageLatency": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "MessageLinkEmbeds": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "MessageLogger": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "MoreQuickReactions": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "MutualGroupDMs": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "NewGuildSettings": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "NoBlockedMessages": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "NoDefaultHangStatus": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "NoDevtoolsWarning": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "NoF1": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "NoMaskedUrlPaste": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "NoMosaic": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "NoOnboardingDelay": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "NoPendingCount": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "NoProfileThemes": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "NoReplyMention": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "NoServerEmojis": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "NoSystemBadge": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "NoTypingAnimation": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "NoUnblockToJump": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "NotificationVolume": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "OnePingPerDM": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "oneko": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "OpenInApp": {[m
+[32m+            "enabled": false,[m
+[32m+            "spotify": true,[m
+[32m+            "steam": true,[m
+[32m+            "epic": true,[m
+[32m+            "tidal": true,[m
+[32m+            "itunes": true[m
+[32m+        },[m
+[32m+        "OverrideForumDefaults": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "PauseInvitesForever": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "PermissionFreeWill": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "PermissionsViewer": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "petpet": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "PictureInPicture": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "PinDMs": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "PlainFolderIcon": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "PlatformIndicators": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "PreviewMessage": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "QuickMention": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "QuickReply": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ReactErrorDecoder": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "ReadAllNotificationsButton": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "RelationshipNotifier": {[m
+[32m+            "enabled": true,[m
+[32m+            "offlineRemovals": true,[m
+[32m+            "groups": true,[m
+[32m+            "servers": true,[m
+[32m+            "friends": true,[m
+[32m+            "friendRequestCancels": true[m
+[32m+        },[m
+[32m+        "ReplaceGoogleSearch": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ReplyTimestamp": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "RevealAllSpoilers": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ReverseImageSearch": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ReviewDB": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "RoleColorEverywhere": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "SecretRingToneEnabler": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "Summaries": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "SendTimestamps": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ServerInfo": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ServerListIndicators": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ShikiCodeblocks": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ShowAllMessageButtons": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ShowConnections": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ShowHiddenChannels": {[m
+[32m+            "enabled": false,[m
+[32m+            "showMode": 0,[m
+[32m+            "hideUnreads": true,[m
+[32m+            "defaultAllowedUsersAndRolesDropdownState": true[m
+[32m+        },[m
+[32m+        "ShowHiddenThings": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ShowMeYourName": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ShowTimeoutDuration": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "SilentMessageToggle": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "SilentTyping": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "SortFriendRequests": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "SpotifyControls": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "SpotifyCrack": {[m
+[32m+            "enabled": true,[m
+[32m+            "noSpotifyAutoPause": true,[m
+[32m+            "keepSpotifyActivityOnIdle": true[m
+[32m+        },[m
+[32m+        "SpotifyShareCommands": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "StartupTimings": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "StickerPaste": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "StreamerModeOnStream": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "SuperReactionTweaks": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "TextReplace": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ThemeAttributes": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "Translate": {[m
+[32m+            "enabled": true,[m
+[32m+            "autoTranslate": false,[m
+[32m+            "service": "google",[m
+[32m+            "showAutoTranslateTooltip": true,[m
+[32m+            "receivedInput": "auto",[m
+[32m+            "receivedOutput": "en",[m
+[32m+            "sentInput": "auto",[m
+[32m+            "sentOutput": "en"[m
+[32m+        },[m
+[32m+        "TypingIndicator": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "TypingTweaks": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "Unindent": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "UnlockedAvatarZoom": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "UnsuppressEmbeds": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "UserMessagesPronouns": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "UserVoiceShow": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "USRBG": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ValidReply": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "ValidUser": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "VoiceChatDoubleClick": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "VcNarrator": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "VencordToolbox": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ViewIcons": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ViewRaw": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "VoiceDownload": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "VoiceMessages": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "VolumeBooster": {[m
+[32m+            "enabled": true,[m
+[32m+            "multiplier": 2[m
+[32m+        },[m
+[32m+        "WhoReacted": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "XSOverlay": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "YoutubeAdblock": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "BadgeAPI": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "NoTrack": {[m
+[32m+            "enabled": true,[m
+[32m+            "disableAnalytics": true[m
+[32m+        },[m
+[32m+        "Settings": {[m
+[32m+            "enabled": true,[m
+[32m+            "settingsLocation": "top",[m
+[32m+            "includeVencordInfoWhenCopying": true[m
+[32m+        },[m
+[32m+        "SupportHelper": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "CharacterCounter": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "NoMiddleClickPaste": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "ConcatenatedComponentExtractor": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "MusicRichPresence": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "TenorGifSearch": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "ContextMenuAPI": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "NoticesAPI": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "WebRichPresence (arRPC)": {[m
+[32m+            "enabled": false[m
+[32m+        },[m
+[32m+        "WebKeybinds": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "WebScreenShareFixes": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "DisableDeepLinks": {[m
+[32m+            "enabled": true[m
+[32m+        },[m
+[32m+        "WebContextMenus": {[m
+[32m+            "enabled": true[m
+[32m+        }[m
+[32m+    },[m
+[32m+    "uiElements": {[m
+[32m+        "chatBarButtons": {[m
+[32m+            "Translate": {[m
+[32m+                "enabled": false[m
+[32m+            }[m
+[32m+        },[m
+[32m+        "messagePopoverButtons": {[m
+[32m+            "Translate": {[m
+[32m+                "enabled": false[m
+[32m+            }[m
+[32m+        }[m
+[32m+    },[m
+[32m+    "notifications": {[m
+[32m+        "timeout": 5000,[m
+[32m+        "position": "bottom-right",[m
+[32m+        "useNative": "not-focused",[m
+[32m+        "logLimit": 50[m
+[32m+    },[m
+[32m+    "cloud": {[m
+[32m+        "authenticated": true,[m
+[32m+        "url": "https://api.vencord.dev/",[m
+[32m+        "settingsSync": true,[m
+[32m+        "settingsSyncVersion": 1787599064454[m
+[32m+    }[m
+[32m+}
+\ No newline at end of file[m
+[1mdiff --git a/.config/fontconfig/fonts.conf b/.config/fontconfig/fonts.conf
+new file mode 100644
+index 0000000000000000000000000000000000000000..76302aafcc6be92a061a459289c185cc7e9d463b
+--- /dev/null
++++ b/.config/fontconfig/fonts.conf[m
+[36m@@ -0,0 +1,18 @@[m
+[32m+<?xml version="1.0"?>[m
+[32m+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">[m
+[32m+<fontconfig>[m
+[32m+<match target="font">[m
+[32m+  <test name="family">[m
+[32m+    <string>DepartureMono Nerd Font Mono</string>[m
+[32m+  </test>[m
+[32m+    <edit name="hintstyle" mode="assign">[m
+[32m+    <const>hintmedium</const>[m
+[32m+  </edit>[m
+[32m+  <edit name="autohint" mode="assign">[m
+[32m+    <bool>false</bool>[m
+[32m+  </edit>[m
+[32m+  <edit name="antialias" mode="assign">[m
+[32m+    <bool>true</bool>[m
+[32m+  </edit>[m
+[32m+</match>[m
+[32m+</fontconfig>[m
+[1mdiff --git a/.config/foot b/.config/foot
+new file mode 40755
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+--- /dev/null
++++ b/.config/foot[m
+[1mdiff --git a/.config/foot/foot.ini b/.config/foot/foot.ini
+new file mode 100644
+index 0000000000000000000000000000000000000000..0575612a7935002cb7f23f868f6cba23e9fc2789
+--- /dev/null
++++ b/.config/foot/foot.ini[m
+[36m@@ -0,0 +1,40 @@[m
+[32m+[main][m
+[32m+font=DepartureMono Nerd Font:size=11[m
+[32m+pad=8x8[m
+[32m+dpi-aware=yes[m
+[32m+[m
+[32m+[colors-dark][m
+[32m+alpha=1[m
+[32m+background=000000[m
+[32m+foreground=F5E6CA[m
+[32m+[m
+[32m+regular0=1A140F[m
+[32m+regular1=E06C75[m
+[32m+regular2=98C379[m
+[32m+regular3=F0C242[m
+[32m+regular4=6B8CAE[m
+[32m+regular5=B48EAD[m
+[32m+regular6=7FB4B4[m
+[32m+regular7=F5E6CA[m
+[32m+[m
+[32m+bright0=4A3B2E[m
+[32m+bright1=E88B92[m
+[32m+bright2=A8D48A[m
+[32m+bright3=F5D066[m
+[32m+bright4=8FA8C2[m
+[32m+bright5=C9A8C2[m
+[32m+bright6=9FC8C8[m
+[32m+bright7=FBF3E4[m
+[32m+[m
+[32m+[cursor][m
+[32m+style=block[m
+[32m+blink=yes[m
+[32m+[m
+[32m+[scrollback][m
+[32m+lines=10000[m
+[32m+[m
+[32m+[mouse][m
+[32m+hide-when-typing=yes[m
+[32m+[m
+[32m+[mouse-bindings][m
+[32m+primary-paste=none[m
+[1mdiff --git a/.config/gtk-3.0 b/.config/gtk-3.0
+old mode 40755
+new mode 40700[m
+[1mdiff --git a/.config/gtk-3.0/gtk.css b/.config/gtk-3.0/gtk.css
+new file mode 100644
+index 0000000000000000000000000000000000000000..1173708d71fbc11995425b0e5eef8b36f4846fbb
+--- /dev/null
++++ b/.config/gtk-3.0/gtk.css[m
+[36m@@ -0,0 +1,99 @@[m
+[32m+/* custom colours - pompompurin/coffee brown */[m
+[32m+@define-color theme_selected_bg_color #A0785A;[m
+[32m+@define-color theme_selected_fg_color #F5E6CA;[m
+[32m+[m
+[32m+/* force selection colors specifically in list/tree views*/[m
+[32m+treeview.view:selected,[m
+[32m+treeview.view row:selected,[m
+[32m+treeview.view row:selected:focus,[m
+[32m+row:selected {[m
+[32m+    background-color: #A0785A;[m
+[32m+    color: #F5E6CA;[m
+[32m+}[m
+[32m+[m
+[32m+/* fix secondary/dimmed text (size, date columns) */[m
+[32m+row:selected .dim-label,[m
+[32m+treeview.view:selected .dim-label {[m
+[32m+    color: #F5E6CA;[m
+[32m+    opacity: 1;[m
+[32m+}[m
+[32m+[m
+[32m+*:selected {[m
+[32m+    background-color: #A0785A;[m
+[32m+    color: #F5E6CA;[m
+[32m+}[m
+[32m+[m
+[32m+/* selection when window loses focus */[m
+[32m+*:selected:backdrop {[m
+[32m+    background-color: shade(#A0785A, 0.6);[m
+[32m+    color: #F5E6CA;[m
+[32m+}[m
+[32m+[m
+[32m+/* button hover/active*/[m
+[32m+button:hover {[m
+[32m+    background-color: shade(#A0785A, 0.4);[m
+[32m+}[m
+[32m+[m
+[32m+button:active,[m
+[32m+button:checked {[m
+[32m+    background-color: #A0785A;[m
+[32m+    color: #F5E6CA;[m
+[32m+}[m
+[32m+[m
+[32m+/* scrollbar*/[m
+[32m+scrollbar slider {[m
+[32m+    background-color: #A0785A;[m
+[32m+    border-radius: 6px;[m
+[32m+}[m
+[32m+[m
+[32m+scrollbar slider:hover {[m
+[32m+    background-color: #2b1a0f;[m
+[32m+}[m
+[32m+[m
+[32m+/* focus outline */[m
+[32m+entry:focus,[m
+[32m+button:focus {[m
+[32m+    border-color: #2b1a0f;[m
+[32m+}[m
+[32m+[m
+[32m+/* when checkboxes/radio buttons are checked */[m
+[32m+check:checked,[m
+[32m+radio:checked {[m
+[32m+    background-color: transparent;[m
+[32m+    border-color: #A0785A;[m
+[32m+    color: #A0785A;[m
+[32m+    box-shadow: none;[m
+[32m+    outline: none;[m
+[32m+}[m
+[32m+[m
+[32m+check:checked:focus,[m
+[32m+radio:checked:focus,[m
+[32m+check:focus,[m
+[32m+radio:focus {[m
+[32m+    box-shadow: none;[m
+[32m+    outline: none;[m
+[32m+}[m
+[32m+[m
+[32m+check:checked:focus,[m
+[32m+radio:checked:focus,[m
+[32m+check:focus,[m
+[32m+radio:focus {[m
+[32m+    box-shadow: none;[m
+[32m+    outline: none;[m
+[32m+}[m
+[32m+[m
+[32m+/* any hyperlinks */[m
+[32m+*.link,[m
+[32m+a {[m
+[32m+    color: #2b1a0f;[m
+[32m+}[m
+[32m+[m
+[32m+/* progress bars */[m
+[32m+progressbar progress {[m
+[32m+    background-image: linear-gradient(to right, #A0785A, #2b1a0f);[m
+[32m+}[m
+[32m+[m
+[32m+/* switches when checked */[m
+[32m+switch:checked {[m
+[32m+    background-color: #A0785A;[m
+[32m+}[m
+[1mdiff --git a/.config/mozilla/firefox b/.config/mozilla/firefox
+old mode 40755
+new mode 40700[m
+[1mdiff --git a/.config/mozilla/firefox/jj8kqfjz.default-release b/.config/mozilla/firefox/jj8kqfjz.default-release
+new file mode 40700
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+--- /dev/null
++++ b/.config/mozilla/firefox/jj8kqfjz.default-release[m
+[1mdiff --git a/.config/mozilla/firefox/jj8kqfjz.default-release/chrome b/.config/mozilla/firefox/jj8kqfjz.default-release/chrome
+new file mode 40755
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+--- /dev/null
++++ b/.config/mozilla/firefox/jj8kqfjz.default-release/chrome[m
+[1mdiff --git a/.config/mozilla/firefox/jj8kqfjz.default-release/chrome/userContent.css b/.config/mozilla/firefox/jj8kqfjz.default-release/chrome/userContent.css
+new file mode 100644
+index 0000000000000000000000000000000000000000..b954c4d4c00c4cb7ab1e330ad7889ddd9cedd8af
+--- /dev/null
++++ b/.config/mozilla/firefox/jj8kqfjz.default-release/chrome/userContent.css[m
+[36m@@ -0,0 +1,138 @@[m
+[32m+@-moz-document domain("youtube.com") {[m
+[32m+    [m
+[32m+    /* change font */[m
+[32m+    [m
+[32m+    * {[m
+[32m+	font-family: "DepartureMono Nerd Font Mono" !important;[m
+[32m+    }[m
+[32m+[m
+[32m+    /* 5 videos per row */[m
+[32m+[m
+[32m+    ytd-two-column-browse-results-renderer.grid {[m
+[32m+        max-width: 100% !important;[m
+[32m+        width: 100% !important;[m
+[32m+    }[m
+[32m+[m
+[32m+    ytd-rich-grid-renderer {[m
+[32m+        --ytd-rich-grid-items-per-row: 5 !important;[m
+[32m+        --ytd-rich-grid-posts-per-row: 5 !important;[m
+[32m+    }[m
+[32m+[m
+[32m+    /* remove centred/max-width layout */[m
+[32m+    ytd-tabbed-page-header,[m
+[32m+    ytd-tabbed-page-header #page-header {[m
+[32m+        width: 100% !important;[m
+[32m+        max-width: none !important;[m
+[32m+        margin-left: 0 !important;[m
+[32m+        margin-right: 0 !important;[m
+[32m+    }[m
+[32m+[m
+[32m+    /* channel header */[m
+[32m+[m
+[32m+    /* remove max-width layout */[m
+[32m+    ytd-tabbed-page-header,[m
+[32m+    ytd-tabbed-page-header #page-header {[m
+[32m+        width: 100% !important;[m
+[32m+        max-width: none !important;[m
+[32m+        margin-left: 0 !important;[m
+[32m+        margin-right: 0 !important;[m
+[32m+    }[m
+[32m+[m
+[32m+    /* banner */[m
+[32m+[m
+[32m+    ytd-tabbed-page-header #page-header-banner-sizer,[m
+[32m+    ytd-tabbed-page-header #page-header-banner {[m
+[32m+        width: 100% !important;[m
+[32m+        max-width: none !important;[m
+[32m+        margin-left: 0 !important;[m
+[32m+        margin-right: 0 !important;[m
+[32m+    }[m
+[32m+[m
+[32m+    /* remove the inset padding from the banner */[m
+[32m+    ytd-tabbed-page-header[has-inset-banner] #page-header-banner {[m
+[32m+        padding-left: 0 !important;[m
+[32m+        padding-right: 0 !important;[m
+[32m+    }[m
+[32m+[m
+[32m+    /* channel information */[m
+[32m+[m
+[32m+    ytd-tabbed-page-header #page-header {[m
+[32m+        padding-left: 0 !important;[m
+[32m+        padding-right: 0 !important;[m
+[32m+    }[m
+[32m+[m
+[32m+    /* the actual channel-info container */[m
+[32m+    ytd-tabbed-page-header .ytImageBannerViewModelHost,[m
+[32m+    ytd-tabbed-page-header .ytImageBannerViewModelInset,[m
+[32m+    ytd-tabbed-page-header .ytImageBannerViewModelPositionAbsolute {[m
+[32m+        max-width: none !important;[m
+[32m+    }[m
+[32m+[m
+[32m+    /* align tabs with channel information */[m
+[32m+    tp-yt-paper-tabs#tabs {[m
+[32m+    margin-left: 0 !important;[m
+[32m+    margin-right: 0 !important;[m
+[32m+}[m
+[32m+}[m
+[32m+[m
+[32m+@-moz-document domain("claude.ai") {[m
+[32m+  * {[m
+[32m+    font-family: "DepartureMono Nerd Font Mono" !important;[m
+[32m+    font-synthesis-weight: none !important;[m
+[32m+  }[m
+[32m+  /* revert claude's icon font elements back to their own font */[m
+[32m+  [data-cds="Icon"] {[m
+[32m+    font-family: var(--font-anthropicons, Anthropicons-Variable) !important;[m
+[32m+  }[m
+[32m+}[m
+[32m+[m
+[32m+@-moz-document domain("mega.nz") {[m
+[32m+  * {[m
+[32m+    font-family: "DepartureMono Nerd Font Mono" !important;[m
+[32m+  }[m
+[32m+}[m
+[32m+[m
+[32m+@-moz-document url-prefix("http") {[m
+[32m+  * {[m
+[32m+    font-synthesis-weight: none !important;[m
+[32m+    font-synthesis-style: none !important;[m
+[32m+  }[m
+[32m+[m
+[32m+  @font-face {[m
+[32m+    font-family: "Roboto";[m
+[32m+    src: local("DepartureMono Nerd Font Mono");[m
+[32m+  }[m
+[32m+  @font-face {[m
+[32m+    font-family: "Arial";[m
+[32m+    src: local("DepartureMono Nerd Font Mono");[m
+[32m+  }[m
+[32m+  @font-face {[m
+[32m+    font-family: "Helvetica Neue";[m
+[32m+    src: local("DepartureMono Nerd Font Mono");[m
+[32m+  }[m
+[32m+  @font-face {[m
+[32m+    font-family: "-apple-system";[m
+[32m+    src: local("DepartureMono Nerd Font Mono");[m
+[32m+  }[m
+[32m+  @font-face {[m
+[32m+    font-family: "Segoe UI";[m
+[32m+    src: local("DepartureMono Nerd Font Mono");[m
+[32m+  }[m
+[32m+  @font-face {[m
+[32m+    font-family: "Open Sans";[m
+[32m+    src: local("DepartureMono Nerd Font Mono");[m
+[32m+  }[m
+[32m+  @font-face {[m
+[32m+    font-family: "Inter";[m
+[32m+    src: local("DepartureMono Nerd Font Mono");[m
+[32m+  }[m
+[32m+  @font-face {[m
+[32m+    font-family: "Noto Sans";[m
+[32m+    src: local("DepartureMono Nerd Font Mono");[m
+[32m+  }[m
+[32m+  @font-face {[m
+[32m+    font-family: "system-ui";[m
+[32m+    src: local("DepartureMono Nerd Font Mono");[m
+[32m+  }[m
+[32m+}[m
+[32m+[m
+[1mdiff --git a/.config/mpv/mpv.conf b/.config/mpv/mpv.conf
+new file mode 100644
+index 0000000000000000000000000000000000000000..83310b012cf8a5a8f709b6e00e04288ec1c75f52
+--- /dev/null
++++ b/.config/mpv/mpv.conf[m
+[36m@@ -0,0 +1,43 @@[m
+[32m+# hardware decoding - AMD[m
+[32m+hwdec=vaapi[m
+[32m+hwdec-codecs=all[m
+[32m+[m
+[32m+# native wayland output[m
+[32m+vo=gpu-next[m
+[32m+gpu-api=vulkan[m
+[32m+gpu-context=waylandvk[m
+[32m+ao=pipewire[m
+[32m+[m
+[32m+# scaling[m
+[32m+correct-downscaling=no[m
+[32m+scale=mitchell[m
+[32m+dscale=mitchell[m
+[32m+cscale=mitchell[m
+[32m+[m
+[32m+# HDR tone mapping[m
+[32m+tone-mapping=bt.2390[m
+[32m+hdr-peak-decay-rate=200[m
+[32m+hdr-compute-peak=yes[m
+[32m+target-colorspace-hint=no[m
+[32m+[m
+[32m+# smoothness[m
+[32m+# video-sync=display-resample[m
+[32m+interpolation=yes[m
+[32m+[m
+[32m+# cache for smoother local file playback[m
+[32m+cache=yes[m
+[32m+demuxer-max-bytes=400MiB[m
+[32m+demuxer-max-back-bytes=100MiB[m
+[32m+demuxer-readahead-secs=30[m
+[32m+cache-pause=no[m
+[32m+[m
+[32m+# subtitles[m
+[32m+sub-auto=fuzzy[m
+[32m+sub-font-size=38[m
+[32m+[m
+[32m+# screenshot format[m
+[32m+screenshot-format=png[m
+[32m+screenshot-directory=~/Pictures/Screenshots[m
+[32m+[m
+[32m+# supress logs[m
+[32m+msg-level=ffmpeg=no[m
+[1mdiff --git a/.config/sway b/.config/sway
+new file mode 40755
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+--- /dev/null
++++ b/.config/sway[m
+[1mdiff --git a/.config/sway/config b/.config/sway/config
+new file mode 100644
+index 0000000000000000000000000000000000000000..f2d8fdca2d7cbf536916300cf40903d4bc2cd224
+--- /dev/null
++++ b/.config/sway/config[m
+[36m@@ -0,0 +1,345 @@[m
+[32m+### Variables[m
+[32m+#[m
+[32m+# Logo key. Use Mod1 for Alt.[m
+[32m+set $mod Mod4[m
+[32m+# Home row direction keys, like vim[m
+[32m+set $left h[m
+[32m+set $down j[m
+[32m+set $up k[m
+[32m+set $right l[m
+[32m+# Your preferred terminal emulator[m
+[32m+set $term foot[m
+[32m+# Your preferred application launcher[m
+[32m+set $menu fuzzel[m
+[32m+# Start waybar service[m
+[32m+exec systemctl --user start waybar.service[m
+[32m+# Toggle waybar[m
+[32m+bindsym $mod+ctrl+shift+b exec killall -SIGUSR1 waybar[m
+[32m+# Start easyffects service[m
+[32m+exec sh -c 'pgrep -x easyeffects || easyeffects --gapplication-service'[m
+[32m+[m
+[32m+#[m
+[32m+### Idle Rules for Playback[m
+[32m+#[m
+[32m+# Firefox[m
+[32m+for_window [app_id="firefox"] inhibit_idle fullscreen[m
+[32m+# mpv[m
+[32m+for_window [app_id="mpv"] inhibit_idle fullscreen[m
+[32m+# night light[m
+[32m+exec_always "pkill gammastep;gammastep >/dev/null 2>&1"[m
+[32m+# audio limit[m
+[32m+exec wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 80%[m
+[32m+[m
+[32m+#[m
+[32m+### floating[m
+[32m+#[m
+[32m+# GTK/Qt-Based Dialogs[m
+[32m+for_window [window_type="dialog"] floating enable[m
+[32m+# obisidan settings[m
+[32m+for_window [app_id="md.Obsidian" title="^Settings"] floating enable[m
+[32m+# Firefox Library (History, Downloads, Bookmarks etc.)[m
+[32m+for_window [app_id="firefox" title="^Library$"] floating enable[m
+[32m+# all xdg-dialogs[m
+[32m+for_window [app_id="xdg-desktop-portal-gtk"] floating enable[m
+[32m+# volume control[m
+[32m+for_window [app_id="org.pulseaudio.pavucontrol"] floating enable[m
+[32m+# mpv[m
+[32m+for_window [app_id="mpv"] floating enable[m
+[32m+# imv[m
+[32m+for_window [app_id="imv"] floating enable[m
+[32m+# Firefox popup dialogs[m
+[32m+for_window [app_id="firefox" title="(?i)(sign in|log in|oauth|authorize)"] floating enable[m
+[32m+# HK: Silksong[m
+[32m+for_window [class="steam_app_1030300"] floating enable[m
+[32m+# HK[m
+[32m+for_window [title="Hollow Knight"] floating enable[m
+[32m+# Wallpaper Engine[m
+[32m+for_window [class="steam_app_431960"] floating enable[m
+[32m+# Steam settings[m
+[32m+for_window [class="steam" title="Steam Settings"] floating enable[m
+[32m+# qBitTorrent[m
+[32m+for_window [app_id="org.qbittorrent.qBittorrent"] floating enable[m
+[32m+# SumatraPDF[m
+[32m+for_window [class="sumatrapdf.exe"] floating enable, move position center[m
+[32m+[m
+[32m+#[m
+[32m+### Output configuration[m
+[32m+#[m
+[32m+# more backgrounds are available in /usr/share/backgrounds/sway/[m
+[32m+exec_always "pkill swaybg;swaybg -c '#000000' >/dev/null 2>&1"[m
+[32m+[m
+[32m+# window border colors[m
+[32m+# class            border     background    text        indicator     child_border[m
+[32m+client.focused     #F6F2AF    #F6F2AF       #000000     #F6F2AF       #F6F2AF [m
+[32m+client.unfocused   #684E3A    #684E3A       #F5E6CA     #684E3A       #684E3A[m
+[32m+[m
+[32m+# xwayland apps allow tearing[m
+[32m+for_window [shell="xwayland"] allow_tearing yes[m
+[32m+[m
+[32m+# keyring daemon[m
+[32m+exec /usr/bin/gnome-keyring-daemon --start --components=secrets [m
+[32m+[m
+[32m+# pixel border[m
+[32m+default_border pixel 2[m
+[32m+default_floating_border pixel 2[m
+[32m+[m
+[32m+# mouse focus disabled[m
+[32m+focus_follows_mouse no[m
+[32m+[m
+[32m+# gaps[m
+[32m+gaps inner 3[m
+[32m+gaps outer 3[m
+[32m+[m
+[32m+# smart gaps[m
+[32m+smart_gaps on[m
+[32m+[m
+[32m+# hide edge borders[m
+[32m+hide_edge_borders smart[m
+[32m+[m
+[32m+# cursor theme[m
+[32m+seat seat0 xcursor_theme "Bibata-Modern-Classic" 24[m
+[32m+[m
+[32m+# laptop Monitor[m
+[32m+output eDP-1 {[m
+[32m+    modeline 133.32 1920 1928 1960 2000 1080 1097 1105 1111 +hsync -vsync[m
+[32m+    scale 1[m
+[32m+    position 2560,0[m
+[32m+    adaptive_sync off[m
+[32m+    max_render_time off[m
+[32m+    render_bit_depth 8[m
+[32m+    scale_filter nearest[m
+[32m+    hdr off[m
+[32m+}[m
+[32m+[m
+[32m+# OLED second monitor[m
+[32m+output HDMI-A-1 {[m
+[32m+    modeline 586.586 2560 2568 2600 2640 1440 1529 1537 1543 +hsync -vsync[m
+[32m+    # 1440p @ 144hz (CVT-RBv2)[m
+[32m+    #modeline 583.20 1920 1928 1960 2000 1080 1201 1209 1215 +hsync -vsync[m
+[32m+    # 1080p @ 240hz (CVT-RBv2)[m
+[32m+    #modeline 422.524 1280 1288 1320 1360 720 849 857 863 +hsync -vsync[m
+[32m+    # 720p @ 360hz (CVT-RBv2)[m
+[32m+    scale 1[m
+[32m+    position 0,0[m
+[32m+    adaptive_sync off[m
+[32m+    max_render_time off[m
+[32m+    render_bit_depth 8[m
+[32m+    scale_filter nearest[m
+[32m+    hdr off[m
+[32m+}[m
+[32m+[m
+[32m+#[m
+[32m+### Idle configuration[m
+[32m+#[m
+[32m+exec swayidle -w \[m
+[32m+    timeout 600 'swaylock -f -c 000000' \[m
+[32m+    timeout 1800 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \[m
+[32m+    timeout 10800 'systemctl poweroff' \[m
+[32m+    before-sleep 'swaylock -f -c 000000'[m
+[32m+[m
+[32m+# any steam game[m
+[32m+for_window [class="^steam_app_"] inhibit_idle visible[m
+[32m+[m
+[32m+# hk & silksong[m
+[32m+for_window [title="(?i)(hollow knight|silksong)"] inhibit_idle open[m
+[32m+[m
+[32m+# screen lock on lid close[m
+[32m+bindswitch --reload lid:on exec swaylock -f -c 000000[m
+[32m+[m
+[32m+# screen lock[m
+[32m+bindsym $mod+Escape exec swaylock -f -c 000000[m
+[32m+[m
+[32m+#[m
+[32m+### Input configuration[m
+[32m+#[m
+[32m+[m
+[32m+input type:touchpad {[m
+[32m+   dwt enabled[m
+[32m+   tap enabled[m
+[32m+   natural_scroll enabled[m
+[32m+   middle_emulation enabled[m
+[32m+   scroll_factor 0.5[m
+[32m+}[m
+[32m+[m
+[32m+input type:keyboard {[m
+[32m+   xkb_layout "gb"[m
+[32m+   repeat_delay 225[m
+[32m+   repeat_rate 65[m
+[32m+}[m
+[32m+[m
+[32m+input "1008:911:HP,_Inc_HyperX_Alloy_Origins_65" {[m
+[32m+  xkb_layout "us"[m
+[32m+}[m
+[32m+[m
+[32m+input "1356:3302:Sony_Interactive_Entertainment_DualSense_Wireless_Controller_Touchpad" {[m
+[32m+    events disabled[m
+[32m+}[m
+[32m+[m
+[32m+#[m
+[32m+### key bindings[m
+[32m+#[m
+[32m+[m
+[32m+# start foot[m
+[32m+bindsym $mod+Return exec $term[m
+[32m+[m
+[32m+# kill focused window[m
+[32m+bindsym $mod+Shift+q kill[m
+[32m+[m
+[32m+# start launcher[m
+[32m+bindsym $mod+d exec $menu[m
+[32m+[m
+[32m+# Drag floating windows by holding down $mod and left mouse button.[m
+[32m+# Resize them with right mouse button + $mod.[m
+[32m+# Despite the name, also works for non-floating windows.[m
+[32m+# Change normal to inverse to use left mouse button for resizing and right mouse button for dragging.[m
+[32m+floating_modifier $mod normal[m
+[32m+[m
+[32m+# Reload the configuration file    [m
+[32m+bindsym $mod+Shift+c reload[m
+[32m+[m
+[32m+# Exit sway (logs you out of your Wayland session)[m
+[32m+bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'[m
+[32m+[m
+[32m+# screenshotting[m
+[32m+bindsym Print exec grim ~/Pictures/Screenshots/$(date +'%Y-%m-%d_%H-%M-%S').png[m
+[32m+bindsym $mod+Print exec sh -c 'g=$(slurp) && grim -g "$g" ~/Pictures/Screenshots/$(date +'\''%Y-%m-%d_%H-%M-%S'\'').png'[m
+[32m+bindsym $mod+Shift+S exec sh -c 'g=$(slurp) && grim -g "$g" - | wl-copy --type image/png'[m
+[32m+[m
+[32m+# file Managers[m
+[32m+bindsym $mod+e exec thunar[m
+[32m+bindsym $mod+f exec foot -e yazi[m
+[32m+[m
+[32m+# firefox[m
+[32m+bindsym $mod+b exec firefox[m
+[32m+[m
+[32m+# start discord[m
+[32m+bindsym $mod+Shift+p exec gtk-launch discord[m
+[32m+[m
+[32m+#[m
+[32m+### Moving around:[m
+[32m+#[m
+[32m+# Move your focus around[m
+[32m+bindsym $mod+$left focus left[m
+[32m+bindsym $mod+$down focus down[m
+[32m+bindsym $mod+$up focus up[m
+[32m+bindsym $mod+$right focus right[m
+[32m+[m
+[32m+# Or use $mod+[up|down|left|right][m
+[32m+bindsym $mod+Left focus left[m
+[32m+bindsym $mod+Down focus down[m
+[32m+bindsym $mod+Up focus up[m
+[32m+bindsym $mod+Right focus right[m
+[32m+[m
+[32m+# Move the focused window with the same, but add Shift[m
+[32m+bindsym $mod+Shift+$left move left[m
+[32m+bindsym $mod+Shift+$down move down[m
+[32m+bindsym $mod+Shift+$up move up[m
+[32m+bindsym $mod+Shift+$right move right[m
+[32m+[m
+[32m+# Ditto, with arrow keys[m
+[32m+bindsym $mod+Shift+Left move left[m
+[32m+bindsym $mod+Shift+Down move down[m
+[32m+bindsym $mod+Shift+Up move up[m
+[32m+bindsym $mod+Shift+Right move right[m
+[32m+[m
+[32m+#[m
+[32m+### Workspaces:[m
+[32m+#[m
+[32m+[m
+[32m+# Switch to workspace[m
+[32m+bindsym $mod+1 workspace number 1[m
+[32m+bindsym $mod+2 workspace number 2[m
+[32m+bindsym $mod+3 workspace number 3[m
+[32m+bindsym $mod+4 workspace number 4[m
+[32m+bindsym $mod+5 workspace number 5[m
+[32m+[m
+[32m+[m
+[32m+# Move focused container to workspace[m
+[32m+bindsym $mod+Shift+1 move container to workspace number 1[m
+[32m+bindsym $mod+Shift+2 move container to workspace number 2[m
+[32m+bindsym $mod+Shift+3 move container to workspace number 3[m
+[32m+bindsym $mod+Shift+4 move container to workspace number 4[m
+[32m+bindsym $mod+Shift+5 move container to workspace number 5[m
+[32m+[m
+[32m+#[m
+[32m+### Layout stuff:[m
+[32m+#[m
+[32m+[m
+[32m+# Make the current focus fullscreen[m
+[32m+bindsym $mod+shift+f fullscreen[m
+[32m+[m
+[32m+# Toggle the current focus between tiling and floating mode[m
+[32m+bindsym $mod+Shift+space floating toggle[m
+[32m+[m
+[32m+# Swap focus between the tiling area and the floating area[m
+[32m+bindsym $mod+space focus mode_toggle[m
+[32m+[m
+[32m+# Move focus to the parent container[m
+[32m+bindsym $mod+a focus parent[m
+[32m+[m
+[32m+#[m
+[32m+### Scratchpad:[m
+[32m+#[m
+[32m+# Sway has a "scratchpad", which is a bag of holding for windows.[m
+[32m+# You can send windows there and get them back later.[m
+[32m+[m
+[32m+# Move the currently focused window to the scratchpad[m
+[32m+# bindsym $mod+Shift+minus move scratchpad[m
+[32m+[m
+[32m+# Show the next scratchpad window or hide the focused scratchpad window.[m
+[32m+# If there are multiple scratchpad windows, this command cycles through them.[m
+[32m+# bindsym $mod+minus scratchpad show[m
+[32m+[m
+[32m+#[m
+[32m+### Resizing containers:[m
+[32m+#[m
+[32m+mode "resize" {[m
+[32m+	# left will shrink the containers width[m
+[32m+	# right will grow the containers width[m
+[32m+	# up will shrink the containers height[m
+[32m+	# down will grow the containers height[m
+[32m+	bindsym $left resize shrink width 10px[m
+[32m+	bindsym $down resize grow height 10px[m
+[32m+	bindsym $up resize shrink height 10px[m
+[32m+	bindsym $right resize grow width 10px[m
+[32m+[m
+[32m+	# Ditto, with arrow keys[m
+[32m+	bindsym Left resize shrink width 10px[m
+[32m+	bindsym Down resize grow height 10px[m
+[32m+	bindsym Up resize shrink height 10px[m
+[32m+	bindsym Right resize grow width 10px[m
+[32m+[m
+[32m+	# Return to default mode[m
+[32m+	bindsym Return mode "default"[m
+[32m+	bindsym Escape mode "default"[m
+[32m+}[m
+[32m+[m
+[32m+bindsym $mod+r mode "resize"[m
+[32m+[m
+[32m+#[m
+[32m+### Utilities:[m
+[32m+#[m
+[32m+# special keys to adjust volume via PulseAudio[m
+[32m+bindsym --locked XF86AudioMute exec pactl set-sink-mute \@DEFAULT_SINK@ toggle[m
+[32m+bindsym --locked XF86AudioLowerVolume exec pactl set-sink-volume \@DEFAULT_SINK@ -5%[m
+[32m+bindsym --locked XF86AudioRaiseVolume exec pactl set-sink-volume \@DEFAULT_SINK@ +5%[m
+[32m+bindsym --locked XF86AudioMicMute exec pactl set-source-mute \@DEFAULT_SOURCE@ toggle[m
+[32m+[m
+[32m+# special keys to control media via playerctl[m
+[32m+bindsym --locked XF86AudioPlay exec playerctl play-pause[m
+[32m+bindsym --locked XF86AudioPause exec playerctl play-pause[m
+[32m+bindsym --locked XF86AudioPrev exec playerctl previous[m
+[32m+bindsym --locked XF86AudioNext exec playerctl next[m
+[32m+bindsym --locked XF86AudioStop exec playerctl stop[m
+[32m+[m
+[32m+# special keys to adjust brightness via brightnessctl[m
+[32m+bindsym --locked XF86MonBrightnessDown exec brightnessctl set 5%-[m
+[32m+bindsym --locked XF86MonBrightnessUp exec brightnessctl set 5%+[m
+[32m+[m
+[32m+### notifications if needed[m
+[32m+# exec_always "pkill swaync;swaync"[m
+[32m+[m
+[32m+### GUI Prompts[m
+[32m+exec /usr/lib/polkit-gnome/polkit-gnome-authentication-agent-1[m
+[32m+[m
+[32m+include /etc/sway/config.d/*[m
+[1mdiff --git a/.config/system-configs b/.config/system-configs
+new file mode 40755
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+--- /dev/null
++++ b/.config/system-configs[m
+[1mdiff --git a/.config/system-configs/99-zram-swappiness.conf b/.config/system-configs/99-zram-swappiness.conf
+new file mode 100644
+index 0000000000000000000000000000000000000000..b3ad25e784383d88b1aa4cf39cf96c350104f31b
+--- /dev/null
++++ b/.config/system-configs/99-zram-swappiness.conf[m
+[36m@@ -0,0 +1 @@[m
+[32m+vm.swappiness=100[m
+[1mdiff --git a/.config/system-configs/journald-size.conf b/.config/system-configs/journald-size.conf
+new file mode 100644
+index 0000000000000000000000000000000000000000..076e765833c97bba4c1ff1e6e9333e5e8c8528da
+--- /dev/null
++++ b/.config/system-configs/journald-size.conf[m
+[36m@@ -0,0 +1,2 @@[m
+[32m+[Journal][m
+[32m+SystemMaxUse=200M[m
+[1mdiff --git a/.config/system-configs/scx_loader-config.toml b/.config/system-configs/scx_loader-config.toml
+new file mode 100644
+index 0000000000000000000000000000000000000000..62c89906f37cbdab13b7ed2361b2dc00fef98578
+--- /dev/null
++++ b/.config/system-configs/scx_loader-config.toml[m
+[36m@@ -0,0 +1,2 @@[m
+[32m+default_sched = "scx_bpfland"[m
+[32m+default_mode = "Auto"[m
+[1mdiff --git a/.config/system-configs/tlp.conf b/.config/system-configs/tlp.conf
+new file mode 100644
+index 0000000000000000000000000000000000000000..dd0788c5b14039cb373e145bd2fcf1588a1bf5dc
+--- /dev/null
++++ b/.config/system-configs/tlp.conf[m
+[36m@@ -0,0 +1,641 @@[m
+[32m+# ----------------------------------------------------------------------------[m
+[32m+# /etc/tlp.conf - TLP user configuration (version 1.10.2)[m
+[32m+# See full explanation: https://linrunner.de/tlp/settings[m
+[32m+#[m
+[32m+# Copyright (c) 2026 Thomas Koch <linrunner at gmx.net> and others.[m
+[32m+# SPDX-License-Identifier: GPL-2.0-or-later[m
+[32m+#[m
+[32m+# Settings are read in the following order:[m
+[32m+#[m
+[32m+# 1. Intrinsic defaults[m
+[32m+# 2. /etc/tlp.d/*.conf - Drop-in customization snippets[m
+[32m+# 3. /etc/tlp.conf     - User configuration (this file)[m
+[32m+#[m
+[32m+# TLP profiles: a part of TLP's parameters is divided into two or three[m
+[32m+# groups:[m
+[32m+# - performance: parameters ending in _AC are used when AC power is[m
+[32m+#   connected or when the command 'tlp performance' is run.[m
+[32m+# - balanced: parameters ending in _BAT are used when operating[m
+[32m+#   on battery power or when the command 'tlp balanced' is run.[m
+[32m+# - power-saver: parameters ending in _SAV are used when the command[m
+[32m+#   'tlp power-saver' is run. If there is no _SAV parameter available[m
+[32m+#   for a feature, the _BAT parameter will be used instead.[m
+[32m+# - Any remaining parameters not divided apply to all TLP profiles.[m
+[32m+#[m
+[32m+# Please note:[m
+[32m+# - If parameters are specified more than once, the last occurrence takes[m
+[32m+#   precedence. This also means that any parameters defined here will take[m
+[32m+#   precedence over any drop-ins.[m
+[32m+# - You can however, append values to a parameter already defined as default[m
+[32m+#   or in a previously read file: use PARAMETER+="add values".[m
+[32m+# - Important: in its native state, all of the parameters in this file are[m
+[32m+#   commented out with a leading '#', so the defaults (if any) apply.[m
+[32m+#   Remove the leading '#' if you want to enable a feature without a default[m
+[32m+#   or if you want to set a value other than the default.[m
+[32m+# - Parameters must always be specified for all TLP profiles, i.e. in the[m
+[32m+#   AC, BAT and SAV category (where applicable). If you omit one of them,[m
+[32m+#   the missing profile will receive its value from another profile, since[m
+[32m+#   a change will only occur if different values are defined.[m
+[32m+# - To completely disable a feature, use PARAMETER="".[m
+[32m+# Legend for defaults:[m
+[32m+# - Default *: effective value when the parameter is missing or the line has[m
+[32m+#   a leading '#'.[m
+[32m+# - Default <none>: feature disabled, use kernel or hardware defaults.[m
+[32m+#[m
+[32m+# ----------------------------------------------------------------------------[m
+[32m+# tlp - Parameters for power saving[m
+[32m+[m
+[32m+# Set to 0 to disable, 1 to enable TLP.[m
+[32m+# Default: 1[m
+[32m+[m
+[32m+#TLP_ENABLE=1[m
+[32m+[m
+[32m+# Set to 1 to disable (almost) all defaults of TLP.[m
+[32m+# This means that TLP only applies settings that have been explicitly activated[m
+[32m+# i.e. parameters without leading '#'.[m
+[32m+# Notes:[m
+[32m+# - Helpful if one wants to use only selected features of TLP[m
+[32m+# - After activation, use tlp-stat -c to display your effective configuration[m
+[32m+# - TLP's operation relies on the defaults of TLP_ENABLE, TLP_WARN_LEVEL,[m
+[32m+#   TLP_AUTO_SWITCH, and TLP_PROFILE_AC/BAT, which are *not* disabled[m
+[32m+#[m
+[32m+#TLP_DISABLE_DEFAULTS=1[m
+[32m+[m
+[32m+# Control how warnings about invalid settings are issued:[m
+[32m+#   0=disabled[m
+[32m+#   1=background tasks (boot, resume, change of power source) report to syslog[m
+[32m+#   2=shell commands report to the terminal (stderr)[m
+[32m+#   3=combination of 1 and 2[m
+[32m+# Default: 3[m
+[32m+[m
+[32m+#TLP_WARN_LEVEL=3[m
+[32m+[m
+[32m+# Colorize error, warning, notice and success messages. Colors are specified[m
+[32m+# with ANSI codes:[m
+[32m+#   1=bold black, 90=grey, 91=red, 92=green, 93=yellow, 94=blue, 95=magenta,[m
+[32m+#   96=cyan, 97=white.[m
+[32m+# Other colors are possible, refer to:[m
+[32m+#   https://en.wikipedia.org/wiki/ANSI_escape_code#3-bit_and_4-bit[m
+[32m+# Colors must be specified in the order[m
+[32m+#   "<error> <warning> <notice> <success>".[m
+[32m+# By default, errors are shown in red, warnings in yellow, notices in bold[m
+[32m+# and success in green.[m
+[32m+# Default: "91 93 1 92"[m
+[32m+[m
+[32m+#TLP_MSG_COLORS="91 93 1 92"[m
+[32m+[m
+[32m+# Control automatic switching of the TLP profile when connecting or removing[m
+[32m+# the charger, when booting the system or when executing 'tlp start':[m
+[32m+#   0=disabled - never switch, use TLP_PROFILE_DEFAULT if configured[m
+[32m+#   1=auto  - always switch, select TLP_PROFILE_AC on AC and TLP_PROFILE_BAT[m
+[32m+#             on battery power.[m
+[32m+#   2=smart - like auto, but skips the switch if you have manually changed the[m
+[32m+#             profile away from the previous power source's default profile[m
+[32m+#             (as defined by TLP_PROFILE_AC/BAT).[m
+[32m+# Note: the same applies if the charger was connected/removed during suspend.[m
+[32m+# Default: 2[m
+[32m+[m
+[32m+#TLP_AUTO_SWITCH=2[m
+[32m+[m
+[32m+# TLP profiles to use when automatic switching is enabled[m
+[32m+# (TLP_AUTO_SWITCH=1 or 2):[m
+[32m+#   PRF=performance, BAL=balanced, SAV=power-saver.[m
+[32m+# Default: PRF (AC power), BAL (battery power)[m
+[32m+[m
+[32m+#TLP_PROFILE_AC=BAL[m
+[32m+#TLP_PROFILE_BAT=SAV[m
+[32m+[m
+[32m+# TLP profile to use when automatic switching is disabled[m
+[32m+# (TLP_AUTO_SWITCH=0) or no power supply is detected:[m
+[32m+#   PRF=performance, BAL=balanced, SAV=power-saver.[m
+[32m+# Note: legacy values AC and BAT continue to work. They are mapped to[m
+[32m+# PRF and BAL, respectively.[m
+[32m+# Default: <none>[m
+[32m+[m
+[32m+#TLP_PROFILE_DEFAULT=BAL[m
+[32m+[m
+[32m+# Power supply classes to ignore when determining TLP profile:[m
+[32m+#  AC, USB, BAT.[m
+[32m+# Separate multiple classes with spaces.[m
+[32m+# Note: try on laptops where operation mode AC/BAT is incorrectly detected.[m
+[32m+# Default: <none>[m
+[32m+[m
+[32m+#TLP_PS_IGNORE="BAT"[m
+[32m+[m
+[32m+# Seconds laptop_mode has to wait after the disk goes idle before doing a[m
+[32m+# sync. Non-zero value enables, zero disables laptop_mode.[m
+[32m+# Note: will be ignored starting with kernel 7.0[m
+[32m+# Default: 0 (AC), 2 (BAT)[m
+[32m+[m
+[32m+#DISK_IDLE_SECS_ON_AC=0[m
+[32m+#DISK_IDLE_SECS_ON_BAT=2[m
+[32m+[m
+[32m+# Dirty page values (timeouts in secs).[m
+[32m+# Default: 15 (AC), 60 (BAT)[m
+[32m+[m
+[32m+#MAX_LOST_WORK_SECS_ON_AC=15[m
+[32m+#MAX_LOST_WORK_SECS_ON_BAT=60[m
+[32m+[m
+[32m+# Select a CPU scaling driver operation mode.[m
+[32m+# Intel CPU with intel_pstate driver:[m
+[32m+#   active, passive.[m
+[32m+# AMD Zen 2 or newer CPU with amd-pstate driver as of kernel 6.3/6.4(*):[m
+[32m+#   active, passive, guided(*).[m
+[32m+# Default: <none>[m
+[32m+#CPU_DRIVER_OPMODE_ON_AC=active[m
+[32m+#CPU_DRIVER_OPMODE_ON_BAT=active[m
+[32m+#CPU_DRIVER_OPMODE_ON_SAV=active[m
+[32m+[m
+[32m+# Select a CPU frequency scaling governor.[m
+[32m+# Intel CPU with intel_pstate driver or[m
+[32m+# AMD CPU with amd-pstate driver in active mode ('amd-pstate-epp'):[m
+[32m+#   performance, powersave(*).[m
+[32m+# Intel CPU with intel_pstate driver in passive mode ('intel_cpufreq') or[m
+[32m+# AMD CPU with amd-pstate driver in passive or guided mode ('amd-pstate') or[m
+[32m+# Intel, AMD and other CPU brands with acpi-cpufreq driver:[m
+[32m+#   conservative, ondemand(*), userspace, powersave, performance, schedutil(*)[m
+[32m+# Use tlp-stat -p to show the active driver and available governors.[m
+[32m+# Important:[m
+[32m+#   Governors marked (*) above are power efficient for *almost all* workloads[m
+[32m+#   and therefore kernel and most distributions have chosen them as defaults.[m
+[32m+#   You should have done your research about advantages/disadvantages *before*[m
+[32m+#   changing the governor.[m
+[32m+# Default: <none>[m
+[32m+[m
+[32m+CPU_SCALING_GOVERNOR_ON_AC=performance[m
+[32m+CPU_SCALING_GOVERNOR_ON_BAT=powersave[m
+[32m+#CPU_SCALING_GOVERNOR_ON_SAV=powersave[m
+[32m+[m
+[32m+# Set the min/max frequency available for the scaling governor.[m
+[32m+# Possible values depend on your CPU. For available frequencies see[m
+[32m+# the output of tlp-stat -p.[m
+[32m+# Notes:[m
+[32m+# - Min/max frequencies must always be specified for both AC *and* BAT[m
+[32m+# - Not recommended for use with the intel_pstate driver, use[m
+[32m+#   CPU_MIN/MAX_PERF_ON_AC/BAT below instead[m
+[32m+# Default: <none>[m
+[32m+[m
+[32m+#CPU_SCALING_MIN_FREQ_ON_AC=0[m
+[32m+#CPU_SCALING_MAX_FREQ_ON_AC=0[m
+[32m+#CPU_SCALING_MIN_FREQ_ON_BAT=0[m
+[32m+#CPU_SCALING_MAX_FREQ_ON_BAT=0[m
+[32m+#CPU_SCALING_MIN_FREQ_ON_SAV=0[m
+[32m+#CPU_SCALING_MAX_FREQ_ON_SAV=0[m
+[32m+[m
+[32m+# Set CPU energy/performance policies EPP and EPB:[m
+[32m+#   performance, balance_performance, default, balance_power, power.[m
+[32m+# Values are given in order of increasing power saving.[m
+[32m+# Requires:[m
+[32m+# * Intel CPU[m
+[32m+#   EPP: Intel Core i 6th gen. or newer CPU with intel_pstate driver[m
+[32m+#   EPB: Intel Core i 2nd gen. or newer CPU with intel_pstate driver[m
+[32m+#   EPP and EPB are mutually exclusive: when EPP is available, Intel CPUs[m
+[32m+#   will not honor EPB. Only the matching feature will be applied by TLP.[m
+[32m+# * AMD Zen 2 or newer CPU[m
+[32m+#   EPP: amd-pstate driver in active mode ('amd-pstate-epp') as of kernel 6.3[m
+[32m+# Default: balance_performance (AC), balance_power (BAT), power (SAV)[m
+[32m+[m
+[32m+CPU_ENERGY_PERF_POLICY_ON_AC=performance[m
+[32m+CPU_ENERGY_PERF_POLICY_ON_BAT=power[m
+[32m+#CPU_ENERGY_PERF_POLICY_ON_SAV=power[m
+[32m+[m
+[32m+# Set Intel CPU P-state performance: 0..100 (%).[m
+[32m+# Limit the max/min P-state to control the power dissipation of the CPU.[m
+[32m+# Values are stated as a percentage of the available performance.[m
+[32m+# Requires Intel Core i 2nd gen. or newer CPU with intel_pstate driver.[m
+[32m+# Default: <none>[m
+[32m+[m
+[32m+#CPU_MIN_PERF_ON_AC=10[m
+[32m+#CPU_MAX_PERF_ON_AC=100[m
+[32m+#CPU_MIN_PERF_ON_BAT=0[m
+[32m+#CPU_MAX_PERF_ON_BAT=70[m
+[32m+#CPU_MIN_PERF_ON_SAV=0[m
+[32m+#CPU_MAX_PERF_ON_SAV=60[m
+[32m+[m
+[32m+# Set the CPU "turbo boost" (Intel) or "core performance boost" (AMD) feature:[m
+[32m+#   0=disable, 1=allow.[m
+[32m+# Allows to raise the maximum frequency/P-state of some cores if the[m
+[32m+# CPU chip is not fully utilized and below it's intended thermal budget.[m
+[32m+# Note: a value of 1 does *not* activate boosting, it just allows it.[m
+[32m+# Default: <none>[m
+[32m+[m
+[32m+CPU_BOOST_ON_AC=1[m
+[32m+CPU_BOOST_ON_BAT=0[m
+[32m+#CPU_BOOST_ON_SAV=0[m
+[32m+[m
+[32m+# Set CPU dynamic boost feature:[m
+[32m+#   0=disable, 1=enable.[m
+[32m+# Improve performance by increasing minimum P-state limit dynamically[m
+[32m+# whenever a task previously waiting on I/O is selected to run.[m
+[32m+# Requires Intel Core i  6th gen. or newer CPU with intel_pstate driver[m
+[32m+# in active mode.[m
+[32m+# Note: AMD CPUs currently have no tunable for this.[m
+[32m+# Default: <none>[m
+[32m+[m
+[32m+#CPU_HWP_DYN_BOOST_ON_AC=1[m
+[32m+#CPU_HWP_DYN_BOOST_ON_BAT=1[m
+[32m+#CPU_HWP_DYN_BOOST_ON_SAV=0[m
+[32m+[m
+[32m+# Kernel NMI Watchdog:[m
+[32m+#   0=disable (default, saves power), 1=enable (for kernel debugging only).[m
+[32m+# Default: 0[m
+[32m+[m
+[32m+#NMI_WATCHDOG=0[m
+[32m+[m
+[32m+# Select platform profile:[m
+[32m+#   performance, balanced, low-power.[m
+[32m+# Controls system operating characteristics around power/performance levels,[m
+[32m+# thermal and fan speed. Values are given in order of increasing power saving.[m
+[32m+# Note: check the output of tlp-stat -p to determine availability on your[m
+[32m+# hardware and additional profiles such as: balanced-performance, quiet, cool.[m
+[32m+# Default: performance (AC), balanced (BAT), low-power (SAV)[m
+[32m+[m
+[32m+#PLATFORM_PROFILE_ON_AC=performance[m
+[32m+#PLATFORM_PROFILE_ON_BAT=balanced[m
+[32m+#PLATFORM_PROFILE_ON_SAV=low-power[m
+[32m+[m
+[32m+# System suspend mode:[m
+[32m+#   s2idle: Idle standby - a pure software, light-weight, system sleep state,[m
+[32m+#   deep: Suspend to RAM - the whole system is put into a low-power state,[m
+[32m+#     except for memory, usually resulting in higher savings than s2idle.[m
+[32m+# CAUTION: changing suspend mode may lead to system instability and even[m
+[32m+# data loss. As for the availability of different modes on your system,[m
+[32m+# check the output of tlp-stat -s. If unsure, stick with the system default[m
+[32m+# by not enabling this.[m
+[32m+# Default: <none>[m
+[32m+[m
+[32m+#MEM_SLEEP_ON_AC=s2idle[m
+[32m+#MEM_SLEEP_ON_BAT=deep[m
+[32m+[m
+[32m+# Define disk devices on which the following DISK/AHCI_RUNTIME parameters act.[m
+[32m+# Separate multiple devices with spaces.[m
+[32m+# Devices can be specified by disk ID also (lookup with: tlp diskid).[m
+[32m+# Default: "nvme0n1 sda"[m
+[32m+[m
+[32m+#DISK_DEVICES="nvme0n1 sda"[m
+[32m+[m
+[32m+# Disk advanced power management level: 1..254, 255 (max saving, min, off).[m
+[32m+# Levels 1..127 may spin down the disk; 255 allowable on most drives.[m
+[32m+# Separate values for multiple disks with spaces. Use the special value 'keep'[m
+[32m+# to keep the hardware default for the particular disk.[m
+[32m+# Default: 254 (AC), 128 (BAT)[m
+[32m+[m
+[32m+#DISK_APM_LEVEL_ON_AC="254 254"[m
+[32m+#DISK_APM_LEVEL_ON_BAT="128 128"[m
+[32m+[m
+[32m+# Exclude disk classes from advanced power management (APM):[m
+[32m+#   sata, ata, usb, ieee1394.[m
+[32m+# Separate multiple classes with spaces.[m
+[32m+# CAUTION: USB and IEEE1394 disks may fail to mount or data may get corrupted[m
+[32m+# with APM enabled. Be careful and make sure you have backups of all affected[m
+[32m+# media before removing 'usb' or 'ieee1394' from the denylist![m
+[32m+# Default: "usb ieee1394"[m
+[32m+[m
+[32m+#DISK_APM_CLASS_DENYLIST="usb ieee1394"[m
+[32m+[m
+[32m+# Hard disk spin down timeout:[m
+[32m+#   0:        spin down disabled[m
+[32m+#   1..240:   timeouts from 5s to 20min (in units of 5s)[m
+[32m+#   241..251: timeouts from 30min to 5.5 hours (in units of 30min)[m
+[32m+# See 'man hdparm' for details.[m
+[32m+# Separate values for multiple disks with spaces. Use the special value 'keep'[m
+[32m+# to keep the hardware default for the particular disk.[m
+[32m+# Default: <none>[m
+[32m+[m
+[32m+#DISK_SPINDOWN_TIMEOUT_ON_AC="0 0"[m
+[32m+#DISK_SPINDOWN_TIMEOUT_ON_BAT="0 0"[m
+[32m+[m
+[32m+# Select I/O scheduler for the disk devices.[m
+[32m+# Multi queue (blk-mq) schedulers:[m
+[32m+#   mq-deadline(*), none, kyber, bfq[m
+[32m+# Single queue schedulers:[m
+[32m+#   deadline(*), cfq, bfq, noop[m
+[32m+# (*) recommended.[m
+[32m+# Separate values for multiple disks with spaces. Use the special value 'keep'[m
+[32m+# to keep the kernel default scheduler for the particular disk.[m
+[32m+# Notes:[m
+[32m+# - Multi queue (blk-mq) may need kernel boot option 'scsi_mod.use_blk_mq=1'[m
+[32m+#   and 'modprobe mq-deadline-iosched|kyber|bfq' on kernels < 5.0[m
+[32m+# - Single queue schedulers are legacy now and were removed together with[m
+[32m+#   the old block layer in kernel 5.0[m
+[32m+# Default: keep[m
+[32m+[m
+[32m+#DISK_IOSCHED="mq-deadline mq-deadline"[m
+[32m+[m
+[32m+# AHCI link power management (ALPM) for SATA disks:[m
+[32m+#   min_power, med_power_with_dipm(*), medium_power, max_performance.[m
+[32m+# (*) recommended.[m
+[32m+# Multiple values separated with spaces are tried sequentially until success.[m
+[32m+# Default: med_power_with_dipm (AC & BAT)[m
+[32m+[m
+[32m+SATA_LINKPWR_ON_AC="med_power_with_dipm"[m
+[32m+#SATA_LINKPWR_ON_BAT="med_power_with_dipm"[m
+[32m+[m
+[32m+# Exclude SATA links from AHCI link power management (ALPM).[m
+[32m+# SATA links are specified by their host. Refer to the output of

@@ -1,0 +1,138 @@
+@-moz-document domain("youtube.com") {
+    
+    /* change font */
+    
+    * {
+	font-family: "DepartureMono Nerd Font Mono" !important;
+    }
+
+    /* 5 videos per row */
+
+    ytd-two-column-browse-results-renderer.grid {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+
+    ytd-rich-grid-renderer {
+        --ytd-rich-grid-items-per-row: 5 !important;
+        --ytd-rich-grid-posts-per-row: 5 !important;
+    }
+
+    /* remove centred/max-width layout */
+    ytd-tabbed-page-header,
+    ytd-tabbed-page-header #page-header {
+        width: 100% !important;
+        max-width: none !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    /* channel header */
+
+    /* remove max-width layout */
+    ytd-tabbed-page-header,
+    ytd-tabbed-page-header #page-header {
+        width: 100% !important;
+        max-width: none !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    /* banner */
+
+    ytd-tabbed-page-header #page-header-banner-sizer,
+    ytd-tabbed-page-header #page-header-banner {
+        width: 100% !important;
+        max-width: none !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    /* remove the inset padding from the banner */
+    ytd-tabbed-page-header[has-inset-banner] #page-header-banner {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    /* channel information */
+
+    ytd-tabbed-page-header #page-header {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    /* the actual channel-info container */
+    ytd-tabbed-page-header .ytImageBannerViewModelHost,
+    ytd-tabbed-page-header .ytImageBannerViewModelInset,
+    ytd-tabbed-page-header .ytImageBannerViewModelPositionAbsolute {
+        max-width: none !important;
+    }
+
+    /* align tabs with channel information */
+    tp-yt-paper-tabs#tabs {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+}
+
+@-moz-document domain("claude.ai") {
+  * {
+    font-family: "DepartureMono Nerd Font Mono" !important;
+    font-synthesis-weight: none !important;
+  }
+  /* revert claude's icon font elements back to their own font */
+  [data-cds="Icon"] {
+    font-family: var(--font-anthropicons, Anthropicons-Variable) !important;
+  }
+}
+
+@-moz-document domain("mega.nz") {
+  * {
+    font-family: "DepartureMono Nerd Font Mono" !important;
+  }
+}
+
+@-moz-document url-prefix("http") {
+  * {
+    font-synthesis-weight: none !important;
+    font-synthesis-style: none !important;
+  }
+
+  @font-face {
+    font-family: "Roboto";
+    src: local("DepartureMono Nerd Font Mono");
+  }
+  @font-face {
+    font-family: "Arial";
+    src: local("DepartureMono Nerd Font Mono");
+  }
+  @font-face {
+    font-family: "Helvetica Neue";
+    src: local("DepartureMono Nerd Font Mono");
+  }
+  @font-face {
+    font-family: "-apple-system";
+    src: local("DepartureMono Nerd Font Mono");
+  }
+  @font-face {
+    font-family: "Segoe UI";
+    src: local("DepartureMono Nerd Font Mono");
+  }
+  @font-face {
+    font-family: "Open Sans";
+    src: local("DepartureMono Nerd Font Mono");
+  }
+  @font-face {
+    font-family: "Inter";
+    src: local("DepartureMono Nerd Font Mono");
+  }
+  @font-face {
+    font-family: "Noto Sans";
+    src: local("DepartureMono Nerd Font Mono");
+  }
+  @font-face {
+    font-family: "system-ui";
+    src: local("DepartureMono Nerd Font Mono");
+  }
+}
+
