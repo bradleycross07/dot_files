@@ -1,5 +1,5 @@
 {
-  "commitMessage": "",
+  "commitMessage": "Last Sync Manual: {{date}}",
   "autoCommitMessage": "Last Sync Automatic: {{date}}",
   "commitMessageScript": "",
   "commitDateFormat": "DD-MM-YYYY HH:mm:ss",
@@ -10,7 +10,6 @@
   "autoCommitOnlyStaged": false,
   "disablePush": false,
   "pullBeforePush": false,
-  "squashCommitsBeforePush": false,
   "disablePopups": false,
   "showErrorNotices": true,
   "disablePopupsForNoChanges": true,
@@ -33,13 +32,13 @@
   "submoduleRecurseCheckout": false,
   "gitDir": "",
   "showFileMenu": true,
-  "authorInHistoryView": "initials",
+  "authorInHistoryView": "full",
   "dateInHistoryView": true,
   "diffStyle": "split",
   "hunks": {
     "showSigns": false,
     "hunkCommands": false,
-    "statusBar": "colored"
+    "statusBar": "disabled"
   },
   "lineAuthor": {
     "show": false,
