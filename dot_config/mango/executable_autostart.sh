@@ -2,12 +2,9 @@
 
 dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP DISPLAY
 
-export XCURSOR_THEME=Adwaita
-export XCURSOR_SIZE=24
-
 swayidle -w \
-	timeout 600 'waylock' \
-	timeout 1800 'systemctl suspend' \
+	timeout 1200 'waylock' \
+	timeout 3600 'systemctl suspend' \
 	before-sleep 'waylock' &
 
 kanshi &

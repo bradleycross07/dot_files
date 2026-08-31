@@ -42,19 +42,20 @@
     "cpu": {
         "format": "{usage}%",
         "tooltip": false,
-	"on-click": "foot -a btop-float -e btop"
+	"on-click": "kitty --class btop-float -e btop"
     },
     "memory": {
         "format": "{}%",
-	"on-click": "foot -a btop-float -e btop"
+	"on-click": "kitty --class btop-float -e btop"
     },
     "temperature": {
         "hwmon-path": "/sys/class/hwmon/hwmon4/temp1_input",
         "critical-threshold": 80,
         "format": "{temperatureC}°C",
-	"on-click": "foot -a btop-float -e btop"
+	"on-click": "kitty --class btop-float -e btop"
     },
     "battery": {
+	"interval": 240,
         "states": {
             "good": 80,
             "warning": 20,
