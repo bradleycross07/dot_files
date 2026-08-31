@@ -1,5 +1,6 @@
 [sie][Gate#0]
 attack=5
 curveThreshold=-15
+makeup=12
 reduction=-10
 release=150
