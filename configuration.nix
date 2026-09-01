@@ -14,6 +14,10 @@ let
       --add-flags "--enable-blink-features=MiddleClickAutoscroll"
     '';
   };
+
+  nix-gaming = import (builtins.fetchTarball {
+    url = "https://github.com/fufexan/nix-gaming/archive/master.tar.gz";
+  });
 in
 
 {
@@ -44,7 +48,12 @@ in
    fileSystems."/home".options = [ "compress=zstd:3" "noatime" ];
    fileSystems."/nix".options = [ "compress=zstd:3" "noatime" ];
    fileSystems."/var/log".options = [ "compress=zstd:3" "noatime" ];
-   fileSystems."/boot".options = [ "umask=0077" ];   
+   fileSystems."/boot".options = [ "umask=0077" ];
+   fileSystems."/games" = {
+  	device = "/dev/disk/by-uuid/9a47d749-9248-4be0-a850-b8adc9320d0b";
+  	fsType = "btrfs";
+  	options = [ "subvol=@games" "compress=zstd:3" "noatime" "exec" ];
+  };
  
    # console keymapping
    console.keyMap = "us";
@@ -103,13 +112,20 @@ in
    # wayland native on every application
    environment.sessionVariables = {
      NIXOS_OZONE_WL = "1"; # electron based apps use wayland
+     RADV_PERFTEST = "gpl";
      MOZ_ENABLE_WAYLAND = "1"; # firefox using wayland
      QT_QPA_PLATFORM = "wayland"; # any qt apps use wayland
+     MESA_SHADER_CACHE_MAX_SIZE = "10G";
      SDL_VIDEODRIVER = "wayland"; 
      XDG_CURRENT_DESKTOP = "mango";
      XDG_SESSION_TYPE = "wayland";
      BROWSER = "firefox";
    };
+
+   boot.extraModprobeConfig = ''
+     options ttm pages_limit=2097152
+     options ttm page_pool_size=1048576
+   '';
 
    # systemw-wide cursor theme
    environment.sessionVariables.XCURSOR_THEME = "Bibata-Modern-Classic";
@@ -127,8 +143,11 @@ in
      RuntimeMaxUse=50M
    '';
 
-   # enable steam
-   programs.steam.enable = true;
+   # enable steam with /games
+   programs.steam = {
+     enable = true;
+     extraCompatPackages = [ pkgs.proton-ge-bin ];
+   }; 
 
    # trust waylock
    security.pam.services.waylock = {};
@@ -240,8 +259,13 @@ in
    # base system packages required
    environment.systemPackages = with pkgs; [
      tree-sitter
+     baobab
+     p7zip
+     unrar
+     xarchiver
      gammastep
      gnome-keyring
+     linuxPackages.cpupower
      chezmoi
      gcc
      gnumake
@@ -303,7 +327,6 @@ in
      papirus-icon-theme
      nerd-fonts.departure-mono
      nwg-look
-     gamescope
      easyeffects
      pavucontrol
      lazygit
@@ -318,10 +341,19 @@ in
      qbittorrent
      discord-scroll
      pulseaudio
+     mangohud
    ];
+  
+   # gamescope & gamemode
+   programs.gamescope.enable = true;
+   programs.gamemode.enable  = true;
+   
+   # xfconf
+   programs.xfconf.enable = true;
 
    # thunar plugins
-   programs.thunar.plugins = with pkgs.xfce; [
+   programs.thunar.enable = true;
+   programs.thunar.plugins = with pkgs; [
      thunar-volman
      thunar-archive-plugin
    ];
@@ -374,6 +406,8 @@ in
      "audio/mpeg" = "mpv.desktop";
      "audio/flac" = "mpv.desktop";
      "audio/ogg" = "mpv.desktop";
+
+     "inode/directory" = "thunar.desktop";
    };
 
    # NixOS state version - shouldn't be changed and matches the release the system was first installed with (26.05.8477.062346a6d85b)

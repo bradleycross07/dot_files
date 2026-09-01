@@ -1,0 +1,11 @@
+[Default Applications]
+x-scheme-handler/discord=vesktop.desktop
+application/schema+json=nvim.desktop
+text/plain=kitty-nvim.desktop
+text/x-nix=kitty-nvim.desktop
+application/zip=xarchiver.desktop
+inode/directory=thunar.desktop
+
+[Added Associations]
+application/schema+json=nvim.desktop;
+application/zip=org.gnome.FileRoller.desktop;xarchiver.desktop;
