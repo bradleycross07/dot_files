@@ -240,6 +240,8 @@ in
    # base system packages required
    environment.systemPackages = with pkgs; [
      tree-sitter
+     gammastep
+     gnome-keyring
      chezmoi
      gcc
      gnumake
