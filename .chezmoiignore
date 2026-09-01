@@ -1,5 +1,11 @@
 README.md
 
+{{if eq .chezmoi.os "linux" }}
+
+dot_config/gh/
+
+{{end}}
+
 {{if eq .chezmoi.os "windows"}}
 
 
