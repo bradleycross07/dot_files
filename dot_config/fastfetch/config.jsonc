@@ -32,17 +32,16 @@
 	"outputColor": "#B8916B"
     },
     { 
-	"type": "cpu",
-	"format": "{name} @ {freq-max}",
+	"type": "command",
         "key": "│ ├󰻠:",
+	"text": "printf 'AMD Ryzen 5 5500U @ %s GHz' \"$(awk '{sum+=$1; n++} END {printf \"%.2f\", sum/n/1000000}' /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq)\"",
 	"keyColor": "#B8916B",
 	"outputColor": "#B8916B"
     },
     { 
-	"type": "gpu",
-	"driveSpecific": true,
-	"format": "{vendor} {name} {type} @ {frequency}",
+	"type": "command",
         "key": "│ ├󰍹:",
+	"text": "printf 'AMD Lucienne Integrated @ %s' \"$(sensors | awk '/^sclk:/ {print $2, $3}')\"",
 	"keyColor": "#BD9769",
 	"outputColor": "#BD9769"
     },
