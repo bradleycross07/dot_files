@@ -1,0 +1,2 @@
+# /etc/set-environment sourced
+[ -f /etc/set-environment ] && source /etc/set-environment

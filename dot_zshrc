@@ -1,0 +1,30 @@
+# ~/.zshrc configuration
+
+# starship themeing start
+eval "$(starship init zsh)"
+
+# start zoxide
+eval "$(zoxide init zsh)"
+
+# fastfetch
+fastfetch
+alias clear="clear && fastfetch"
+
+# zinit: plugin manager
+source /nix/store/*-zinit-3.14.0/share/zinit/zinit.zsh(N)
+
+# history settings
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_DUPS
+
+# spicetify
+export PATH=$PATH:/home/bradley/.spicetify
+
+# fzf, gh & kitty
+source <(fzf --zsh)
+bindkey '^R' history-incremental-search-backward
+source <(gh completion -s zsh)
+source <(kitty + complete setup zsh)
