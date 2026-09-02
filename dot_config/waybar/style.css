@@ -67,7 +67,7 @@ button:hover {
 #cpu,
 #memory,
 #tray,
-#temperature,
+#custom-temperature,
 #network {
     padding: 0px 12px;
     margin: 4px 2px 6px 2px;

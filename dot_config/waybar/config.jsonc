@@ -15,7 +15,7 @@
     "modules-right": [
         "cpu",
         "memory",
-        "temperature",
+        "custom/temperature",
         "battery",
         "clock",
         "tray"
@@ -48,14 +48,14 @@
         "format": "{}%",
 	"on-click": "kitty --class btop-float -e btop"
     },
-    "temperature": {
-        "hwmon-path": "/sys/class/hwmon/hwmon1/temp1_input",
-        "critical-threshold": 80,
-        "format": "{temperatureC}°C",
+    "custom/temperature": {
+        "exec": "~/.config/waybar/scripts/temp.sh",
+	"interval": 5,
+        "format": "{text}",
+	"return-type": "json",
 	"on-click": "kitty --class btop-float -e btop"
     },
     "battery": {
-	"interval": 240,
         "states": {
             "good": 80,
             "warning": 20,

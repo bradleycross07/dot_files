@@ -112,14 +112,15 @@ in
    # wayland native on every application
    environment.sessionVariables = {
      NIXOS_OZONE_WL = "1"; # electron based apps use wayland
-     RADV_PERFTEST = "gpl";
      MOZ_ENABLE_WAYLAND = "1"; # firefox using wayland
+     MESA_GLTHREAD = "true"; # offload some cpu load
      QT_QPA_PLATFORM = "wayland"; # any qt apps use wayland
      MESA_SHADER_CACHE_MAX_SIZE = "10G";
      SDL_VIDEODRIVER = "wayland"; 
      XDG_CURRENT_DESKTOP = "mango";
      XDG_SESSION_TYPE = "wayland";
      BROWSER = "firefox";
+     GSETTINGS_SCHEMA_DIR = "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}/glib-2.0/schemas";
    };
 
    boot.extraModprobeConfig = ''
@@ -143,11 +144,24 @@ in
      RuntimeMaxUse=50M
    '';
 
-   # enable steam with /games
+   # enable steam
    programs.steam = {
      enable = true;
      extraCompatPackages = [ pkgs.proton-ge-bin ];
    }; 
+
+   # gamemode
+   programs.gamemode.settings = {
+     general = {
+     renice = 10;
+   };
+   
+   gpu = {
+     apply_gpu_optimisations = "accept-responsibility";
+     gpu_device = 0;
+     amd_performance_level = "high";
+     };
+   };
 
    # trust waylock
    security.pam.services.waylock = {};
@@ -218,11 +232,11 @@ in
    services.tlp = {
      enable = true;
      settings = {
-       CPU_SCALING_GOVERNOR_ON_AC = "performance";
+       CPU_SCALING_GOVERNOR_ON_AC = "schedutil";
        CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
 
        CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
-       CPU_ENERGY_PERF_POLICY_ON_BAT = "power";
+       CPU_ENERGY_PERF_POLICY_ON_BAT = "balance_power";
 
        CPU_BOOST_ON_AC = 1;
        CPU_BOOST_ON_BAT = 0;
@@ -266,6 +280,8 @@ in
      gammastep
      gnome-keyring
      linuxPackages.cpupower
+     amdgpu_top
+     ryzenadj
      chezmoi
      gcc
      gnumake

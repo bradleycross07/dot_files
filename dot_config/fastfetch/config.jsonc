@@ -40,6 +40,7 @@
     },
     { 
 	"type": "gpu",
+	"driveSpecific": true,
 	"format": "{vendor} {name} {type} @ {frequency}",
         "key": "│ ├󰍹:",
 	"keyColor": "#BD9769",

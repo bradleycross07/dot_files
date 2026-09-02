@@ -1,10 +1,12 @@
 [
-  "table-editor-obsidian",
   "fast-text-color",
-  "obsidian-git",
   "obsidian-latex-suite",
   "markitdown",
   "obsidian-plugin-toc",
   "break-page",
-  "better-export-pdf"
+  "obsidian-file-color",
+  "table-editor-obsidian",
+  "pdf-plus",
+  "image-converter",
+  "settings-profiles"
 ]
