@@ -14,10 +14,6 @@ let
       --add-flags "--enable-blink-features=MiddleClickAutoscroll"
     '';
   };
-
-  nix-gaming = import (builtins.fetchTarball {
-    url = "https://github.com/fufexan/nix-gaming/archive/master.tar.gz";
-  });
 in
 
 {
@@ -37,12 +33,32 @@ in
    # using the latest kernel rather than LTS
    boot.kernelPackages = pkgs.linuxPackages_latest;
 
+   # amd_pstate to active
+   boot.kernelParams = [ 
+     "amd_pstate=active"
+     "mitigations=off"
+   ];
+   
+   # zram optimisation
+   boot.kernel.sysctl = {
+    "vm.swappiness" = 180;
+    "vm.vfs_cache_pressure" = 50;
+   };
+   
+   # kills processes early if system runs out of memory
+   services.earlyoom.enable = true;
+
    # bootloader: systemd-boot, don't need GRUB since no dual boot and UEFI
    boot.loader.systemd-boot.enable = true;
 
    # allow systemd-boot to manage UEFI NVRAM boot entries directly
    boot.loader.efi.canTouchEfiVariables = true;
 
+   boot.extraModprobeConfig = ''
+    options ttm pages_limit=2097152
+    options ttm page_pool_size=1048576
+   '';
+   
    # btrfs mount option overrides
    fileSystems."/".options = [ "compress=zstd:3" "noatime" ];
    fileSystems."/home".options = [ "compress=zstd:3" "noatime" ];
@@ -53,18 +69,15 @@ in
   	device = "/dev/disk/by-uuid/9a47d749-9248-4be0-a850-b8adc9320d0b";
   	fsType = "btrfs";
   	options = [ "subvol=@games" "compress=zstd:3" "noatime" "exec" ];
-  };
+   };
  
    # console keymapping
    console.keyMap = "us";
 
-   # later configuartion for wayland, external keyboard is US, internal keyboard is UK
-   services.xserver.xkb.layout = "us";
-
    # system locale
    i18n.defaultLocale = "en_GB.UTF-8";
 
-   # user (myself)
+   # users
    users.users.bradley = {
      isNormalUser = true;
      description = "Bradley";
@@ -74,12 +87,12 @@ in
 
    # logind behaviour
    services.logind.settings.Login = {
-     HandleLidSwitch = "suspend";
-     HandleLidSwitchExternalPower = "ignore";
+     HandleLidSwitch = "poweroff";
+     HandleLidSwitchExternalPower = "suspend";
      HandleLidSwitchDocked = "ignore";
    };
    
-   # lid handler service
+   # lid handler service (note to track this to chezmoi)
    services.acpid.enable = true;
    services.acpid.lidEventCommands = ''
      /home/bradley/.local/bin/lid-handler.sh
@@ -103,6 +116,11 @@ in
        cat = "bat";
        nano = "nvim";
        grep = "rg";
+       rebuild = "sudo nixos-rebuild switch";
+       update = "sudo nixos-rebuild switch --upgrade";
+       du = "dust";
+       df = "duf";
+       ps = "procs";
      };
    };
 
@@ -123,21 +141,24 @@ in
      GSETTINGS_SCHEMA_DIR = "${pkgs.gsettings-desktop-schemas}/share/gsettings-schemas/${pkgs.gsettings-desktop-schemas.name}/glib-2.0/schemas";
    };
 
-   boot.extraModprobeConfig = ''
-     options ttm pages_limit=2097152
-     options ttm page_pool_size=1048576
-   '';
-
    # systemw-wide cursor theme
    environment.sessionVariables.XCURSOR_THEME = "Bibata-Modern-Classic";
    environment.sessionVariables.XCURSOR_SIZE = "30";
    
    # faster compilation
    nix.settings = {
-     cores = 0;        # 0 = auto-detect, use all available cores per build (like -j$(nproc) inside a single derivation's build script)
+     cores = 0; # 0 = auto-detect, use all available cores per build (like -j$(nproc) inside a single derivation's build script)
      max-jobs = "auto"; # how many derivations build in parallel simultaneously
+     auto-optimise-store = true;
    };
   
+   # automatic garbage collection
+   nix.gc = {
+     automatic = true;
+     dates = "weekly";
+     options = "--delete-older-than 30d";
+   };
+
    # journald max usage
    services.journald.extraConfig = ''
      SystemMaxUse=200M
@@ -153,18 +174,34 @@ in
    # gamemode
    programs.gamemode.settings = {
      general = {
-     renice = 10;
-   };
-   
-   gpu = {
-     apply_gpu_optimisations = "accept-responsibility";
-     gpu_device = 0;
-     amd_performance_level = "high";
+       renice = 10;
+     };
+
+     gpu = {
+       apply_gpu_optimisations = "accept-responsibility";
+       gpu_device = 0;
+       amd_performance_level = "high";
      };
    };
 
+   # gamescope & gamemode
+   programs.gamescope.enable = true;
+   programs.gamemode.enable = true;
+
+   # sched-ext scheduler set to lavd (more gaming/latency & desktop resposiveness targeted)
+   services.scx = {
+     enable = true;
+     scheduler = "scx_lavd";
+   };
+
    # trust waylock
-   security.pam.services.waylock = {};
+   security.pam.services.waylock = { };
+
+   # gnome-keyring PAM integration so it unlocks at login
+   services.gnome.gnome-keyring.enable = true;
+
+   # firmware update daemon
+   services.fwupd.enable = true;
 
    # networkmanager to handle both ethernet/wifi (wireless)
    networking.networkmanager.enable = true;
@@ -178,12 +215,6 @@ in
    # AMD CPU microcode
    hardware.cpu.amd.updateMicrocode = true;
    
-   # scx_bpfland scheduling
-   # services.scx = {
-   #  enable = true;
-   #  scheduler = "scx_bpfland";
-   # };
-
    # graphics: 32 bit for steam games & wine, added vulkan
    hardware.graphics = {
      enable = true;
@@ -215,8 +246,8 @@ in
      interval = "weekly";
    };
 
-   # bluetooth
-   hardware.bluetooth.enable = true;
+   # bluetooth (disabled right now)
+   hardware.bluetooth.enable = false;
 
    # seatd needed to manage I/O
    services.seatd.enable = true;
@@ -227,7 +258,7 @@ in
    # fstrim (ssd trimming)
    services.fstrim.enable = true;
 
-   # power profiles daemon disable, tlp enable
+   # tlp settings, disable power-profiles-daemon
    services.power-profiles-daemon.enable = false;
    services.tlp = {
      enable = true;
@@ -282,6 +313,12 @@ in
      linuxPackages.cpupower
      amdgpu_top
      ryzenadj
+     delta
+     dust
+     duf
+     procs
+     jq
+     tokei
      chezmoi
      gcc
      gnumake
@@ -359,11 +396,13 @@ in
      pulseaudio
      mangohud
    ];
-  
-   # gamescope & gamemode
-   programs.gamescope.enable = true;
-   programs.gamemode.enable  = true;
    
+   # direnv
+   programs.direnv = {
+     enable = true;
+     nix-direnv.enable = true;
+   };
+
    # xfconf
    programs.xfconf.enable = true;
 
@@ -378,7 +417,7 @@ in
    programs.spicetify = {
      enable = true;
      enabledExtensions = with spicetify-nix.packages.extensions; [
-     # extensions here
+      # extensions here
      ];
      enabledCustomApps = with spicetify-nix.packages.apps; [
        marketplace
@@ -388,11 +427,11 @@ in
    programs.spicetify.theme = {
      name = "blackout";
      src = pkgs.fetchFromGitHub {
-     owner = "thefoodiee";
-     repo = "blackout";
-     rev = "main"; # or a specific commit/tag
-     hash = "sha256-/kB4cknOWeFE1mPZVQpmB2y/RGY/JjU61KXD+lWXDzg="; # leave empty first, Nix will tell you the correct hash on build
-   };
+       owner = "thefoodiee";
+       repo = "blackout";
+       rev = "main"; # will need to change hash if it gets updated
+       hash = "sha256-/kB4cknOWeFE1mPZVQpmB2y/RGY/JjU61KXD+lWXDzg=";
+     };
      injectCss = true;
      injectThemeJs = true;
      replaceColors = true;
@@ -436,13 +475,6 @@ in
    documentation.man.enable = true;
    documentation.nixos.enable = true;
 
-   # automatic garbage collection  
-   nix.gc = {
-     automatic = true;
-     dates = "weekly";
-     options = "--delete-older-than 30d";
-   };
-
    # fonts available system-wide
    fonts.packages = with pkgs; [
      nerd-fonts.departure-mono
@@ -460,11 +492,4 @@ in
        sansSerif = [ "DepartureMono Nerd Font Propo" ];
        monospace = [ "DepartureMono Nerd Font Mono" ];
    };
-
-   # nix store optimization
-   nix.settings.auto-optimise-store = true;
-
-   # clean /tmp on every boot
-   boot.tmp.cleanOnBoot = true;
-
 }

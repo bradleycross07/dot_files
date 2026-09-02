@@ -1,17 +1,18 @@
 # ~/.zshrc configuration
 
-# starship themeing start
+# starship theming
 eval "$(starship init zsh)"
 
-# start zoxide
+# zoxide
 eval "$(zoxide init zsh)"
-
-# fastfetch
-fastfetch
-alias clear="clear && fastfetch"
 
 # zinit: plugin manager
 source /nix/store/*-zinit-3.14.0/share/zinit/zinit.zsh(N)
+
+# turbo-load completions
+source <(fzf --zsh)
+source <(gh completion -s zsh)
+source <(kitty + complete setup zsh)
 
 # history settings
 HISTFILE=~/.zsh_history
@@ -19,12 +20,14 @@ HISTSIZE=10000
 SAVEHIST=10000
 setopt SHARE_HISTORY
 setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE   # prefix a command with a space to exclude it from history
+setopt AUTO_CD             # type a directory name to cd into it
 
 # spicetify
 export PATH=$PATH:/home/bradley/.spicetify
 
-# fzf, gh & kitty
-source <(fzf --zsh)
 bindkey '^R' history-incremental-search-backward
-source <(gh completion -s zsh)
-source <(kitty + complete setup zsh)
+
+# open ff automatically
+fastfetch
+alias clear="command clear && printf '\e[3J' && fastfetch" # clear everything
