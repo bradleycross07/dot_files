@@ -1,0 +1,42 @@
+{
+  "pythonPath": "python",
+  "enablePlugins": false,
+  "pluginArgs": [],
+  "docintelEndpoint": "",
+  "outputPath": "",
+  "imageExtractionEnabled": true,
+  "imageSubfolderTemplate": "{filename}-images",
+  "enableBatchProgress": true,
+  "enableContextMenu": true,
+  "enableRecursiveConversion": true,
+  "outputFilenameTemplate": "{filename}",
+  "enableDragDrop": true,
+  "enableAutoFrontmatter": false,
+  "autoTags": "",
+  "conversionHistory": [
+    {
+      "inputFile": "C:\\Users\\Bradley\\University_Work\\Slides & Scripts\\Analogue Electronics\\L1_Lecture_2026_Introduction.pdf",
+      "outputFile": "C:\\Users\\Bradley\\University_Work\\markitdown-output\\L1_Lecture_2026_Introduction.md",
+      "timestamp": "2026-06-02T15:01:25.579Z",
+      "success": true,
+      "processingTimeMs": 2140,
+      "imagesExtracted": 0
+    },
+    {
+      "inputFile": "C:\\Users\\Bradley\\University_Work\\Slides & Scripts\\Analogue Electronics\\L1_Lecture_2026_Introduction.pdf",
+      "outputFile": "C:\\Users\\Bradley\\University_Work\\markitdown-output\\L1_Lecture_2026_Introduction.md",
+      "timestamp": "2026-06-02T14:50:12.839Z",
+      "success": true,
+      "processingTimeMs": 1695,
+      "imagesExtracted": 0
+    },
+    {
+      "inputFile": "C:\\Users\\Bradley\\University_Work\\Slides & Scripts\\Analogue Electronics\\L1_Lecture_2026_Introduction.pdf",
+      "outputFile": "C:\\Users\\Bradley\\University_Work\\markitdown-output\\L1_Lecture_2026_Introduction.md",
+      "timestamp": "2026-06-02T14:49:48.678Z",
+      "success": true,
+      "processingTimeMs": 1599,
+      "imagesExtracted": 0
+    }
+  ]
+}

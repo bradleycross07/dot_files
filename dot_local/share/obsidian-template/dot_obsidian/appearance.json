@@ -1,0 +1,10 @@
+{
+  "cssTheme": "Material Ocean",
+  "accentColor": "#960ab2",
+  "showRibbon": true,
+  "showViewHeader": true,
+  "baseFontSizeAction": true,
+  "nativeMenus": false,
+  "baseFontSize": 16,
+  "theme": "obsidian"
+}

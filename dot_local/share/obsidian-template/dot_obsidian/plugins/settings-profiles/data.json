@@ -1,0 +1,19 @@
+{
+  "activeProfile": {
+    "name": "main",
+    "modifiedAt": "2026-09-02T16:49:33.802Z"
+  },
+  "profileUpdate": true,
+  "profileUpdateDelay": 800,
+  "uiUpdate": true,
+  "uiUpdateInterval": 1000,
+  "devices": {
+    "0bd067a94f1e576cc35ae1f09cf3eee2ddd5a8c89d21933d8a73e449118f3470": "/home/bradley/.local/share/obsidianplugins/Profiles"
+  },
+  "statusbarInteraction": {
+    "click": "auto",
+    "ctrl_click": "none",
+    "shift_click": "none",
+    "alt_click": "none"
+  }
+}
