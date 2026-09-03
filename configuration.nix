@@ -15,6 +15,19 @@ let
     config.allowUnfree = true;
   };
 
+  proton-ge-latest = pkgs.stdenv.mkDerivation {
+    pname = "proton-ge-custom";
+    version = "GE-Proton11-6";
+    src = pkgs.fetchurl {
+      url = "https://github.com/GloriousEggroll/proton-ge-custom/releases/download/GE-Proton11-6/GE-Proton11-6-x86_64.tar.gz";
+      hash = "sha256-ZZ+NcfL3hlk0ASCyDBxaFGSqE4k5MyoTdt6iL20twuQ=";
+  };
+    installPhase = ''
+      mkdir -p $out
+      cp -r . $out/
+    '';
+  };
+
   discord-scroll = pkgs.symlinkJoin {
     name = "discord-scroll";
     paths = [ (pkgs.discord.override { withVencord = true; }) ];
@@ -112,6 +125,12 @@ in
    # USB headset stop sending VOLDOWN/UP
    services.udev.extraRules = ''
      SUBSYSTEM=="input", ATTRS{name}=="Kingston HyperX Cloud Stinger Wireless Consumer Control", ENV{LIBINPUT_IGNORE_DEVICE}="1"
+     
+     # sc-controller: allow libusb access
+     SUBSYSTEM=="usb", ATTRS{idVendor}=="054c", ATTRS{idProduct}=="0ce6", MODE="0666", TAG+="uaccess"
+     
+     # DualSense Edge
+     SUBSYSTEM=="usb", ATTRS{idVendor}=="054c", ATTRS{idProduct}=="0df2", MODE="0666", TAG+="uaccess"
    '';
 
    # set zsh system-wide as default shell
@@ -139,7 +158,7 @@ in
    environment.variables.TERMINAL = "kitty";
    
    # libexec
-   environment.pathsToLink = [ "/libexec" ];
+   environment.pathsToLink = [ "/libexec" "/share/inputplumber" ];
 
    # wayland native on every application
    environment.sessionVariables = {
@@ -181,8 +200,12 @@ in
    # enable steam
    programs.steam = {
      enable = true;
-     extraCompatPackages = [ pkgs.proton-ge-bin ];
+     extraCompatPackages = [ pkgs.proton-ge-bin proton-ge-latest ];
    }; 
+
+   # controller support
+   hardware.steam-hardware.enable = true;
+
 
    # gamemode
    programs.gamemode.settings = {
@@ -354,6 +377,10 @@ in
      pkgs-unstable.wlr-randr
      pkgs-unstable.mangohud
      tree-sitter
+     libayatana-appindicator
+     (pkgs.sc-controller.overrideAttrs (old: {
+       buildInputs = old.buildInputs ++ [ pkgs.libayatana-appindicator ];
+     }))
      baobab
      p7zip
      unrar

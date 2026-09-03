@@ -13,6 +13,8 @@ swayidle -w \
 
 kanshi &
 
+sc-controller &
+
 easyeffects --gapplication-service &
 
 wl-paste --type text --watch cliphist store &
