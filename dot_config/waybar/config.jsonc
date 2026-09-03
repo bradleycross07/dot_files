@@ -7,10 +7,10 @@
     "spacing": 4, // gaps between modules
     "on-sigusr1": "toggle",
     "modules-left": [
-        "dwl/tags"
+        "mango/workspaces"
     ],
     "modules-center": [
-        "dwl/window"
+        "mango/window"
     ],
     "modules-right": [
         "cpu",
@@ -27,9 +27,8 @@
             "deactivated": ""
         }
     },
-    "dwl/tags": {
-	"num-tags": 9,
-	"hide-vacant": true
+    "mango/workspaces": {
+	"hide-empty": true
     },
     "tray": {
         "spacing": 10
@@ -62,17 +61,5 @@
             "critical": 10
         },
         "format": "{capacity}%"
-    },
-    "custom/power": {
-        "format" : "⏻ ",
-		"tooltip": false,
-		"menu": "on-click",
-		"menu-file": "$HOME/.config/waybar/power_menu.xml", // menu file in resources folder
-		"menu-actions": {
-			"shutdown": "shutdown",
-			"reboot": "reboot",
-			"suspend": "systemctl suspend",
-			"hibernate": "systemctl hibernate"
-		}
     }
 }

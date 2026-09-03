@@ -135,7 +135,7 @@
     },
     {
         "type": "command",
-        "key": "  › OS Age   :",
+        "key": "  › OS Age      :",
         "keyColor": "#E4C558",
         "outputColor": "#E4C558",
         "text": "birth_install=$(stat -c %W /); current=$(date +%s); time_progression=$((current - birth_install)); days_difference=$((time_progression / 86400)); echo $days_difference days"
@@ -143,14 +143,14 @@
     {
         "type": "uptime",
 	"format": "{formatted}",
-        "key": "  › Uptime   :",
+        "key": "  › Uptime      :",
         "keyColor": "#E4C558",
         "outputColor": "#E4C558"
     },
     {
         "type": "datetime",
 	"format": "{year}-{month-pretty}-{day-pretty} {hour-pretty}:{minute-pretty}",
-        "key": "  › DateTime :",
+        "key": "  › Date & Time :",
         "keyColor": "#E9CB56",
         "outputColor": "#E9CB56"
     },

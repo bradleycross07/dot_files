@@ -4,6 +4,16 @@ let
   spicetify-nix = import (builtins.fetchTarball {
     url = "https://github.com/Gerg-L/spicetify-nix/archive/master.tar.gz";
   }) { };
+  
+  # nixpkgs-unstable, grab latest packages
+  # without moving whole system off of 26.05 (stable release)
+  # basically pick & choose packages to be the latest version
+  pkgs-unstable = import (builtins.fetchTarball {
+    url = "https://github.com/NixOS/nixpkgs/archive/nixos-unstable.tar.gz";
+  }) {
+    sytsem = pkgs.stdenv.hostPlatform.system;
+    config.allowUnfree = true;
+  };
 
   discord-scroll = pkgs.symlinkJoin {
     name = "discord-scroll";
@@ -46,6 +56,7 @@ in
    };
    
    # kills processes early if system runs out of memory
+   systemd.oomd.enable = false;
    services.earlyoom.enable = true;
 
    # bootloader: systemd-boot, don't need GRUB since no dual boot and UEFI
@@ -126,12 +137,14 @@ in
 
    # set kitty system-wide as default terminal
    environment.variables.TERMINAL = "kitty";
+   
+   # libexec
+   environment.pathsToLink = [ "/libexec" ];
 
    # wayland native on every application
    environment.sessionVariables = {
      NIXOS_OZONE_WL = "1"; # electron based apps use wayland
      MOZ_ENABLE_WAYLAND = "1"; # firefox using wayland
-     MESA_GLTHREAD = "true"; # offload some cpu load
      QT_QPA_PLATFORM = "wayland"; # any qt apps use wayland
      MESA_SHADER_CACHE_MAX_SIZE = "10G";
      SDL_VIDEODRIVER = "wayland"; 
@@ -185,12 +198,17 @@ in
    };
 
    # gamescope & gamemode
-   programs.gamescope.enable = true;
+   programs.gamescope = {
+      enable = true;
+      package = pkgs-unstable.gamescope;
+   };
+
    programs.gamemode.enable = true;
 
    # sched-ext scheduler set to lavd (more gaming/latency & desktop resposiveness targeted)
    services.scx = {
      enable = true;
+     package = pkgs-unstable.scx.full;
      scheduler = "scx_lavd";
    };
 
@@ -202,6 +220,19 @@ in
 
    # firmware update daemon
    services.fwupd.enable = true;
+    
+   # snapper: restore files in case of failure/backup
+   services.snapper = {
+     configs.root = {
+     SUBVOLUME = "/";
+     ALLOW_USERS = [ "bradley" ];
+     TIMELINE_CREATE = true;
+     TIMELINE_CLEANUP = true;
+     TIMELINE_LIMIT_HOURLY = 5;
+     TIMELINE_LIMIT_DAILY = 7;
+     TIMELINE_LIMIT_WEEKLY = 4;
+     };
+   };
 
    # networkmanager to handle both ethernet/wifi (wireless)
    networking.networkmanager.enable = true;
@@ -219,6 +250,8 @@ in
    hardware.graphics = {
      enable = true;
      enable32Bit = true;
+     extraPackages = [ pkgs-unstable.mangohud ];
+     extraPackages32 = [ pkgs-unstable.pkgsi686Linux.mangohud ];
    };
 
    # enable for screen sharing, file pickers etc.
@@ -229,7 +262,7 @@ in
      common.default = "*";
      common."org.freedesktop.impl.portal.ScreenCast" = "wlr";
    };
-   
+ 
    # audio: pipewire
    services.pulseaudio.enable = false;
    services.pipewire = {
@@ -263,7 +296,7 @@ in
    services.tlp = {
      enable = true;
      settings = {
-       CPU_SCALING_GOVERNOR_ON_AC = "schedutil";
+       CPU_SCALING_GOVERNOR_ON_AC = "performance";
        CPU_SCALING_GOVERNOR_ON_BAT = "powersave";
 
        CPU_ENERGY_PERF_POLICY_ON_AC = "performance";
@@ -303,6 +336,23 @@ in
 
    # base system packages required
    environment.systemPackages = with pkgs; [
+     pkgs-unstable.mangowc
+     ((pkgs-unstable.waybar.override {
+       cavaSupport = false;
+       }).overrideAttrs (old: {
+       	 doInstallCheck = false;
+	 version = "unstable-2026-08-27";
+	 src = pkgs.fetchFromGitHub {
+	 owner = "Alexays";
+	 repo = "Waybar";
+	 rev = "6d60c8e02be67bb85bb9b1ea803f2fbcf0722002";
+	 hash = "sha256-G6AcGuevhkYflQHhJq9GnLhEMgcI51Y6MYKBQvdRPDc=";
+        };
+       mesonFlags = old.mesonFlags ++ [ "-Dwwan=disabled" ];
+     }))
+     pkgs-unstable.kanshi
+     pkgs-unstable.wlr-randr
+     pkgs-unstable.mangohud
      tree-sitter
      baobab
      p7zip
@@ -311,11 +361,13 @@ in
      gammastep
      gnome-keyring
      linuxPackages.cpupower
+     sysstat
      amdgpu_top
      ryzenadj
      delta
      dust
      duf
+     libstrangle
      procs
      jq
      tokei
@@ -347,7 +399,6 @@ in
      eza
      zinit
      starship
-     mangowc
      xwayland
      bibata-cursors
      vulkan-loader
@@ -359,15 +410,12 @@ in
      lm_sensors
      zoxide
      fuzzel
-     wlr-randr
-     waybar
      thunar
      yazi
      waylock
      swayidle
      swaybg
      cliphist
-     kanshi
      alsa-utils
      xdg-user-dirs 
      playerctl
@@ -394,7 +442,6 @@ in
      qbittorrent
      discord-scroll
      pulseaudio
-     mangohud
    ];
    
    # direnv
