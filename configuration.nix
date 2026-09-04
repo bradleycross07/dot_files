@@ -116,12 +116,6 @@ in
      HandleLidSwitchDocked = "ignore";
    };
    
-   # lid handler service (note to track this to chezmoi)
-   services.acpid.enable = true;
-   services.acpid.lidEventCommands = ''
-     /home/bradley/.local/bin/lid-handler.sh
-   '';
-   
    # USB headset stop sending VOLDOWN/UP
    services.udev.extraRules = ''
      SUBSYSTEM=="input", ATTRS{name}=="Kingston HyperX Cloud Stinger Wireless Consumer Control", ENV{LIBINPUT_IGNORE_DEVICE}="1"
@@ -158,7 +152,7 @@ in
    environment.variables.TERMINAL = "kitty";
    
    # libexec
-   environment.pathsToLink = [ "/libexec" "/share/inputplumber" ];
+   environment.pathsToLink = [ "/libexec" ];
 
    # wayland native on every application
    environment.sessionVariables = {
@@ -284,6 +278,11 @@ in
    xdg.portal.config = {
      common.default = "*";
      common."org.freedesktop.impl.portal.ScreenCast" = "wlr";
+   };
+
+   xdg.portal.wlr.settings.screencast = {
+    chooser_type = "simple";
+    chooser_cmd = "${pkgs.slurp}/bin/slurp -f %o -or";
    };
  
    # audio: pipewire
@@ -471,6 +470,16 @@ in
      pulseaudio
    ];
    
+   # obs
+   programs.obs-studio = {
+     enable = true;
+     enableVirtualCamera = true;
+     plugins = with pkgs.obs-studio-plugins; [
+       obs-vaapi
+       obs-pipewire-audio-capture
+     ];
+   };
+
    # direnv
    programs.direnv = {
      enable = true;

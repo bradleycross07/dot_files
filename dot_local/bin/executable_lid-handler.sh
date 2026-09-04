@@ -1,11 +1,10 @@
-### !/bin/sh
-#
-#
+#!/bin/sh
 
 LID_STATE=$(cat /proc/acpi/button/lid/*/state | awk '{print $2}')
 
 if [ "$LID_STATE" = "closed" ]; then
-	wlr-randr --output eDP-1 --off
+    wlr-randr --output eDP-1 --off
+    waylock
 else
-	wlr-randr --output eDP-1 --on
+    wlr-randr --output eDP-1 --on
 fi

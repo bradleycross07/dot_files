@@ -7,8 +7,9 @@ wpctl set-volume -l 1.0 @DEFAULT_AUDIO_SINK@ 80%
 dbus-update-activation-environment --systemd WAYLAND_DISPLAY XDG_CURRENT_DESKTOP DISPLAY
 
 swayidle -w \
-	timeout 1200 'waylock' \
-	timeout 3600 'systemctl suspend' \
+	timeout 600 'waylock' \
+	timeout 900 'mmsg dispatch sleep_monitor,eDP-1; mmsg dispatch sleep_monitor,HDMI-A-1' resume 'mmsg dispatch wakeup_monitor,eDP-1; mmsg dispatch wakeup_monitor,HDMI-A-1' \
+	timeout 10800 'systemctl poweroff' \
 	before-sleep 'waylock' &
 
 kanshi &
