@@ -47,7 +47,7 @@
     },
     { 
 	"type": "memory",
-	"format": "{used} / {total}",	
+	"format": "{used} / {total} @ 4266 MT/s",	
         "key": "│ ├󰑭:",
 	"keyColor": "#C29D67",
 	"outputColor": "#C29D67"
