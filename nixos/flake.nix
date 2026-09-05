@@ -10,15 +10,18 @@
 
     # spicetify
     spicetify-nix.url = "github:Gerg-L/spicetify-nix";
+
+    # aurelia (steam CLI)
+    aurelia.url = "github:Drackrath/Aurelia";
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, spicetify-nix, ... }:
+  outputs = { self, nixpkgs, nixpkgs-unstable, spicetify-nix, aurelia, ... }:
     {
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
 
         specialArgs = {
-          inherit nixpkgs-unstable spicetify-nix;
+          inherit nixpkgs-unstable spicetify-nix aurelia;
 
 	  pkgs-unstable = import nixpkgs-unstable {
             system = "x86_64-linux";

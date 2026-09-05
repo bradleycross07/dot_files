@@ -49,6 +49,60 @@
       ps = "procs";
     };
   };
+  
+  # allow compatibility for DLLs
+  programs.nix-ld = {
+   
+   enable = true;
+   
+   libraries = with pkgs; [
+    
+    # X11 compatibility
+    libX11
+    libXext
+    libXcursor
+    libXi
+    libXrandr
+    libXinerama
+    libXrender
+    libxcb
+    libXfixes
+    libXcomposite
+    libXdamage
+    libXau
+    libXdmcp
+
+    # wayland
+    wayland
+
+    # vulkan / graphics
+    vulkan-loader
+    pkgsi686Linux.vulkan-loader
+    libdrm
+    mesa
+
+    # Fonts
+    freetype
+    fontconfig
+
+    # Networking / USB
+    libusb1
+    gnutls
+
+    # audio
+    alsa-lib
+    libpulseaudio
+
+    # general runtime libraries
+    zlib
+    glib
+    dbus
+    expat
+    pango
+    cairo
+   
+   ];
+  };
 
   # environment
   environment.variables.TERMINAL = "kitty";

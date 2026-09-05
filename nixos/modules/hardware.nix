@@ -19,11 +19,6 @@
   # allow systemd-boot to manage UEFI NVRAM boot entries directly & don't need GRUB since no dual-boot
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
- 
-  boot.extraModprobeConfig = ''
-    options ttm pages_limit=2097152
-    options ttm page_pool_size=1048576
-  '';
 
   # filesystems
   fileSystems."/".options = [ "compress=zstd:3" "noatime" ];

@@ -1,4 +1,4 @@
-{ config, pkgs, pkgs-unstable, spicetify-nix, ... }:
+{ config, pkgs, pkgs-unstable, spicetify-nix, aurelia, ... }:
 
 let
   spicePkgs = spicetify-nix.legacyPackages.${pkgs.system};
@@ -24,20 +24,20 @@ in
 {
   environment.systemPackages = with pkgs; [
     tree-sitter
-    libayatana-appindicator
-
+    pkgs-unstable.mangohud
     (pkgs.sc-controller.overrideAttrs (old: {
       buildInputs = old.buildInputs ++ [
         pkgs.libayatana-appindicator
       ];
     }))
-
     baobab
+    bubblewrap
+    umu-launcher
+    aurelia.packages.${pkgs.system}.default
     p7zip
     unrar
     xarchiver
     gammastep
-    gnome-keyring
     linuxPackages.cpupower
     sysstat
     amdgpu_top
@@ -45,13 +45,13 @@ in
     delta
     dust
     duf
-    libstrangle
     procs
     jq
     tokei
     chezmoi
     gcc
     gnumake
+    python3
     fzf
     stylua
     shfmt
@@ -77,20 +77,16 @@ in
     eza
     zinit
     starship
-    vulkan-loader
     vulkan-tools
     lm_sensors
     zoxide
-    thunar
     yazi
     cliphist
     alsa-utils
     xdg-user-dirs
     polkit_gnome
     ffmpegthumbnailer
-    ntfs3g
     gnome-themes-extra
-    nerd-fonts.departure-mono
     easyeffects
     pavucontrol
     lazygit
@@ -99,7 +95,6 @@ in
     obsidian
     evtest
     glib
-    gsettings-desktop-schemas
     motrix
     qbittorrent
     discord-scroll
