@@ -22,6 +22,10 @@
       "input"
     ];
     shell = pkgs.zsh;
+
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIBca/etIVaovCsz9647TlQhl/4Y6vFn7ELdUejdipt4L nixos-laptop-login"
+    ];
   };
 
   # zsh shell
@@ -140,7 +144,17 @@
       "flakes"
     ];
   };
-  
+   
+  # auto-updates
+  system.autoUpgrade = {
+    enable = true;
+    flake = "/home/bradley/nixos#nixos";
+    flags = [ "--update-input" "nixpkgs" "--update-input" "nixpkgs-unstable" ];
+    dates = "weekly";
+    randomizedDelaySec = "45min";
+    allowReboot = false;
+  };
+
   # automatic garbage collection
   nix.gc = {
     automatic = true;
@@ -157,6 +171,13 @@
   # documentation/manual enabled
   documentation.man.enable = true;
   documentation.nixos.enable = true;
+
+  # firewall
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [ 22 ];
+    allowedUDPPorts = [ ];
+  };
 
   # fonts, some apps require these fonts
   fonts.packages = with pkgs; [

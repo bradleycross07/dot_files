@@ -64,6 +64,15 @@
   # networking
   networking.networkmanager.enable = true;
 
+  # SSH
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;
+      PermitRootLogin = "no";
+    };
+  };
+
   # audio
   services.pulseaudio.enable = false;
 

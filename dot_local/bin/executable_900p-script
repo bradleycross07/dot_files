@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+export PROTON_ENABLE_WAYLAND=1
+
+exec gamescope -w 1600 -h 900 -W 1600 -H 900 -r 144 -f -- \
+  mangohud "$@"
