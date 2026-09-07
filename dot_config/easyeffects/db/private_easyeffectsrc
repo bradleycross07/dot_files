@@ -2,7 +2,7 @@
 inputDevice=alsa_input.usb-Kingston_HyperX_Cloud_Stinger_Wireless-00.mono-fallback
 plugins=compressor#0,rnnoise#0,gate#0
 visiblePage=pluginsPage
-visiblePlugin=rnnoise#0
+visiblePlugin=gate#0
 
 [StreamOutputs]
 outputDevice=alsa_output.usb-Kingston_HyperX_Cloud_Stinger_Wireless-00.analog-stereo
@@ -10,8 +10,8 @@ visiblePage=pluginsPage
 
 [Window]
 autostartOnLogin=true
-height=1392
+height=1406
 reducePluginsListControls=true
 showTrayIcon=false
 visiblePage=inputPage
-width=1396
+width=1382

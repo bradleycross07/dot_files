@@ -46,3 +46,4 @@ alias ps="procs"
 # open ff automatically
 fastfetch
 alias clear="command clear && printf '\e[3J' && fastfetch" # clear everything
+
