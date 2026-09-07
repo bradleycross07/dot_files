@@ -1,0 +1,29 @@
+# ~/.zshrc configuration
+
+# starship theming
+eval "$(starship init zsh)"
+
+# zoxide
+eval "$(zoxide init zsh)"
+
+# zinit: plugin manager
+source ~/.local/share/zinit/zinit.git/zinit.zsh
+
+# turbo-load completions
+source <(fzf --zsh)
+source <(gh completion -s zsh)
+
+# history settings
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt SHARE_HISTORY
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE   # prefix a command with a space to exclude it from history
+setopt AUTO_CD             # type a directory name to cd into it
+
+bindkey '^R' history-incremental-search-backward
+
+# open ff automatically
+fastfetch
+alias clear="command clear && printf '\e[3J' && fastfetch" # clear everything

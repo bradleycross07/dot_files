@@ -7,16 +7,6 @@ nixos/
 .config/kitty/
 .config/waybar/
 .config/systemd/
-.config/mozilla
-.zshrc
-.zprofile
-.local/share/obsidian-template
-
-{{end}}
-
-{{if eq .chezmoi.os "linux" }}
-
-./gh/
 
 {{end}}
 
