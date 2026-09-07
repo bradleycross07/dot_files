@@ -1,13 +1,21 @@
 # ~/.zshrc configuration
 
+# zinit: plugin manager
+source ~/.local/share/zinit/zinit.git/zinit.zsh
+
 # starship theming
 eval "$(starship init zsh)"
 
 # zoxide
 eval "$(zoxide init zsh)"
 
-# zinit: plugin manager
-source ~/.local/share/zinit/zinit.git/zinit.zsh
+# completion
+autoload -Uz compinit
+compinit
+
+# autocomplete suggestions & syntax
+zinit light zsh-users/zsh-autosuggestions
+zinit light zsh-users/zsh-syntax-highlighting
 
 # turbo-load completions
 source <(fzf --zsh)
@@ -23,6 +31,17 @@ setopt HIST_IGNORE_SPACE   # prefix a command with a space to exclude it from hi
 setopt AUTO_CD             # type a directory name to cd into it
 
 bindkey '^R' history-incremental-search-backward
+
+# needed shell aliases
+alias ff="fastfetch"
+alias ls="eza --color=always"
+alias lt="eza --tree --color=always"
+alias cat="bat"
+alias nano="nvim"
+alias grep="rg"
+alias du="dust"
+alias df="duf"
+alias ps="procs"
 
 # open ff automatically
 fastfetch

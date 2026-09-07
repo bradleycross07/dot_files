@@ -9,7 +9,7 @@ $directory\
 [](fg:#D9A62E bg:#EAD9B8)\
 $git_branch\
 $git_status\
-[](fg:#EAD9B8 bg:#FFF8E7)\
+[](fg:#EAD9B8 bg:#D6C6A5)\
 $c\
 $elixir\
 $elm\
@@ -24,7 +24,7 @@ $bun\
 $nim\
 $rust\
 $scala\
-[](fg:#FFF8E7 bg:#3B2A1A)\
+[](fg:#D6C6A5 bg:#3B2A1A)\
 $docker_context\
 [](fg:#3B2A1A bg:#6F4E37)\
 $time\
@@ -50,7 +50,7 @@ style = "bg:#6F4E37"
 disabled = true # Disabled by default
 
 [directory]
-style = "bg:#D9A62E fg:#1A1108"
+style = "bg:#D9A62E fg:#2E1E10"
 format = "[ $path ]($style)"
 truncation_length = 3
 truncation_symbol = "…/"
@@ -70,89 +70,89 @@ truncation_symbol = "…/"
 
 [c]
 symbol = " "
-style = "bg:#FFF8E7"
+style = "bg:#D6C6A5 fg:#2E1E10"
 format = '[ $symbol ($version) ]($style)'
 
 [cpp]
 symbol = " "
-style = "bg:#FFF8E7"
+style = "bg:#D6C6A5 fg:#2E1E10"
 format = '[ $symbol ($version) ]($style)'
 
 [docker_context]
 symbol = " "
-style = "bg:#3B2A1A"
+style = "bg:#3B2A1A fg:#2E1E10"
 format = '[ $symbol $context ]($style)'
 
 [elixir]
 symbol = " "
-style = "bg:#FFF8E7"
+style = "bg:#D6C6A5 fg:#2E1E10"
 format = '[ $symbol ($version) ]($style)'
 
 [elm]
 symbol = " "
-style = "bg:#FFF8E7"
+style = "bg:#D6C6A5 fg:#2E1E10"
 format = '[ $symbol ($version) ]($style)'
 
 [git_branch]
 symbol = ""
-style = "bg:#EAD9B8 fg:#1A1108"
+style = "bg:#EAD9B8 fg:#2E1E10"
 format = '[ $symbol $branch ]($style)'
 
 [git_status]
-style = "bg:#EAD9B8 fg:#1A1108"
+style = "bg:#EAD9B8 fg:#2E1E10"
 format = '[$all_status$ahead_behind ]($style)'
 
 [golang]
 symbol = " "
-style = "bg:#FFF8E7"
+style = "bg:#D6C6A5 fg:#2E1E10"
 format = '[ $symbol ($version) ]($style)'
 
 [gradle]
-style = "bg:#FFF8E7"
+style = "bg:#D6C6A5 fg:#2E1E10"
 format = '[ $symbol ($version) ]($style)'
 
 [haskell]
 symbol = " "
-style = "bg:#FFF8E7"
+style = "bg:#D6C6A5 fg:#2E1E10"
 format = '[ $symbol ($version) ]($style)'
 
 [java]
 symbol = " "
-style = "bg:#FFF8E7"
+style = "bg:#D6C6A5 fg:#2E1E10"
 format = '[ $symbol ($version) ]($style)'
 
 [julia]
 symbol = " "
-style = "bg:#FFF8E7"
+style = "bg:#D6C6A5 fg:#2E1E10"
 format = '[ $symbol ($version) ]($style)'
 
 [maven]
-style = "bg:#FFF8E7"
+style = "bg:#D6C6A5 fg:#2E1E10"
 format = '[ $symbol ($version) ]($style)'
 
 [nodejs]
 symbol = ""
-style = "bg:#FFF8E7"
+style = "bg:#D6C6A5 fg:#2E1E10"
 format = '[ $symbol ($version) ]($style)'
 
 [bun]
 symbol = ""
-style = "bg:#FFF8E7"
+style = "bg:#D6C6A5 fg:#2E1E10"
 format = '[ $symbol ($version) ]($style)'
 
 [nim]
 symbol = "󰆥 "
-style = "bg:#FFF8E7"
+style = "bg:#D6C6A5 fg:#2E1E10"
 format = '[ $symbol ($version) ]($style)'
 
 [rust]
 symbol = ""
-style = "bg:#FFF8E7"
+style = "bg:#D6C6A5 fg:#2E1E10"
 format = '[ $symbol ($version) ]($style)'
 
 [scala]
 symbol = " "
-style = "bg:#FFF8E7"
+style = "bg:#D6C6A5 fg:#2E1E10"
 format = '[ $symbol ($version) ]($style)'
 
 [time]

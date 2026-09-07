@@ -1,11 +1,43 @@
 [Default Applications]
-x-scheme-handler/discord=vesktop.desktop
-application/schema+json=nvim.desktop
-text/plain=kitty-nvim.desktop
-text/x-nix=kitty-nvim.desktop
+text/html=userapp-Firefox-OVL0U3.desktop
+x-scheme-handler/http=userapp-Firefox-OVL0U3.desktop
+x-scheme-handler/https=userapp-Firefox-OVL0U3.desktop
+x-scheme-handler/about=firefox.desktop
+x-scheme-handler/unknown=firefox.desktop
+image/png=imv.desktop
+image/jpeg=imv.desktop
+image/gif=imv.desktop
+image/webp=imv.desktop
+image/bmp=imv.desktop
+image/tiff=imv.desktop
+video/mp4=mpv.desktop
+video/x-matroska=mpv.desktop
+video/webm=mpv.desktop
+video/quicktime=mpv.desktop
+audio/mpeg=mpv.desktop
+audio/flac=mpv.desktop
+audio/ogg=mpv.desktop
 application/zip=xarchiver.desktop
+text/plain=nvim.desktop
 inode/directory=thunar.desktop
+x-scheme-handler/chrome=userapp-Firefox-OVL0U3.desktop
+application/x-extension-htm=userapp-Firefox-OVL0U3.desktop
+application/x-extension-html=userapp-Firefox-OVL0U3.desktop
+application/x-extension-shtml=userapp-Firefox-OVL0U3.desktop
+application/xhtml+xml=userapp-Firefox-OVL0U3.desktop
+application/x-extension-xhtml=userapp-Firefox-OVL0U3.desktop
+application/x-extension-xht=userapp-Firefox-OVL0U3.desktop
 
 [Added Associations]
 application/schema+json=nvim.desktop;
 application/zip=org.gnome.FileRoller.desktop;xarchiver.desktop;
+x-scheme-handler/http=userapp-Firefox-OVL0U3.desktop;
+x-scheme-handler/https=userapp-Firefox-OVL0U3.desktop;
+x-scheme-handler/chrome=userapp-Firefox-OVL0U3.desktop;
+text/html=userapp-Firefox-OVL0U3.desktop;
+application/x-extension-htm=userapp-Firefox-OVL0U3.desktop;
+application/x-extension-html=userapp-Firefox-OVL0U3.desktop;
+application/x-extension-shtml=userapp-Firefox-OVL0U3.desktop;
+application/xhtml+xml=userapp-Firefox-OVL0U3.desktop;
+application/x-extension-xhtml=userapp-Firefox-OVL0U3.desktop;
+application/x-extension-xht=userapp-Firefox-OVL0U3.desktop;
