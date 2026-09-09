@@ -2,7 +2,7 @@
 Type=Application
 Name=Obsidian
 Comment=Knowledge base
-Exec=obsidian %u
+Exec=env PIPEWIRE_QUANTUM=2048/48000 obsidian --enable-features=UseOzonePlatform --ozone-platform=wayland --enable-blink-features=MiddleClickAutoscroll %U
 Icon=obsidian
 Terminal=false
 MimeType=x-scheme-handler/obsidian;
