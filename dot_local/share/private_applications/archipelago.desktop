@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Archipelago
+Comment=Multi-game randomizer launcher
+Exec=archipelago
+Icon=archipelago
+Terminal=false
+Categories=Game;

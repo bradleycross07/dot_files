@@ -1,0 +1,2 @@
+#!/bin/sh
+exec ~/.local/share/archipelago/Archipelago_0.6.7_linux-x86_64.AppImage "$@"

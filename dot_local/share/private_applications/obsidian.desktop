@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Obsidian
+Comment=Knowledge base
+Exec=obsidian %u
+Icon=obsidian
+Terminal=false
+MimeType=x-scheme-handler/obsidian;
+Categories=Office;
