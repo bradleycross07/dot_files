@@ -3,6 +3,6 @@ Type=Application
 Name=Archipelago
 Comment=Multi-game randomizer launcher
 Exec=archipelago
-Icon=archipelago
+Icon=/home/bradley/.local/share/icons/archipelago.png
 Terminal=false
 Categories=Game;

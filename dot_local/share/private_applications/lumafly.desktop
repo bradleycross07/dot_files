@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=Lumafly
+Exec=/home/bradley/.local/share/lumafly/Lumafly %u
+Path=/home/bradley/.local/share/lumafly
+Icon=/home/bradley/.local/share/icons/lumafly.png
+Terminal=false
+MimeType=x-scheme-handler/lumafly;
+Categories=Game;
