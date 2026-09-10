@@ -1,0 +1,26 @@
+# ~/.zprofile configuration
+
+ulimit -c unlimited
+
+export NO_AT_BRIDGE=1
+export GTK_A11Y=none
+export GIO_USE_VFS=local
+
+export XDG_CURRENT_DESKTOP=wlroots
+
+export MOZ_ENABLE_WAYLAND=1
+export QT_QPA_PLATFORM=wayland
+export SDL_VIDEODRIVER=wayland,x11
+export XDG_SESSION_TYPE=wayland
+
+export XCURSOR_THEME=Bibata-Modern-Classic
+export XCURSOR_SIZE=30
+
+export BROWSER=firefox
+export EDITOR=nvim
+
+export PATH="$HOME/.local/bin:$HOME/.spicetify:$PATH"
+
+if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
+    exec dbus-run-session dwl > "$HOME/.local/share/dwl.log" 2>&1
+fi
