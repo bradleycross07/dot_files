@@ -27,6 +27,7 @@ application/x-extension-shtml=userapp-Firefox-OVL0U3.desktop
 application/xhtml+xml=userapp-Firefox-OVL0U3.desktop
 application/x-extension-xhtml=userapp-Firefox-OVL0U3.desktop
 application/x-extension-xht=userapp-Firefox-OVL0U3.desktop
+x-scheme-handler/lumafly=lumafly.desktop
 
 [Added Associations]
 application/schema+json=nvim.desktop;

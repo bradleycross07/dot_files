@@ -19,4 +19,5 @@
 #   exec gamescope -W 2560 -H 1440 -- "$@"
 #
 # Default: run the resolved command unchanged.
-exec gamescope -w 1600 -h 900 -W 1600 -H 900 -r 144 -F linear -f -- mangohud "$@"
+export -n LD_LIBRARY_PATH
+exec gamescope -w 1600 -h 900 -W 1600 -H 900 -r 144 -f -- mangohud "$@"
