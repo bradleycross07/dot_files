@@ -1,0 +1,3 @@
+#!/bin/sh
+cd ~/.local/share/lumafly || exit 1
+exec ./Lumafly "$@"

@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+cd /tmp
+curl -L -o vscode.tar.gz 'https://code.visualstudio.com/sha/download?build=stable&os=linux-x64'
+rm -rf ~/.local/opt/VSCode-linux-x64
+tar -xzf vscode.tar.gz -C ~/.local/opt
+rm vscode.tar.gz
+echo "VS Code updated."
