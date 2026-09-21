@@ -1,99 +1,214 @@
-/* custom colours - pompompurin/coffee brown */
-@define-color theme_selected_bg_color #A0785A;
-@define-color theme_selected_fg_color #F5E6CA;
+/* custom colours - pompompurin/coffee brown (dark base) */
+@define-color accent_brown #A0785A;
+@define-color accent_light #C9A27E;
+@define-color accent_fg    #F5E6CA;
 
-/* force selection colors specifically in list/tree views*/
+@define-color theme_selected_bg_color @accent_brown;
+@define-color theme_selected_fg_color @accent_fg;
+
+/* override Breeze-Dark's accent colours at the source */
+@define-color theme_selected_bg_color_breeze                   @accent_brown;
+@define-color theme_hovering_selected_bg_color_breeze          @accent_light;
+@define-color theme_unfocused_selected_bg_color_alt_breeze     @accent_brown;
+@define-color theme_unfocused_selected_bg_color_breeze         alpha(@accent_brown, 0.5);
+
+@define-color theme_view_hover_decoration_color_breeze         @accent_light;
+@define-color theme_view_active_decoration_color_breeze        @accent_brown;
+
+@define-color theme_button_decoration_hover_breeze             @accent_light;
+@define-color theme_button_decoration_focus_breeze             @accent_light;
+@define-color theme_button_decoration_hover_backdrop_breeze    @accent_light;
+@define-color theme_button_decoration_focus_backdrop_breeze    @accent_light;
+
+/* disabled/insensitive variants */
+@define-color insensitive_selected_bg_color_breeze                          alpha(@accent_brown, 0.35);
+@define-color insensitive_unfocused_selected_bg_color_breeze                alpha(@accent_brown, 0.35);
+@define-color theme_button_decoration_hover_insensitive_breeze              alpha(@accent_brown, 0.35);
+@define-color theme_button_decoration_focus_insensitive_breeze              alpha(@accent_brown, 0.35);
+@define-color theme_button_decoration_hover_backdrop_insensitive_breeze     alpha(@accent_brown, 0.35);
+@define-color theme_button_decoration_focus_backdrop_insensitive_breeze     alpha(@accent_brown, 0.35);
+
+/* selected text colour to match your cream */
+@define-color theme_selected_fg_color_breeze                                @accent_fg;
+@define-color theme_unfocused_selected_fg_color_breeze                      @accent_fg;
+
+/* selections */
+*:selected,
+row:selected,
 treeview.view:selected,
 treeview.view row:selected,
-treeview.view row:selected:focus,
-row:selected {
-    background-color: #A0785A;
-    color: #F5E6CA;
+treeview.view row:selected:focus {
+    background-color: @accent_brown;
+    color: @accent_fg;
 }
 
-/* fix secondary/dimmed text (size, date columns) */
 row:selected .dim-label,
 treeview.view:selected .dim-label {
-    color: #F5E6CA;
+    color: @accent_fg;
     opacity: 1;
 }
 
-*:selected {
-    background-color: #A0785A;
-    color: #F5E6CA;
-}
-
-/* selection when window loses focus */
 *:selected:backdrop {
-    background-color: shade(#A0785A, 0.6);
-    color: #F5E6CA;
+    background-color: shade(@accent_brown, 0.7);
+    color: @accent_fg;
 }
 
-/* button hover/active*/
+/* buttons */
 button:hover {
-    background-color: shade(#A0785A, 0.4);
+    background-color: alpha(@accent_brown, 0.3);
 }
 
 button:active,
 button:checked {
-    background-color: #A0785A;
-    color: #F5E6CA;
+    background-color: @accent_brown;
+    color: @accent_fg;
 }
 
-/* scrollbar*/
+/* scrollbar */
 scrollbar slider {
-    background-color: #A0785A;
+    background-color: @accent_brown;
     border-radius: 6px;
 }
 
 scrollbar slider:hover {
-    background-color: #2b1a0f;
+    background-color: @accent_light;
 }
 
 /* focus outline */
 entry:focus,
 button:focus {
-    border-color: #2b1a0f;
+    border-color: @accent_light;
 }
 
-/* when checkboxes/radio buttons are checked */
+/* checkboxes / radio buttons */
 check:checked,
 radio:checked {
     background-color: transparent;
-    border-color: #A0785A;
-    color: #A0785A;
+    border-color: @accent_brown;
+    color: @accent_light;
     box-shadow: none;
     outline: none;
 }
 
-check:checked:focus,
-radio:checked:focus,
 check:focus,
-radio:focus {
-    box-shadow: none;
-    outline: none;
-}
-
+radio:focus,
 check:checked:focus,
-radio:checked:focus,
-check:focus,
-radio:focus {
+radio:checked:focus {
     box-shadow: none;
     outline: none;
 }
 
-/* any hyperlinks */
+/* links */
 *.link,
 a {
-    color: #2b1a0f;
+    color: @accent_light;
 }
 
 /* progress bars */
 progressbar progress {
-    background-image: linear-gradient(to right, #A0785A, #2b1a0f);
+    background-image: linear-gradient(to right, @accent_brown, @accent_light);
 }
 
-/* switches when checked */
+/* switches */
 switch:checked {
-    background-color: #A0785A;
+    background-color: @accent_brown;
+}
+
+/* sliders */
+scale highlight,
+scale trough highlight {
+    background-color: @accent_brown;
+    background-image: none;
+    border-color: @accent_brown;
+}
+
+scale slider:hover,
+scale slider:active {
+    border-color: @accent_light;
+}
+
+/* text selection inside entries and text views */
+selection {
+    background-color: @accent_brown;
+    color: @accent_fg;
+}
+
+/* dropdown / menu items */
+menu menuitem:hover,
+.menu menuitem:hover,
+menuitem:hover,
+modelbutton:hover,
+popover modelbutton:hover {
+    background-color: @accent_brown;
+    color: @accent_fg;
+}
+
+/* hover outlines */
+button:hover,
+entry:hover,
+spinbutton:hover,
+combobox button:hover {
+    border-color: @accent_light;
+}
+
+/* focus outlines */
+entry:focus,
+spinbutton:focus,
+combobox button:focus,
+button:focus {
+    border-color: @accent_light;
+    box-shadow: inset 0 0 0 1px @accent_brown;
+}
+
+/* slider focus / hover rings */
+scale:focus slider,
+scale slider:focus,
+scale slider:hover {
+    border-color: @accent_light;
+    box-shadow: none;
+}
+
+/* focus rings (the dotted/solid outline around focused widgets) */
+* {
+    outline-color: alpha(@accent_light, 0.6);
+}
+
+/* checkbox and radio hover borders */
+check:hover,
+radio:hover {
+    border-color: @accent_light;
+}
+
+/* stop Breeze drawing its own blue glow on hover */
+button:hover,
+entry:hover,
+spinbutton:hover,
+combobox button:hover {
+    box-shadow: none;
+}
+
+/* list/tree row hover (theme list in nwg-look, file pickers, etc.) */
+treeview.view:hover,
+treeview.view row:hover,
+list row:hover,
+row:hover {
+    background-color: alpha(@accent_brown, 0.25);
+    box-shadow: none;
+}
+
+/* all buttons incl. toggle buttons (dropdowns), hover and focus */
+button:hover,
+button:focus,
+button:checked,
+togglebutton:hover,
+combobox button:hover,
+combobox button:checked {
+    border-color: @accent_light;
+    box-shadow: none;
+    border-image: none;
+}
+
+/* generic hover outline catch-all */
+*:hover {
+    outline-color: alpha(@accent_light, 0.6);
 }

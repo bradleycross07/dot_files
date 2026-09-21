@@ -18,7 +18,7 @@ audio/mpeg=mpv.desktop
 audio/flac=mpv.desktop
 audio/ogg=mpv.desktop
 application/zip=xarchiver.desktop
-text/plain=nvim.desktop
+text/plain=code.desktop
 inode/directory=thunar.desktop
 x-scheme-handler/chrome=userapp-Firefox-OVL0U3.desktop
 application/x-extension-htm=userapp-Firefox-OVL0U3.desktop
@@ -32,6 +32,18 @@ x-scheme-handler/motrix=motrix-appimage.desktop
 application/x-bittorrent=org.qbittorrent.qBittorrent.desktop
 x-scheme-handler/magnet=motrix-appimage.desktop
 x-scheme-handler/scarab=lumafly.desktop
+text/x-c++src=code.desktop
+text/x-c++hdr=code.desktop
+text/x-csrc=code.desktop
+text/x-chdr=code.desktop
+application/xml=code.desktop
+text/xml=code.desktop
+application/yaml=code.desktop
+application/x-yaml=code.desktop
+application/json=code.desktop
+text/markdown=code.desktop
+text/x-python=code.desktop
+text/x-shellscript=code.desktop
 
 [Added Associations]
 application/schema+json=nvim.desktop;
