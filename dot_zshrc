@@ -27,10 +27,9 @@ HISTSIZE=10000
 SAVEHIST=10000
 setopt SHARE_HISTORY
 setopt HIST_IGNORE_DUPS
+setopt HIST_REDUCE_BLANKS
 setopt HIST_IGNORE_SPACE   # prefix a command with a space to exclude it from history
 setopt AUTO_CD             # type a directory name to cd into it
-
-bindkey '^R' history-incremental-search-backward
 
 # needed shell aliases
 alias ff="fastfetch"

@@ -5,5 +5,5 @@ Exec=/home/bradley/.local/share/lumafly/Lumafly %u
 Path=/home/bradley/.local/share/lumafly
 Icon=/home/bradley/.local/share/icons/lumafly.png
 Terminal=false
-MimeType=x-scheme-handler/lumafly;
+MimeType=x-scheme-handler/lumafly;x-scheme-handler/scarab;
 Categories=Game;

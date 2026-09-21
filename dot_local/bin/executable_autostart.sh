@@ -11,6 +11,7 @@ pipewire &
 
 # audio processing
 ( while ! wpctl status >/dev/null 2>&1; do sleep 0.2; done
+  sway-audio-idle-inhibit &
   pipewire-pulse &
   easyeffects --gapplication-service ) &
 
@@ -31,6 +32,3 @@ swayidle -w \
   resume        'wlopm --on "*"' \
   timeout 10800 'doas poweroff' \
   before-sleep  'waylock -fork-on-lock' &
-
-# inhibit idle when audio is playing
-sway-audio-idle-inhibit &

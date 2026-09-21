@@ -41,7 +41,7 @@
     { 
 	"type": "command",
         "key": "│ ├󰍹:",
-	"text": "printf 'AMD Lucienne Integrated @ %s' \"$(sensors | awk '/^sclk:/ {print $2, $3}')\"",
+	"text": "printf 'AMD Lucienne Integrated @ %dMHz' $(($(cat /sys/class/hwmon/hwmon2/freq1_input)/1000000))",
 	"keyColor": "#BD9769",
 	"outputColor": "#BD9769"
     },

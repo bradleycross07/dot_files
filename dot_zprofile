@@ -1,10 +1,6 @@
 # ~/.zprofile configuration
-
-ulimit -c unlimited
-
 export NO_AT_BRIDGE=1
 export GTK_A11Y=none
-export GIO_USE_VFS=local
 
 export XDG_CURRENT_DESKTOP=wlroots
 
@@ -15,6 +11,9 @@ export XDG_SESSION_TYPE=wayland
 
 export XCURSOR_THEME=Bibata-Modern-Classic
 export XCURSOR_SIZE=30
+
+export QT_QPA_PLATFORMTHEME=qt6ct
+export QT_QUICK_CONTROLS_STYLE=org.kde.desktop
 
 export BROWSER=firefox
 export EDITOR=nvim

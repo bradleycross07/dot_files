@@ -28,6 +28,10 @@ application/xhtml+xml=userapp-Firefox-OVL0U3.desktop
 application/x-extension-xhtml=userapp-Firefox-OVL0U3.desktop
 application/x-extension-xht=userapp-Firefox-OVL0U3.desktop
 x-scheme-handler/lumafly=lumafly.desktop
+x-scheme-handler/motrix=motrix-appimage.desktop
+application/x-bittorrent=org.qbittorrent.qBittorrent.desktop
+x-scheme-handler/magnet=motrix-appimage.desktop
+x-scheme-handler/scarab=lumafly.desktop
 
 [Added Associations]
 application/schema+json=nvim.desktop;
