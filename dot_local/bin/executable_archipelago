@@ -1,2 +1,2 @@
 #!/bin/sh
-exec ~/Applications/archipelago/Archipelago_*.AppImage "$@"
+exec "$HOME/.local/opt/Archipelago/ArchipelagoLauncher" "$@"

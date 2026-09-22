@@ -18,6 +18,9 @@ pipewire &
 # monitors
 kanshi &
 
+# x11 stuff
+xsettingsd &
+
 # night light
 gammastep &
 

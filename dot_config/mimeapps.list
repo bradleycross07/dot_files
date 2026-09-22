@@ -28,7 +28,7 @@ application/xhtml+xml=userapp-Firefox-OVL0U3.desktop
 application/x-extension-xhtml=userapp-Firefox-OVL0U3.desktop
 application/x-extension-xht=userapp-Firefox-OVL0U3.desktop
 x-scheme-handler/lumafly=lumafly.desktop
-x-scheme-handler/motrix=motrix-appimage.desktop
+x-scheme-handler/motrix=motrix.desktop
 application/x-bittorrent=org.qbittorrent.qBittorrent.desktop
 x-scheme-handler/magnet=motrix-appimage.desktop
 x-scheme-handler/scarab=lumafly.desktop
@@ -44,6 +44,7 @@ application/json=code.desktop
 text/markdown=code.desktop
 text/x-python=code.desktop
 text/x-shellscript=code.desktop
+application/pdf=firefox.desktop
 
 [Added Associations]
 application/schema+json=nvim.desktop;
@@ -58,3 +59,5 @@ application/x-extension-shtml=userapp-Firefox-OVL0U3.desktop;
 application/xhtml+xml=userapp-Firefox-OVL0U3.desktop;
 application/x-extension-xhtml=userapp-Firefox-OVL0U3.desktop;
 application/x-extension-xht=userapp-Firefox-OVL0U3.desktop;
+x-scheme-handler/motrix=motrix.desktop;
+application/pdf=firefox.desktop;

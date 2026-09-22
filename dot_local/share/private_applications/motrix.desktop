@@ -1,0 +1,13 @@
+[Desktop Entry]
+Type=Application
+Name=Motrix
+GenericName=Download Manager
+Comment=Full-featured download manager
+Exec=motrix --enable-features=UseOzonePlatform --ozone-platform=wayland %U %U
+Icon=motrix
+Terminal=false
+Categories=Network;FileTransfer;
+Keywords=download;bittorrent;magnet;aria2;
+MimeType=application/x-bittorrent;x-scheme-handler/magnet;x-scheme-handler/motrix;
+StartupWMClass=Motrix
+StartupNotify=true

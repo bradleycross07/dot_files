@@ -1,0 +1,29 @@
+#!/home/bradley/.local/share/discord-rpc-venv/bin/python3
+"""Run a game and show it in Discord under a given application ID.
+Usage: discord-rpc-wrap <app_id> <command...>"""
+import subprocess
+import sys
+import time
+
+app_id, *cmd = sys.argv[1:]
+
+rpc = None
+try:
+    from pypresence import Presence
+    rpc = Presence(app_id)
+    rpc.connect()
+    rpc.update(start=int(time.time()))
+except Exception as e:  # missing module, Discord not running, etc.
+    print(f"discord-rpc-wrap: presence unavailable: {e}", file=sys.stderr)
+    rpc = None
+
+try:
+    code = subprocess.call(cmd)
+finally:
+    if rpc:
+        try:
+            rpc.close()
+        except Exception:
+            pass
+
+sys.exit(code)

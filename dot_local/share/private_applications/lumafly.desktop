@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=Lumafly
-Exec=/home/bradley/.local/share/lumafly/Lumafly %u
+Exec=env AVALONIA_USE_WAYLAND=1 /home/bradley/.local/share/lumafly/Lumafly %u %u
 Path=/home/bradley/.local/share/lumafly
 Icon=/home/bradley/.local/share/icons/lumafly.png
 Terminal=false

@@ -1,4 +1,2 @@
 #!/bin/sh
-export ELECTRON_OZONE_PLATFORM_HINT=wayland
-exec ~/Applications/obsidian/Obsidian-*.AppImage \
-  --enable-blink-features=MiddleClickAutoscroll "$@"
+exec "$HOME/.local/opt/Obsidian/AppRun" "$@"
