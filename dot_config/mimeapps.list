@@ -45,6 +45,7 @@ text/markdown=code.desktop
 text/x-python=code.desktop
 text/x-shellscript=code.desktop
 application/pdf=firefox.desktop
+x-scheme-handler/spotify=spotify.desktop
 
 [Added Associations]
 application/schema+json=nvim.desktop;
