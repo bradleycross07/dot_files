@@ -6,5 +6,8 @@
   "baseFontSizeAction": true,
   "nativeMenus": false,
   "baseFontSize": 16,
-  "theme": "obsidian"
+  "theme": "obsidian",
+  "textFontFamily": "Arial,DejaVu Sans",
+  "interfaceFontFamily": "DepartureMono Nerd Font Mono",
+  "monospaceFontFamily": "DejaVu Sans Mono"
 }

@@ -42,7 +42,10 @@ alias du="dust"
 alias df="duf"
 alias ps="procs"
 
+# VPN
+alias vpnup='doas wg-quick up windscribe'
+alias vpndown='doas wg-quick down windscribe'
+
 # open ff automatically
 fastfetch
 alias clear="command clear && printf '\e[3J' && fastfetch" # clear everything
-

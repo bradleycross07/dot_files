@@ -11,8 +11,8 @@ visiblePage=pluginsPage
 
 [Window]
 autostartOnLogin=true
-height=1432
+height=1406
 reducePluginsListControls=true
 showTrayIcon=false
 visiblePage=inputPage
-width=2552
+width=1382
