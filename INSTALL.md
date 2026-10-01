@@ -81,7 +81,6 @@ Manual chroot install following https://docs.voidlinux.org (glibc, x86_64).
 - [ ] set the hostname (`void` or `void-desktop`) - chezmoi relies on it
 - [ ] user `bradley` in groups: `wheel users audio video input plugdev`
       plus `socklog` on the laptop, `_seatd` on the desktop
-- [ ] desktop: add `discard` to the root's mount options in `/etc/fstab` (continuous TRIM, so no fstrim job is needed)
 - [ ] shell: `zsh`
 - [ ] `opendoas` instead of sudo - in the chroot, give it a minimal config so `doas` works on first boot
       (the full one is restored in step 4):
@@ -185,12 +184,17 @@ doas xbps-install -Su
 
 The xbps pins were already created in step 1; the copies in `~/.config/system-configs` are the backup.
 
-Install everything from the saved list. Review it first - on the desktop drop the laptop-only packages:
-`tlp`, `zramen`, `earlyoom`, `iwd`, `grub`/`grub-x86_64-efi` (desktop boots with `limine` instead),
-`unbound`, `cronie`, `socklog-void`, `elogind` (desktop uses `seatd` + `turnstile`).
+Install packages by hand, one group at a time, as each step needs them - the laptop's list
+(`~/.config/system-configs/packages-void.txt`) is a reference to pick from, not something to install wholesale.
+
+Never needed on the desktop: `tlp`, `zramen`, `earlyoom`, `iwd`, `grub`/`grub-x86_64-efi` (Limine instead),
+`unbound`, `cronie`, `socklog-void`, `elogind` (seatd + turnstile instead), plus the laptop-only apps in step 11.
+
+Example - the session basics for dwl:
 
 ```sh
-doas xbps-install -S $(cat ~/.config/system-configs/packages-void.txt)   # start from the laptop's list
+doas xbps-install -S seatd turnstile pipewire wireplumber easyeffects swayidle waylock wlopm \
+    wl-clipboard foot fuzzel power-profiles-daemon
 ```
 
 > Each machine keeps its own lists - refresh them with:
@@ -252,12 +256,11 @@ for s in elogind iwd unbound tlp zramen earlyoom cronie socklog-unix nanoklogd; 
   doas ln -s /etc/sv/$s /var/service/
 done
 
-# desktop only: seatd + turnstile instead of elogind
-for s in seatd turnstiled; do
+# desktop only: seatd + turnstile instead of elogind, power-profiles-daemon instead of TLP
+for s in seatd turnstiled power-profiles-daemon; do
   doas ln -s /etc/sv/$s /var/service/
 done
-# optional on the desktop: quick power profile switching (never alongside TLP)
-# doas ln -s /etc/sv/power-profiles-daemon /var/service/
+# then, once: powerprofilesctl set performance   (the choice is remembered across reboots)
 ```
 
 - [ ] only keep `agetty-tty1` and `agetty-tty2`: `doas rm /var/service/agetty-tty{3,4,5,6}`
@@ -344,7 +347,6 @@ chmod 755 ~/.config/autostart ~/.config/menus
 
 - [ ] GPU (RX 9070, RDNA4): recent Mesa + `mesa-vulkan-radeon`, AMD firmware; mainline kernel helps
 - [ ] dwl `desktop` branch: monitor rule for the XG27ACDNG, 2560x1440 @ 360 Hz
-- [ ] consider the `fullscreenadaptivesync` dwl patch (VRR on the OLED)
 - [ ] mpv: `gpu-api=vulkan`, heavier scalers, add `av1` to `hwdec-codecs`
 - [ ] minimal service set - no TLP, zram, earlyoom, iwd, unbound, cronie or logging:
       ethernet only, 32 GB RAM, amd-pstate-epp handles the 7800X3D
@@ -355,7 +357,8 @@ chmod 755 ~/.config/autostart ~/.config/menus
       - polkit prompts (e.g. mounting drives in Thunar) generally need elogind - use doas instead
 - [ ] DNS: Cloudflare directly via dhcpcd (no local cache/DoT); comes from the `dhcpcd.conf` template
 - [ ] locate: no cron, so refresh by hand when needed - `doas updatedb`
-- [ ] TRIM: `discard` mount option instead of a weekly fstrim job
+- [ ] TRIM: manual, no job and no `discard` - run every month or so:
+      `doas fstrim -av` (trims every mounted filesystem that supports it and shows how much)
 - [ ] IPv4 only: `ipv6.disable=1` on the kernel command line; nftables.conf stays the same as the laptop's
 - [ ] session packages to skip (autostart.sh doesn't run them on the desktop):
       `kanshi`, `gammastep`, `xsettingsd`, `polkit-gnome`, `gnome-keyring`, `cliphist`,
@@ -364,7 +367,7 @@ chmod 755 ~/.config/autostart ~/.config/menus
       - `mimeapps.list` opens code/text files with `code.desktop`: set those to `nvim.desktop` on the desktop
       - optional: `wl-clip-persist` keeps the clipboard after the source app closes (no history)
       - add `gnome-keyring` back if signing into VS Code/GitHub on the desktop
-- [ ] optional: `power-profiles-daemon` + `powerprofilesctl set performance` for gaming
+- [ ] power: `power-profiles-daemon` set to `performance` (never run it alongside TLP)
 - [ ] `rc.conf` KEYMAP `us` (US keyboard only) - automatic via the `rc.conf` template
 - [ ] bootloader: Limine instead of GRUB - full steps in step 1 (EFI at `/boot`, kernel hook)
       - kernel options: the laptop's `loglevel=4 nowatchdog mitigations=off`, plus `ipv6.disable=1` (IPv4 only)
