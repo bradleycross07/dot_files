@@ -11,7 +11,7 @@ Repos:
 
 ## 0. Before you start
 
-Do these on the laptop (or before wiping anything) - follow the rest of this file on the laptop screen.
+Do these first - follow the rest of this file on the laptop screen.
 
 ### Save and push everything
 - [ ] refresh the lists: `xbps-query -m > ~/.config/system-configs/packages-void.txt` and
@@ -19,38 +19,65 @@ Do these on the laptop (or before wiping anything) - follow the rest of this fil
 - [ ] `chezmoi diff` is empty, then commit + push the dotfiles
 - [ ] dwl: commit + push `main` (create the `desktop` branch now or during step 8)
 
-### USB drives
-- [ ] **USB 1 - installer:** latest Void live ISO (glibc, x86_64), written with
-      `doas dd if=void-live-x86_64-*.iso of=/dev/sdX bs=4M status=progress oflag=sync`
-      (double-check `/dev/sdX` with `lsblk` first - it erases that drive)
-- [ ] **USB 2 - personal files** (keep it somewhere safe, it holds a private key):
-  - `~/.ssh/github-void` and `~/.ssh/github-void.pub` - needed to push dotfiles and clone the private dwl repo
-  - game saves: `~/.config/unity3d` (Hollow Knight, Silksong)
-  - `/etc/wireguard/windscribe.conf` only if the VPN is wanted on this machine
+### Ventoy USB
+- [ ] Void live ISO on it (an older ISO is fine - `xbps-install -Su` brings everything up to date)
+- [ ] folder `ssh key` on the Ventoy data partition with `github-void` and `github-void.pub`
+      (exFAT has no Unix permissions - the `chmod` in step 2 fixes that after copying)
+- [ ] game saves: `~/.config/unity3d` from the laptop
+- [ ] `/etc/wireguard/windscribe.conf` only if the VPN is wanted on this machine
+- [ ] after setup: delete the key from the USB
 
-### Drives being reused
-- [ ] back up anything wanted from the ADATA 512GB NVMe and the WD Green 1TB SATA SSD - the install wipes them
-- [ ] decide the layout, e.g. NVMe = system (EFI 512 MB-1 GB FAT32 + ext4 root, no swap),
-      SATA SSD = games (`~/Games`)
+### Backing up the old Windows drives (the old PC can't boot, so do it from Linux)
+Plan: free space on the SATA SSD, copy the NVMe's data onto it, install Void on the NVMe, then
+sort the backup out from the finished desktop, and only then format the SATA SSD.
+
+1. Boot the Void live ISO on the new PC and log in as `root` (password `voidlinux`)
+2. Find the partitions: `lsblk -f` (the big NTFS partition on each drive)
+3. Mount both:
+   ```sh
+   xbps-install -S ntfs-3g           # live session only, for ntfsfix if needed
+   mkdir -p /mnt/win /mnt/sata
+   mount -t ntfs3 -o ro /dev/nvme0n1pX /mnt/win      # Windows drive, read-only
+   mount -t ntfs3 /dev/sdaX /mnt/sata                # SATA SSD, read-write
+   ```
+   If the SATA mount refuses ("dirty" volume - Windows Fast Startup), run `ntfsfix -d /dev/sdaX` and retry.
+4. Delete the games from `/mnt/sata` to make room (they can be redownloaded)
+5. Copy what's wanted from the Windows drive, e.g.
+   ```sh
+   mkdir -p /mnt/sata/backup
+   cp -a "/mnt/win/Users/<name>/Documents" /mnt/sata/backup/
+   cp -a /mnt/win/Xilinx /mnt/sata/backup/            # year 1 Vivado projects
+   ```
+   Also worth a look: `Users/<name>/Pictures`, `Desktop` and `Downloads` (AppData isn't needed -
+   game saves are already backed up elsewhere)
+6. `umount /mnt/win /mnt/sata` - then carry on with step 1 (which wipes only the NVMe)
+7. Once the desktop is set up: upload the phone photos (~50 GB) and anything else to the uni
+   Google Drive from Firefox, copy the rest to `~`, THEN reformat the SATA SSD as ext4 for games
+
+### Disk layout
+- NVMe: EFI 512 MiB FAT32 mounted at **/boot** (Limine reads the kernel from it - see step 1)
+  + ext4 root, no swap
+- SATA SSD: ext4, games (`~/Games`), formatted only after the backup is safe
+  (Linux reads/writes NTFS fine via the kernel ntfs3 driver, but games and Proton need ext4: permissions, symlinks)
 
 ### BIOS / UEFI (desktop)
 - [ ] update the BIOS first (newest AGESA for the 7800X3D and B850)
-- [ ] UEFI only (CSM off) and Secure Boot off
+- [ ] UEFI only: CSM off, Secure Boot off, TPM off
 - [ ] EXPO on for the DDR5-6000 CL30 kit - first boot can sit on a black screen for a few
       minutes while the memory trains; that's normal
 - [ ] Resizable BAR (and Above 4G Decoding) on for the RX 9070
 
 ### Things to expect
-- [ ] the live ISO's kernel may be too old for the RX 9070 (RDNA4), so the installer may only show
-      a basic console - fine for a terminal install; full GPU support comes with `linux-mainline` + recent Mesa
+- [ ] the live ISO's kernel may be too old for the RX 9070 (RDNA4) - fine for a TTY install;
+      full GPU support comes with `linux-mainline` + recent Mesa
 - [ ] ethernet cable plugged in (the onboard wifi isn't used)
-- [ ] Limine: read Void's docs/package notes before step 1 - GRUB is the fallback if it gets fiddly
 
 ## 1. Base install
 
 Manual chroot install following https://docs.voidlinux.org (glibc, x86_64).
 
-- [ ] ext4 root mounted with `noatime`, EFI on `/boot/efi`, `/tmp` as tmpfs (`defaults,nosuid,nodev`)
+- [ ] ext4 root mounted with `noatime`, `/tmp` as tmpfs (`defaults,nosuid,nodev`)
+      EFI on `/boot/efi` (laptop, GRUB) or on `/boot` (desktop, Limine)
 - [ ] set the hostname (`void` or `void-desktop`) - chezmoi relies on it
 - [ ] user `bradley` in groups: `wheel users audio video input plugdev`
       plus `socklog` on the laptop, `_seatd` on the desktop
@@ -79,6 +106,60 @@ xbps-query -l | grep linux   # want linux-mainline, NOT plain linux
 
 > Don't apply the dotfiles in the chroot - you're root there, so chezmoi would set up `/root`.
 > Boot into the new system first and log in as `bradley`.
+
+
+### Desktop bootloader: Limine (instead of GRUB)
+
+Limine only reads FAT, so the kernels and initramfs live on the EFI partition itself, mounted at `/boot`.
+That's why the EFI partition holds more than the laptop's (GRUB's) few hundred KB - each kernel +
+initramfs is tens of MB. 512 MiB is plenty if old kernels are cleaned up (`doas vkpurge rm all`).
+
+Inside the chroot:
+
+```sh
+xbps-install -S limine efibootmgr
+mkdir -p /boot/EFI/BOOT
+cp /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT/
+efibootmgr --create --disk /dev/nvme0n1 --part 1 --label "Void Linux" --loader '\EFI\BOOT\BOOTX64.EFI'
+```
+
+(check the real path of `BOOTX64.EFI` with `xbps-query -f limine | grep -i efi` - copy it again whenever the `limine` package updates)
+
+Kernel update hook - rewrites `/boot/limine.conf` for each new kernel, so an update never leaves a stale entry.
+Save as `/etc/kernel.d/post-install/60-limine` and `chmod +x` it:
+
+```sh
+#!/bin/sh
+# called by xbps after installing a kernel: $1 = package, $2 = version
+VERSION="$2"
+ROOT_UUID=$(findmnt -no UUID /)
+cat > /boot/limine.conf <<CONF
+timeout: 3
+
+/Void Linux ($VERSION)
+    protocol: linux
+    path: boot():/vmlinuz-$VERSION
+    module_path: boot():/initramfs-$VERSION.img
+    cmdline: root=UUID=$ROOT_UUID ro loglevel=4 nowatchdog mitigations=off ipv6.disable=1
+CONF
+```
+
+Run it once by hand for the kernel already installed, then check the result:
+
+```sh
+/etc/kernel.d/post-install/60-limine linux-mainline "$(ls /boot | sed -n 's/^vmlinuz-//p' | sort -V | tail -1)"
+cat /boot/limine.conf
+ls /boot        # vmlinuz-<version> and initramfs-<version>.img must both be there
+```
+
+### Remove leftover Windows boot entries
+
+Wiping the NVMe removes Windows Boot Manager's files, but the firmware can keep its menu entry:
+
+```sh
+efibootmgr                     # list entries
+efibootmgr -b 0001 -B          # delete one by its number (e.g. Boot0001 "Windows Boot Manager")
+```
 
 ## 2. First boot: dotfiles (chezmoi)
 
@@ -285,8 +366,6 @@ chmod 755 ~/.config/autostart ~/.config/menus
       - add `gnome-keyring` back if signing into VS Code/GitHub on the desktop
 - [ ] optional: `power-profiles-daemon` + `powerprofilesctl set performance` for gaming
 - [ ] `rc.conf` KEYMAP `us` (US keyboard only) - automatic via the `rc.conf` template
-- [ ] bootloader: Limine instead of GRUB
+- [ ] bootloader: Limine instead of GRUB - full steps in step 1 (EFI at `/boot`, kernel hook)
       - kernel options: the laptop's `loglevel=4 nowatchdog mitigations=off`, plus `ipv6.disable=1` (IPv4 only)
-      - check whether Void's `limine` package updates its config when the kernel updates;
-        if not, add a hook in `/etc/kernel.d/post-install/` - linux-mainline updates often,
-        and a stale entry means booting an old (or removed) kernel
+- [ ] once the backup is safe: format the SATA SSD as ext4 and mount it for `~/Games`
