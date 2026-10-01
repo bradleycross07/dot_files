@@ -15,7 +15,9 @@ Manual chroot install following https://docs.voidlinux.org (glibc, x86_64).
 
 - [ ] ext4 root mounted with `noatime`, EFI on `/boot/efi`, `/tmp` as tmpfs (`defaults,nosuid,nodev`)
 - [ ] set the hostname (`void` or `void-desktop`) - chezmoi relies on it
-- [ ] user `bradley` in groups: `wheel users audio video input plugdev socklog`
+- [ ] user `bradley` in groups: `wheel users audio video input plugdev`
+      plus `socklog` on the laptop, `_seatd` on the desktop
+- [ ] desktop: add `discard` to the root's mount options in `/etc/fstab` (continuous TRIM, so no fstrim job is needed)
 - [ ] shell: `zsh`
 - [ ] `opendoas` instead of sudo - in the chroot, give it a minimal config so `doas` works on first boot
       (the full one is restored in step 4):
@@ -64,15 +66,21 @@ doas xbps-install -Su
 The xbps pins were already created in step 1; the copies in `~/.config/system-configs` are the backup.
 
 Install everything from the saved list. Review it first - on the desktop drop the laptop-only packages:
-`tlp`, `zramen`, `earlyoom`, `iwd`, `grub`/`grub-x86_64-efi` (desktop boots with `limine` instead).
+`tlp`, `zramen`, `earlyoom`, `iwd`, `grub`/`grub-x86_64-efi` (desktop boots with `limine` instead),
+`unbound`, `cronie`, `socklog-void`, `elogind` (desktop uses `seatd` + `turnstile`).
 
 ```sh
-doas xbps-install -S $(cat ~/.config/system-configs/packages.txt)
+doas xbps-install -S $(cat ~/.config/system-configs/packages-void.txt)   # start from the laptop's list
 ```
 
-> Keep the list current on the old machine with: `xbps-query -m > ~/.config/system-configs/packages.txt`
+> Each machine keeps its own lists - refresh them with:
+> `xbps-query -m > ~/.config/system-configs/packages-$(hostname).txt`
+> `ls /var/service > ~/.config/system-configs/services-$(hostname).txt`
 
 ## 4. System configs (/etc)
+
+`dhcpcd.conf` and `rc.conf` are chezmoi templates (`.tmpl` in the repo): their per-machine lines are
+filled in from the hostname. Edit them with `chezmoi edit` - `chezmoi re-add` skips templates.
 
 Copies live in `~/.config/system-configs` (applied by chezmoi in step 2).
 
@@ -85,11 +93,11 @@ Copies live in `~/.config/system-configs` (applied by chezmoi in step 2).
 | `grub`               | `/etc/default/grub`           | laptop only; `doas update-grub` |
 | `iwd-main.conf`      | `/etc/iwd/main.conf`          | laptop only (wifi)        |
 | `nftables.conf`      | `/etc/nftables.conf`          | check: `nft -c -f`        |
-| `rc.conf`            | `/etc/rc.conf`                | KEYMAP: `uk` laptop, `us` desktop |
+| `rc.conf`            | `/etc/rc.conf`                | template: KEYMAP `uk` laptop, `us` desktop |
 | `tlp.conf`           | `/etc/tlp.conf`               | laptop only               |
-| `unbound.conf`       | `/etc/unbound/unbound.conf`   | check: `unbound-checkconf`|
+| `unbound.conf`       | `/etc/unbound/unbound.conf`   | laptop only; `unbound-checkconf` |
 | `zramen.conf`        | `/etc/sv/zramen/conf`         | laptop only               |
-| `dhcpcd.conf`        | `/etc/dhcpcd.conf`            | points DNS at unbound     |
+| `dhcpcd.conf`        | `/etc/dhcpcd.conf`            | template: unbound on laptop, Cloudflare on desktop |
 
 ```sh
 cd ~/.config/system-configs
@@ -97,11 +105,11 @@ cd ~/.config/system-configs
 doas cp 99-core.conf 99-network.conf /etc/sysctl.d/
 doas cp doas.conf /etc/doas.conf && doas chmod 0400 /etc/doas.conf
 doas cp nftables.conf /etc/nftables.conf && doas nft -c -f /etc/nftables.conf
-doas cp rc.conf /etc/rc.conf          # then set KEYMAP for this machine
-doas cp unbound.conf /etc/unbound/unbound.conf && doas unbound-checkconf
-doas cp dhcpcd.conf /etc/dhcpcd.conf
+doas cp rc.conf /etc/rc.conf          # KEYMAP already filled in per machine by chezmoi
+doas cp dhcpcd.conf /etc/dhcpcd.conf   # DNS line already filled in per machine by chezmoi
 # laptop only (chezmoi doesn't even place these files on the desktop):
 doas cp 99-vm.conf /etc/sysctl.d/
+doas cp unbound.conf /etc/unbound/unbound.conf && doas unbound-checkconf
 doas cp grub /etc/default/grub && doas update-grub
 doas cp iwd-main.conf /etc/iwd/main.conf
 doas cp zramen.conf /etc/sv/zramen/conf
@@ -112,23 +120,28 @@ Not backed up on purpose (machine-specific or secret): `/etc/fstab`, `/etc/wireg
 
 ## 5. Services (runit)
 
-Full list saved in `~/.config/system-configs/services.txt`. Enable with:
+Per-machine lists saved as `~/.config/system-configs/services-<hostname>.txt`.
 
 ```sh
 # both machines:
-for s in dbus elogind udevd dhcpcd unbound chronyd nftables cronie rtkit \
-         socklog-unix nanoklogd inputplumber tailscaled; do
+for s in dbus udevd dhcpcd chronyd nftables rtkit inputplumber; do
   doas ln -s /etc/sv/$s /var/service/
 done
+
 # laptop only:
-for s in iwd tlp zramen earlyoom; do
+for s in elogind iwd unbound tlp zramen earlyoom cronie socklog-unix nanoklogd tailscaled; do
   doas ln -s /etc/sv/$s /var/service/
 done
-# desktop, optional: quick power profile switching (never alongside TLP)
+
+# desktop only: seatd + turnstile instead of elogind
+for s in seatd turnstiled; do
+  doas ln -s /etc/sv/$s /var/service/
+done
+# optional on the desktop: quick power profile switching (never alongside TLP)
 # doas ln -s /etc/sv/power-profiles-daemon /var/service/
 ```
 
-- [ ] tailscaled: manual start only - `doas touch /etc/sv/tailscaled/down`
+- [ ] laptop: tailscaled manual start only - `doas touch /etc/sv/tailscaled/down`
 - [ ] only keep `agetty-tty1` and `agetty-tty2`: `doas rm /var/service/agetty-tty{3,4,5,6}`
 - [ ] irqbalance, bluetoothd, NetworkManager, wpa_supplicant: leave disabled
 
@@ -210,9 +223,18 @@ chmod 755 ~/.config/autostart ~/.config/menus
 - [ ] dwl `desktop` branch: monitor rule for the XG27ACDNG, 2560x1440 @ 360 Hz
 - [ ] consider the `fullscreenadaptivesync` dwl patch (VRR on the OLED)
 - [ ] mpv: `gpu-api=vulkan`, heavier scalers, add `av1` to `hwdec-codecs`
-- [ ] no TLP, zram, earlyoom or iwd: ethernet only, 32 GB RAM, amd-pstate-epp handles the 7800X3D
+- [ ] minimal service set - no TLP, zram, earlyoom, iwd, unbound, cronie or logging:
+      ethernet only, 32 GB RAM, amd-pstate-epp handles the 7800X3D
+- [ ] seat management: `seatd` + `turnstile` instead of elogind
+      (see https://docs.voidlinux.org/config/session-management.html)
+      - don't run elogind and seatd together
+      - poweroff/suspend: `doas poweroff`, `doas zzz` (no loginctl)
+      - polkit prompts (e.g. mounting drives in Thunar) generally need elogind - use doas instead
+- [ ] DNS: Cloudflare directly via dhcpcd (no local cache/DoT); comes from the `dhcpcd.conf` template
+- [ ] locate: no cron, so refresh by hand when needed - `doas updatedb`
+- [ ] TRIM: `discard` mount option instead of a weekly fstrim job
 - [ ] optional: `power-profiles-daemon` + `powerprofilesctl set performance` for gaming
-- [ ] `rc.conf` KEYMAP `us` (US keyboard only)
+- [ ] `rc.conf` KEYMAP `us` (US keyboard only) - automatic via the `rc.conf` template
 - [ ] bootloader: Limine instead of GRUB
       - carry over the kernel options from the laptop's `grub` file: `loglevel=4 nowatchdog mitigations=off`
       - check whether Void's `limine` package updates its config when the kernel updates;

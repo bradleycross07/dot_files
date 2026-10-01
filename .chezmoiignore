@@ -17,8 +17,16 @@ INSTALL.md
 # lid close handling
 .local/bin/lid-handler.sh
 
-# TLP is for laptop battery/power management
+# laptop-only system configs:
+#   TLP (battery/power), zram + its zram-tuned sysctl, iwd (wifi), GRUB
+#   (the desktop uses ethernet only, no swap, Limine, no local resolver)
 .config/system-configs/tlp.conf
+.config/system-configs/zramen.conf
+.config/system-configs/99-vm.conf
+.config/system-configs/iwd-main.conf
+.config/system-configs/grub
+# local DNS resolver (desktop uses Cloudflare directly via dhcpcd.conf template)
+.config/system-configs/unbound.conf
 
 {{- end }}
 
