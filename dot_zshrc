@@ -11,7 +11,7 @@ eval "$(zoxide init zsh)"
 
 # completion
 autoload -Uz compinit
-compinit
+compinit 
 
 # autocomplete suggestions & syntax
 zinit light zsh-users/zsh-autosuggestions

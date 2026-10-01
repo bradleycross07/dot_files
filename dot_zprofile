@@ -1,4 +1,8 @@
 # ~/.zprofile configuration
+
+typeset -U path
+path=(~/.local/bin ~/.spicetify ~/.cargo/bin $path)
+
 export NO_AT_BRIDGE=1
 export GTK_A11Y=none
 
@@ -17,8 +21,6 @@ export QT_QUICK_CONTROLS_STYLE=org.kde.desktop
 
 export BROWSER=firefox
 export EDITOR=nvim
-
-export PATH="$HOME/.local/bin:$HOME/.spicetify:$PATH"
 
 if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
     exec dbus-run-session dwl > "$HOME/.local/share/dwl.log" 2>&1

@@ -1,3 +1,8 @@
+vim.g.loaded_node_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_ruby_provider = 0
+
 -- lazy.neovim load
 vim.opt.rtp:prepend(vim.fn.stdpath('data') .. '/lazy/lazy.nvim')
 
@@ -7,8 +12,9 @@ vim.opt.termguicolors = true
 -- plugins
 require('lazy').setup({
   spec = {
-     { import = 'plugins' },
-   },
+    { import = 'plugins' },
+  },
+  rocks = { enabled = false },
 })
 
 -- change in specific colour overrides
