@@ -9,6 +9,43 @@ Repos:
 
 ---
 
+## 0. Before you start
+
+Do these on the laptop (or before wiping anything) - follow the rest of this file on the laptop screen.
+
+### Save and push everything
+- [ ] refresh the lists: `xbps-query -m > ~/.config/system-configs/packages-void.txt` and
+      `ls /var/service > ~/.config/system-configs/services-void.txt`
+- [ ] `chezmoi diff` is empty, then commit + push the dotfiles
+- [ ] dwl: commit + push `main` (create the `desktop` branch now or during step 8)
+
+### USB drives
+- [ ] **USB 1 - installer:** latest Void live ISO (glibc, x86_64), written with
+      `doas dd if=void-live-x86_64-*.iso of=/dev/sdX bs=4M status=progress oflag=sync`
+      (double-check `/dev/sdX` with `lsblk` first - it erases that drive)
+- [ ] **USB 2 - personal files** (keep it somewhere safe, it holds a private key):
+  - `~/.ssh/github-void` and `~/.ssh/github-void.pub` - needed to push dotfiles and clone the private dwl repo
+  - game saves: `~/.config/unity3d` (Hollow Knight, Silksong)
+  - `/etc/wireguard/windscribe.conf` only if the VPN is wanted on this machine
+
+### Drives being reused
+- [ ] back up anything wanted from the ADATA 512GB NVMe and the WD Green 1TB SATA SSD - the install wipes them
+- [ ] decide the layout, e.g. NVMe = system (EFI 512 MB-1 GB FAT32 + ext4 root, no swap),
+      SATA SSD = games (`~/Games`)
+
+### BIOS / UEFI (desktop)
+- [ ] update the BIOS first (newest AGESA for the 7800X3D and B850)
+- [ ] UEFI only (CSM off) and Secure Boot off
+- [ ] EXPO on for the DDR5-6000 CL30 kit - first boot can sit on a black screen for a few
+      minutes while the memory trains; that's normal
+- [ ] Resizable BAR (and Above 4G Decoding) on for the RX 9070
+
+### Things to expect
+- [ ] the live ISO's kernel may be too old for the RX 9070 (RDNA4), so the installer may only show
+      a basic console - fine for a terminal install; full GPU support comes with `linux-mainline` + recent Mesa
+- [ ] ethernet cable plugged in (the onboard wifi isn't used)
+- [ ] Limine: read Void's docs/package notes before step 1 - GRUB is the fallback if it gets fiddly
+
 ## 1. Base install
 
 Manual chroot install following https://docs.voidlinux.org (glibc, x86_64).
@@ -52,7 +89,9 @@ doas xbps-install -S chezmoi git
 chezmoi init --branch void-linux --apply https://github.com/bradleycross07/dot_files.git
 ```
 
-- [ ] SSH key for GitHub + commit signing: `~/.ssh/github-void` (referenced in `.gitconfig`)
+- [ ] SSH key for GitHub + commit signing: copy `github-void` and `github-void.pub` from USB 2
+      into `~/.ssh/`, then `chmod 700 ~/.ssh && chmod 600 ~/.ssh/github-void`
+      (same filename, so `.gitconfig` works unchanged; already on GitHub for auth + signing)
 - [ ] `gh auth login` (token stays local, never commit `~/.config/gh`)
 - [ ] switch the chezmoi remote to SSH if pushing from this machine
 
@@ -128,7 +167,7 @@ for s in dbus udevd dhcpcd chronyd nftables rtkit inputplumber; do
 done
 
 # laptop only:
-for s in elogind iwd unbound tlp zramen earlyoom cronie socklog-unix nanoklogd tailscaled; do
+for s in elogind iwd unbound tlp zramen earlyoom cronie socklog-unix nanoklogd; do
   doas ln -s /etc/sv/$s /var/service/
 done
 
@@ -140,7 +179,6 @@ done
 # doas ln -s /etc/sv/power-profiles-daemon /var/service/
 ```
 
-- [ ] laptop: tailscaled manual start only - `doas touch /etc/sv/tailscaled/down`
 - [ ] only keep `agetty-tty1` and `agetty-tty2`: `doas rm /var/service/agetty-tty{3,4,5,6}`
 - [ ] irqbalance, bluetoothd, NetworkManager, wpa_supplicant: leave disabled
 
@@ -176,7 +214,7 @@ make && doas make install
 - dwl runs `~/.local/bin/autostart.sh` at startup (a template):
   - laptop: keyring, polkit agent, PipeWire + EasyEffects + audio idle inhibit, kanshi,
     xsettingsd, gammastep, clipboard history, swayidle (lock, screen off, poweroff after 3 h)
-  - desktop: PipeWire and swayidle only (lock after 10 min, screen off after 15 - protects the OLED)
+  - desktop: PipeWire, EasyEffects (mic for Discord) and swayidle (lock after 10 min, screen off after 15 - protects the OLED)
 - quitting dwl stops everything autostart.sh started (the autostart patch kills its process group)
 - needs: `wlroots0.20-devel` and dwl's other build deps
 
@@ -204,11 +242,11 @@ echo XBPS_ALLOW_RESTRICTED=yes >> etc/conf
 | ------------- | -------------------------------- | --------------------------------------- |
 | Obsidian      | `~/.local/opt/Obsidian`          | AppImage extracted; wrapper in `~/.local/bin` |
 | Motrix        | `~/.local/opt/Motrix`            | AppImage extracted; wrapper in `~/.local/bin` |
-| VS Code       | `~/.local/opt/VSCode-linux-x64`  | install/update with `update-vscode`     |
+| VS Code       | `~/.local/opt/VSCode-linux-x64`  | install/update with `update-vscode` (laptop only) |
 | Archipelago   | `~/.local/opt/Archipelago`       | wrapper in `~/.local/bin`               |
 | Lumafly       | `~/.local/share/lumafly`         | wrapper in `~/.local/bin`               |
-| ProjectLibre  | `/usr/share/projectlibre`        | jar; icon in hicolor 128x128            |
-| Vivado 2023.2 | `/tools/Xilinx`                  | ML Standard, Zynq-7000; launch via `~/.local/bin/vivado` |
+| ProjectLibre  | `/usr/share/projectlibre`        | jar; icon in hicolor 128x128 (laptop only) |
+| Vivado 2023.2 | `/tools/Xilinx`                  | ML Standard, Zynq-7000; launch via `~/.local/bin/vivado` (laptop only) |
 
 After installing Vivado, fix the folders its installer makes world-writable:
 ```sh
@@ -239,8 +277,10 @@ chmod 755 ~/.config/autostart ~/.config/menus
 - [ ] TRIM: `discard` mount option instead of a weekly fstrim job
 - [ ] IPv4 only: `ipv6.disable=1` on the kernel command line; nftables.conf stays the same as the laptop's
 - [ ] session packages to skip (autostart.sh doesn't run them on the desktop):
-      `kanshi`, `gammastep`, `xsettingsd`, `polkit-gnome`, `gnome-keyring`, `cliphist`, `easyeffects`,
-      `sway-audio-idle-inhibit` - keep `wl-clipboard` (screenshots), `swayidle`, `waylock`, `wlopm`
+      `kanshi`, `gammastep`, `xsettingsd`, `polkit-gnome`, `gnome-keyring`, `cliphist`,
+      `sway-audio-idle-inhibit` - keep `wl-clipboard` (screenshots), `swayidle`, `waylock`, `wlopm`, `easyeffects`
+- [ ] laptop-only apps, skip on the desktop: VS Code, ProjectLibre, Vivado, `tailscale`
+      - `mimeapps.list` opens code/text files with `code.desktop`: set those to `nvim.desktop` on the desktop
       - optional: `wl-clip-persist` keeps the clipboard after the source app closes (no history)
       - add `gnome-keyring` back if signing into VS Code/GitHub on the desktop
 - [ ] optional: `power-profiles-daemon` + `powerprofilesctl set performance` for gaming

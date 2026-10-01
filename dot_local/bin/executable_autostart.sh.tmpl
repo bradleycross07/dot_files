@@ -41,6 +41,10 @@ swayidle -w \
 # audio (pipewire starts wireplumber and pipewire-pulse via ~/.config/pipewire/pipewire.conf.d)
 pipewire &
 
+# mic processing (gate, compressor, noise reduction) once PipeWire is up
+( while ! wpctl status >/dev/null 2>&1; do sleep 0.2; done
+  easyeffects --gapplication-service ) &
+
 # idling: lock after 10 min, screen off after 15 (protects the OLED)
 # games, mpv and Firefox video inhibit idle on their own
 swayidle -w \

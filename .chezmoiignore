@@ -23,10 +23,18 @@ INSTALL.md
 .config/gammastep/**
 .config/xsettingsd
 .config/xsettingsd/**
-.config/easyeffects
-.config/easyeffects/**
-.config/easyeffectsrc
-.local/share/applications/com.github.wwmm.easyeffects.desktop
+
+# laptop-only apps: VS Code, ProjectLibre, Vivado (and Vivado's launcher entries)
+.local/bin/update-vscode
+.local/bin/code
+.local/bin/vivado
+.local/share/applications/code.desktop
+.local/share/applications/projectlibre.desktop
+.local/share/icons/hicolor/128x128/apps/projectlibre.png
+.local/share/applications/*2023.2*.desktop
+.local/share/applications/Documentation Navigator_*.desktop
+.local/share/applications/Uninstall *.desktop
+.local/share/applications/Xilinx Information Center_*.desktop
 
 # laptop-only system configs:
 #   TLP (battery/power), zram + its zram-tuned sysctl, iwd (wifi), GRUB
