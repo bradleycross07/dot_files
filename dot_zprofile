@@ -20,7 +20,3 @@ export QT_QUICK_CONTROLS_STYLE=org.kde.desktop
 
 export BROWSER=firefox
 export EDITOR=nvim
-
-if [ -z "$WAYLAND_DISPLAY" ] && [ "$(tty)" = "/dev/tty1" ]; then
-    exec dbus-run-session dwl > "$HOME/.local/share/dwl.log" 2>&1
-fi

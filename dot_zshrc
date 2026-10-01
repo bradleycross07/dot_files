@@ -42,6 +42,18 @@ alias ps="procs"
 alias vpnup='doas wg-quick up windscribe'
 alias vpndown='doas wg-quick down windscribe'
 
+# start dwl with its own D-Bus session, logging to ~/.local/share/dwl.log
+dwl() {
+  if [ -n "$WAYLAND_DISPLAY" ]; then
+    echo "dwl is already running" >&2
+    return 1
+  fi
+  dbus-run-session dwl > "$HOME/.local/share/dwl.log" 2>&1
+
+  # stop audio left running after quitting out of dwl
+  pkill -u "$USER" -x 'pipewire|wireplumber'
+}
+
 # open ff automatically
 fastfetch
 alias clear="command clear && printf '\e[3J' && fastfetch" # clear everything
