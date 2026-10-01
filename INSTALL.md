@@ -111,9 +111,9 @@ What each extra is for: `linux-mainline` + `dracut` kernel and its initramfs, `e
 
 Once inside the chroot, confirm:
 
-```sh
-xbps-query -l | grep linux   # want linux-mainline, hopefully showing the latest version
-```
+`xbps-query linux >/dev/null && echo "plain linux IS installed - remove it" || echo "ok: no plain linux"`
+
+`xbps-query -l | command grep 'linux-mainline\|^ii linux[0-9]'`
 
 ### Inside the chroot
 
@@ -392,8 +392,7 @@ chmod 755 ~/.config/autostart ~/.config/menus
 
 ## 10. Secrets and personal setup (never in the repo)
 
-- [ ] WireGuard (optional): copy `windscribe.conf` from the Ventoy USB to `/etc/wireguard/`, install
-      `wireguard-tools` (`vpnup` / `vpndown`)
+- [ ] laptop only - WireGuard: restore `windscribe.conf` to `/etc/wireguard/` (or download a fresh one from Windscribe), install `wireguard-tools` (`vpnup` / `vpndown`)      `wireguard-tools` (`vpnup` / `vpndown`)
 - [ ] eduroam: run the university CAT installer (laptop)
 - [ ] game saves: restore `~/.config/unity3d` from backup
 
