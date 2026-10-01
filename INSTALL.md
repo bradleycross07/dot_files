@@ -79,17 +79,16 @@ doas xbps-install -S $(cat ~/.config/system-configs/packages-void.txt)   # start
 
 ## 4. System configs (/etc)
 
-`dhcpcd.conf` and `rc.conf` are chezmoi templates (`.tmpl` in the repo): their per-machine lines are
-filled in from the hostname. Edit them with `chezmoi edit` - `chezmoi re-add` skips templates.
+`dhcpcd.conf` and `rc.conf` (and `~/.local/bin/autostart.sh`) are chezmoi templates (`.tmpl` in the repo):
+their per-machine parts are filled in from the hostname. Edit them with `chezmoi edit` - `chezmoi re-add` skips templates.
 
 Copies live in `~/.config/system-configs` (applied by chezmoi in step 2).
 
 | Backup file          | Restore to                    | Notes                     |
 | -------------------- | ----------------------------- | ------------------------- |
-| `99-core.conf`       | `/etc/sysctl.d/`              |                           |
 | `99-network.conf`    | `/etc/sysctl.d/`              | BBR + fq                  |
 | `99-vm.conf`         | `/etc/sysctl.d/`              | zram-tuned, laptop only   |
-| `doas.conf`          | `/etc/doas.conf`              | `chmod 0400` afterwards   |
+| `doas.conf`          | `/etc/doas.conf`              | `chmod 0400`; passwordless poweroff/reboot/zzz |
 | `grub`               | `/etc/default/grub`           | laptop only; `doas update-grub` |
 | `iwd-main.conf`      | `/etc/iwd/main.conf`          | laptop only (wifi)        |
 | `nftables.conf`      | `/etc/nftables.conf`          | check: `nft -c -f`        |
@@ -102,7 +101,7 @@ Copies live in `~/.config/system-configs` (applied by chezmoi in step 2).
 ```sh
 cd ~/.config/system-configs
 # both machines:
-doas cp 99-core.conf 99-network.conf /etc/sysctl.d/
+doas cp 99-network.conf /etc/sysctl.d/
 doas cp doas.conf /etc/doas.conf && doas chmod 0400 /etc/doas.conf
 doas cp nftables.conf /etc/nftables.conf && doas nft -c -f /etc/nftables.conf
 doas cp rc.conf /etc/rc.conf          # KEYMAP already filled in per machine by chezmoi
@@ -173,7 +172,12 @@ cd ~/.local/src/dwl
 git remote add upstream https://codeberg.org/dwl/dwl.git
 make && doas make install
 ```
-- desktop: use the `desktop` branch (monitor rule, no brightness keys)
+- desktop: use the `desktop` branch (monitor rule, no brightness keys, no Mod+v clipboard picker)
+- dwl runs `~/.local/bin/autostart.sh` at startup (a template):
+  - laptop: keyring, polkit agent, PipeWire + EasyEffects + audio idle inhibit, kanshi,
+    xsettingsd, gammastep, clipboard history, swayidle (lock, screen off, poweroff after 3 h)
+  - desktop: PipeWire and swayidle only (lock after 10 min, screen off after 15 - protects the OLED)
+- quitting dwl stops everything autostart.sh started (the autostart patch kills its process group)
 - needs: `wlroots0.20-devel` and dwl's other build deps
 
 ### Aurelia
@@ -233,10 +237,16 @@ chmod 755 ~/.config/autostart ~/.config/menus
 - [ ] DNS: Cloudflare directly via dhcpcd (no local cache/DoT); comes from the `dhcpcd.conf` template
 - [ ] locate: no cron, so refresh by hand when needed - `doas updatedb`
 - [ ] TRIM: `discard` mount option instead of a weekly fstrim job
+- [ ] IPv4 only: `ipv6.disable=1` on the kernel command line; nftables.conf stays the same as the laptop's
+- [ ] session packages to skip (autostart.sh doesn't run them on the desktop):
+      `kanshi`, `gammastep`, `xsettingsd`, `polkit-gnome`, `gnome-keyring`, `cliphist`, `easyeffects`,
+      `sway-audio-idle-inhibit` - keep `wl-clipboard` (screenshots), `swayidle`, `waylock`, `wlopm`
+      - optional: `wl-clip-persist` keeps the clipboard after the source app closes (no history)
+      - add `gnome-keyring` back if signing into VS Code/GitHub on the desktop
 - [ ] optional: `power-profiles-daemon` + `powerprofilesctl set performance` for gaming
 - [ ] `rc.conf` KEYMAP `us` (US keyboard only) - automatic via the `rc.conf` template
 - [ ] bootloader: Limine instead of GRUB
-      - carry over the kernel options from the laptop's `grub` file: `loglevel=4 nowatchdog mitigations=off`
+      - kernel options: the laptop's `loglevel=4 nowatchdog mitigations=off`, plus `ipv6.disable=1` (IPv4 only)
       - check whether Void's `limine` package updates its config when the kernel updates;
         if not, add a hook in `/etc/kernel.d/post-install/` - linux-mainline updates often,
         and a stale entry means booting an old (or removed) kernel

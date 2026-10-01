@@ -2,7 +2,7 @@
 
 # let D-Bus activated services (portals etc.) find the Wayland session
 dbus-update-activation-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
-
+{{ if eq .chezmoi.hostname "void" }}
 # gnome keyring
 gnome-keyring-daemon --start --components=secrets &
 
@@ -37,3 +37,15 @@ swayidle -w \
   resume        'wlopm --on "*"' \
   timeout 10800 'doas poweroff' \
   before-sleep  'waylock -fork-on-lock' &
+{{- else }}
+# audio (pipewire starts wireplumber and pipewire-pulse via ~/.config/pipewire/pipewire.conf.d)
+pipewire &
+
+# idling: lock after 10 min, screen off after 15 (protects the OLED)
+# games, mpv and Firefox video inhibit idle on their own
+swayidle -w \
+  timeout 600   'waylock -fork-on-lock' \
+  timeout 900   'wlopm --off "*"' \
+  resume        'wlopm --on "*"' \
+  before-sleep  'waylock -fork-on-lock' &
+{{- end }}

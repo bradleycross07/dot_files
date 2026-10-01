@@ -17,6 +17,17 @@ INSTALL.md
 # lid close handling
 .local/bin/lid-handler.sh
 
+# session extras the desktop's autostart.sh doesn't run
+.local/bin/clipboard-picker.sh
+.config/gammastep
+.config/gammastep/**
+.config/xsettingsd
+.config/xsettingsd/**
+.config/easyeffects
+.config/easyeffects/**
+.config/easyeffectsrc
+.local/share/applications/com.github.wwmm.easyeffects.desktop
+
 # laptop-only system configs:
 #   TLP (battery/power), zram + its zram-tuned sysctl, iwd (wifi), GRUB
 #   (the desktop uses ethernet only, no swap, Limine, no local resolver)
