@@ -5,5 +5,4 @@ GenericName=AMDGPU Monitoring Tool
 Exec=amdgpu_top --gui
 Categories=System;Monitor;
 Icon=utilities-system-monitor
-NoDisplay=yes
 NoDisplay=true

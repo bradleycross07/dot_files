@@ -3,8 +3,13 @@ vim.g.loaded_perl_provider = 0
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_ruby_provider = 0
 
--- lazy.neovim load
-vim.opt.rtp:prepend(vim.fn.stdpath('data') .. '/lazy/lazy.nvim')
+-- lazy.nvim load (downloads it automatically if missing)
+local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
+if not vim.uv.fs_stat(lazypath) then
+  vim.fn.system({ 'git', 'clone', '--filter=blob:none', '--branch=stable',
+    'https://github.com/folke/lazy.nvim.git', lazypath })
+end
+vim.opt.rtp:prepend(lazypath)
 
 -- allow termguicolors
 vim.opt.termguicolors = true
