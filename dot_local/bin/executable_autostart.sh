@@ -1,18 +1,20 @@
 #!/bin/sh
 
+# let D-Bus activated services (portals etc.) find the Wayland session
+dbus-update-activation-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+
 # gnome keyring
 gnome-keyring-daemon --start --components=secrets &
 
 # polkit authentication agent
 /usr/libexec/polkit-gnome-authentication-agent-1 &
 
-# audio
+# audio (pipewire starts wireplumber and pipewire-pulse via ~/.config/pipewire/pipewire.conf.d)
 pipewire &
 
 # audio processing
 ( while ! wpctl status >/dev/null 2>&1; do sleep 0.2; done
   sway-audio-idle-inhibit &
-  pipewire-pulse &
   easyeffects --gapplication-service ) &
 
 # monitors

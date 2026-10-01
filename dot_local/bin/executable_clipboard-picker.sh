@@ -1,6 +1,3 @@
-### !/bin/sh
-#
-#
-
-# clipboard to output onto fuzzel
-cliphist list | fuzzel --dmenu | cliphist decode | wl-copy
+#!/bin/sh
+sel=$(cliphist list | fuzzel --dmenu) || exit 0
+printf '%s\n' "$sel" | cliphist decode | wl-copy
