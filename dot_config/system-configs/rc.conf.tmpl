@@ -20,7 +20,7 @@
 #TIMEZONE="Europe/Madrid"
 
 # Keymap to load, see loadkeys(8).
-KEYMAP="uk"
+KEYMAP="{{ if eq .chezmoi.hostname "void" }}uk{{ else }}us{{ end }}"
 
 # Console font to load, see setfont(8).
 #FONT="lat9w-16"
