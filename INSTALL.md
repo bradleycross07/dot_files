@@ -81,9 +81,9 @@ sort the backup out from the finished desktop, and only then format the SATA SSD
 
 Manual chroot install following https://docs.voidlinux.org (glibc, x86_64).
 
-In order: partition and mount, set the xbps pins, install base-system, then chroot.
+In order: partition and mount, set the xbps pins, install `base-minimal` plus the extras below, then chroot.
 
-### xbps pins: do this in the live environment, BEFORE installing base-system
+### xbps pins: do this in the live environment, BEFORE installing anything
 
 With the new root mounted at `/mnt`:
 
@@ -93,7 +93,31 @@ printf 'ignorepkg=linux\nignorepkg=linux-headers\n' > /mnt/etc/xbps.d/mainline.c
 printf 'ignorepkg=linux-firmware-nvidia\n' > /mnt/etc/xbps.d/ignore.conf
 ```
 
-Then install `linux-mainline` alongside `base-system` in the same command.
+### Install the base system (`base-minimal`, not `base-system`)
+
+`base-minimal` is the lean option, so everything the system needs to boot and get online is listed
+explicitly. Follow the Void docs for the rest of the command (copying the xbps keys, `XBPS_ARCH`):
+
+```sh
+# desktop
+xbps-install -S -r /mnt -R https://repo-de.voidlinux.org/current \
+    base-minimal linux-mainline dracut e2fsprogs kbd ncurses iproute2 iputils \
+    dhcpcd dbus opendoas zsh \
+    linux-firmware-amd linux-firmware-network dosfstools seatd
+
+# laptop (for reference)
+xbps-install -S -r /mnt -R https://repo-de.voidlinux.org/current \
+    base-minimal linux-mainline dracut e2fsprogs kbd ncurses iproute2 iputils \
+    dhcpcd dbus opendoas zsh \
+    linux-firmware-amd wifi-firmware iwd grub-x86_64-efi socklog-void
+```
+
+What each extra is for: `linux-mainline` + `dracut` kernel and its initramfs, `e2fsprogs` checks the ext4
+root at boot, `kbd` applies the `rc.conf` keymap, `ncurses` terminal handling, `iproute2`/`iputils`
+(`ip`, `ping`), `dhcpcd` network, `dbus` + `opendoas` + `zsh` for the user, `linux-firmware-amd` GPU/CPU
+firmware (the RX 9070 won't start without it), `linux-firmware-network` the onboard ethernet chip's firmware,
+`dosfstools` checks the FAT32 EFI partition (where Limine's kernels live), `seatd` seat management.
+
 Once inside the chroot, confirm:
 
 ```sh
@@ -106,10 +130,7 @@ xbps-query -l | grep linux   # want linux-mainline, NOT plain linux
       ext4 root with `noatime`, `/tmp` as tmpfs (`defaults,nosuid,nodev`),
       EFI on `/boot/efi` (laptop, GRUB) or on `/boot` (desktop, Limine)
 - [ ] set the hostname (`void` or `void-desktop`) - chezmoi relies on it
-- [ ] install what the user and first boot need (base-system has none of these):
-      `xbps-install -S opendoas zsh dbus`, plus `seatd` on the desktop (it creates the `_seatd` group)
-      or `socklog-void` on the laptop (creates the `socklog` group)
-- [ ] user `bradley` with shell `zsh`, in groups: `wheel users audio video input plugdev`
+- [ ] user `bradley` with shell `zsh` (the `_seatd`/`socklog` groups exist because those packages were installed above), in groups: `wheel users audio video input plugdev`
       plus `_seatd` on the desktop, `socklog` on the laptop:
       `useradd -m -s /bin/zsh -G wheel,users,audio,video,input,plugdev,_seatd bradley && passwd bradley`
 - [ ] `opendoas` instead of sudo - give it a minimal config so `doas` works on first boot
@@ -214,8 +235,8 @@ The xbps pins were already created in step 1; the copies in `~/.config/system-co
 Install packages by hand, one group at a time, as each step needs them - the laptop's list
 (`~/.config/system-configs/packages-void.txt`) is a reference to pick from, not something to install wholesale.
 
-Never needed on the desktop: `tlp`, `zramen`, `earlyoom`, `iwd`, `grub`/`grub-x86_64-efi` (Limine instead),
-`unbound`, `cronie`, `socklog-void`, `elogind` (seatd + turnstile instead), plus the laptop-only apps in step 11.
+Never needed on the desktop: `tlp`, `zramen`, `earlyoom`, `iwd`, `wifi-firmware`, `grub-x86_64-efi` (Limine instead),
+`unbound`, `cronie`, `socklog-void`, `elogind` (seatd + turnstile instead), `yarn`, plus the laptop-only apps in step 11.
 
 Examples - packages the later steps rely on:
 
@@ -324,15 +345,15 @@ Manual:
 
 ### dwl
 ```sh
-doas xbps-install -S base-devel pkg-config wlroots0.20-devel wayland-devel wayland-protocols \
-    libinput-devel libxkbcommon-devel xcb-util-wm-devel
+doas xbps-install -S base-devel pkg-config wlroots0.20-devel xorg-server-xwayland
 git clone git@github.com:bradleycross07/void-dwl-config.git ~/.local/src/dwl
 cd ~/.local/src/dwl
 git remote add upstream https://codeberg.org/dwl/dwl.git
 git checkout desktop          # desktop only
 make && doas make install
 ```
-(check the exact `-devel` names with `xbps-query -Rs wlroots` if one isn't found)
+(`wlroots0.20-devel` pulls in the Wayland, libinput, xkbcommon and XCB headers; `base-devel` is gcc + make;
+`xorg-server-xwayland` runs X11 apps and most games)
 - desktop: use the `desktop` branch (monitor rule, no brightness keys, no Mod+v clipboard picker)
 - dwl runs `~/.local/bin/autostart.sh` at startup (a template):
   - laptop: keyring, polkit agent, PipeWire + EasyEffects + audio idle inhibit, kanshi,
@@ -341,11 +362,13 @@ make && doas make install
 - quitting dwl stops everything autostart.sh started (the autostart patch kills its process group)
 
 ### Aurelia
+- needs `rust cargo` (and possibly `openssl-devel` - it's on the laptop's list)
 - own tweaks on the `local` branch, rebased onto `origin/main`
 - build, copy the binary to `~/.local/bin/aurelia`, then `cargo clean`
 - game library: `~/Games/Aurelia`
 
 ### InputPlumber
+- needs `rust cargo libevdev-devel libiio-devel dbus-devel` (as on the laptop; its README has the full list)
 - build per its README
 - restore its service and enable it:
   `doas cp -r ~/.config/system-configs/sv-inputplumber /etc/sv/inputplumber && doas ln -s /etc/sv/inputplumber /var/service/`
@@ -410,6 +433,8 @@ chmod 755 ~/.config/autostart ~/.config/menus
 - [ ] laptop-only apps, skip on the desktop: VS Code, ProjectLibre, Vivado, `tailscale`
       - `mimeapps.list` opens code/text files with `code.desktop`: set those to `nvim.desktop` on the desktop
 - [ ] power: `power-profiles-daemon` set to `performance` (never run it alongside TLP)
+- [ ] optional, test before keeping: sched_ext scheduler (`scx`, `scx-loader`, e.g. `scx_lavd`) - compare frame
+      times with MangoHud with and without it; only keep it if it measurably helps
 - [ ] `rc.conf` KEYMAP `us` (US keyboard only) - automatic via the `rc.conf` template
 - [ ] bootloader: Limine instead of GRUB - full steps in step 1 (EFI at `/boot`, kernel hook)
       - kernel options: the laptop's `loglevel=4 nowatchdog mitigations=off`, plus `ipv6.disable=1` (IPv4 only)
