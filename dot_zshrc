@@ -6,18 +6,14 @@ source ~/.local/share/zinit/zinit.git/zinit.zsh
 # starship theming
 eval "$(starship init zsh)"
 
-# zoxide
-eval "$(zoxide init zsh)"
-
 # completion
 autoload -Uz compinit
-compinit 
+compinit
 
-# autocomplete suggestions & syntax
+# autocomplete suggestions
 zinit light zsh-users/zsh-autosuggestions
-zinit light zsh-users/zsh-syntax-highlighting
 
-# turbo-load completions
+# shell integrations & completions
 source <(fzf --zsh)
 source <(gh completion -s zsh)
 
@@ -33,8 +29,8 @@ setopt AUTO_CD             # type a directory name to cd into it
 
 # needed shell aliases
 alias ff="fastfetch"
-alias ls="eza --color=always"
-alias lt="eza --tree --color=always"
+alias ls="eza --color=auto"
+alias lt="eza --tree --color=auto"
 alias cat="bat"
 alias nano="nvim"
 alias grep="rg"
@@ -42,10 +38,16 @@ alias du="dust"
 alias df="duf"
 alias ps="procs"
 
-# VPN
+# VPN aliases (windscribe isn't on void manually installed it with config)
 alias vpnup='doas wg-quick up windscribe'
 alias vpndown='doas wg-quick down windscribe'
 
 # open ff automatically
 fastfetch
 alias clear="command clear && printf '\e[3J' && fastfetch" # clear everything
+
+# zoxide
+eval "$(zoxide init zsh)"
+
+# syntax highlighting 
+zinit light zsh-users/zsh-syntax-highlighting

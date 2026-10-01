@@ -1,4 +1,5 @@
 README.md
+.local/share/applications/mimeinfo.cache
 
 {{if eq .chezmoi.hostname "void"}}
 
