@@ -18,8 +18,8 @@ Do these first - follow the rest of this file on the laptop screen.
       `ls /var/service > ~/.config/system-configs/services-void.txt`
 - [ ] `chezmoi diff` is empty, then commit + push the dotfiles
 - [ ] dwl: commit + push `main` (create the `desktop` branch now or during step 8)
-- [ ] InputPlumber's runit service is hand-made - back it up too:
-      `cp -r /etc/sv/inputplumber ~/.config/system-configs/sv-inputplumber && chezmoi add ~/.config/system-configs/sv-inputplumber`
+- [x] InputPlumber's runit service is hand-made, so it's backed up in `~/.config/system-configs/sv-inputplumber`
+      (`run` and `log/run` only - never `supervise`, that's runit's runtime state)
 
 ### Ventoy USB
 - [ ] Void live ISO on it (an older ISO is fine - `xbps-install -Su` brings everything up to date)
@@ -35,9 +35,11 @@ Plan: free space on the SATA SSD, copy the NVMe's data onto it, install Void on 
 sort the backup out from the finished desktop, and only then format the SATA SSD.
 
 1. Boot the Void live ISO on the new PC and log in as `root` (password `voidlinux`)
-2. Find the partitions: `lsblk -f` (the big NTFS partition on each drive)
+2. Find the partitions: `lsblk -f` (the big NTFS partition on each drive). The names below are examples -
+   the Ventoy USB is also an `sdX` device, so check sizes before mounting anything
 3. Mount both:
    ```sh
+   xbps-install -Su xbps             # an older ISO's xbps must be updated before anything else installs
    xbps-install -S ntfs-3g           # live session only, for ntfsfix if needed
    mkdir -p /mnt/win /mnt/sata
    mount -t ntfs3 -o ro /dev/nvme0n1pX /mnt/win      # Windows drive, read-only
@@ -79,15 +81,7 @@ sort the backup out from the finished desktop, and only then format the SATA SSD
 
 Manual chroot install following https://docs.voidlinux.org (glibc, x86_64).
 
-- [ ] ext4 root mounted with `noatime`, `/tmp` as tmpfs (`defaults,nosuid,nodev`)
-      EFI on `/boot/efi` (laptop, GRUB) or on `/boot` (desktop, Limine)
-- [ ] set the hostname (`void` or `void-desktop`) - chezmoi relies on it
-- [ ] user `bradley` in groups: `wheel users audio video input plugdev`
-      plus `socklog` on the laptop, `_seatd` on the desktop
-- [ ] shell: `zsh`
-- [ ] `opendoas` instead of sudo - in the chroot, give it a minimal config so `doas` works on first boot
-      (the full one is restored in step 4):
-      `echo 'permit persist bradley as root' > /etc/doas.conf && chmod 0400 /etc/doas.conf`
+In order: partition and mount, set the xbps pins, install base-system, then chroot.
 
 ### xbps pins: do this in the live environment, BEFORE installing base-system
 
@@ -100,11 +94,27 @@ printf 'ignorepkg=linux-firmware-nvidia\n' > /mnt/etc/xbps.d/ignore.conf
 ```
 
 Then install `linux-mainline` alongside `base-system` in the same command.
-Inside the chroot, confirm before rebooting:
+Once inside the chroot, confirm:
 
 ```sh
 xbps-query -l | grep linux   # want linux-mainline, NOT plain linux
 ```
+
+### Inside the chroot
+
+- [ ] `/etc/fstab` (generated with `xgenfstab -U /mnt > /mnt/etc/fstab` before chrooting, then checked):
+      ext4 root with `noatime`, `/tmp` as tmpfs (`defaults,nosuid,nodev`),
+      EFI on `/boot/efi` (laptop, GRUB) or on `/boot` (desktop, Limine)
+- [ ] set the hostname (`void` or `void-desktop`) - chezmoi relies on it
+- [ ] install what the user and first boot need (base-system has none of these):
+      `xbps-install -S opendoas zsh dbus`, plus `seatd` on the desktop (it creates the `_seatd` group)
+      or `socklog-void` on the laptop (creates the `socklog` group)
+- [ ] user `bradley` with shell `zsh`, in groups: `wheel users audio video input plugdev`
+      plus `_seatd` on the desktop, `socklog` on the laptop:
+      `useradd -m -s /bin/zsh -G wheel,users,audio,video,input,plugdev,_seatd bradley && passwd bradley`
+- [ ] `opendoas` instead of sudo - give it a minimal config so `doas` works on first boot
+      (the full one is restored in step 4):
+      `echo 'permit persist bradley as root' > /etc/doas.conf && chmod 0400 /etc/doas.conf`
 
 Still in the chroot, enable networking so the first boot is online (in a chroot, services are enabled
 in `/etc/runit/runsvdir/default/`, not `/var/service/`):
@@ -174,20 +184,23 @@ efibootmgr -b 0001 -B          # delete one by its number (e.g. Boot0001 "Window
 
 ## 2. First boot: dotfiles (chezmoi)
 
-Log in as `bradley` on tty1, connect to the network, then:
+Log in as `bradley` on tty1 (dhcpcd from step 1 should already have you online - check with `ping -c 3 voidlinux.org`), then:
 
 ```sh
 doas xbps-install -S chezmoi git
 chezmoi init --branch void-linux --apply https://github.com/bradleycross07/dot_files.git
 ```
 
+> The applied `.zshrc` expects its tools - until step 6 is done, new shells will print errors. Do step 6 straight after this one.
+
 - [ ] SSH key for GitHub + commit signing: copy `github-void`, `github-void.pub` and `config` from the
       Ventoy USB's `ssh key` folder into `~/.ssh/`, then
       `chmod 700 ~/.ssh && chmod 600 ~/.ssh/github-void ~/.ssh/config`
       (same filename, so `.gitconfig` works unchanged; already on GitHub for auth + signing)
       test with: `ssh -T git@github.com`
-- [ ] `gh auth login` (token stays local, never commit `~/.config/gh`)
-- [ ] switch the chezmoi remote to SSH if pushing from this machine
+- [ ] `doas xbps-install -S github-cli` then `gh auth login` (token stays local, never commit `~/.config/gh`)
+- [ ] switch the chezmoi remote to SSH to push from this machine:
+      `chezmoi git -- remote set-url origin git@github.com:bradleycross07/dot_files.git`
 
 ## 3. Repositories and packages
 
@@ -204,11 +217,13 @@ Install packages by hand, one group at a time, as each step needs them - the lap
 Never needed on the desktop: `tlp`, `zramen`, `earlyoom`, `iwd`, `grub`/`grub-x86_64-efi` (Limine instead),
 `unbound`, `cronie`, `socklog-void`, `elogind` (seatd + turnstile instead), plus the laptop-only apps in step 11.
 
-Example - the session basics for dwl:
+Examples - packages the later steps rely on:
 
 ```sh
-doas xbps-install -S seatd turnstile pipewire wireplumber easyeffects swayidle waylock wlopm \
-    wl-clipboard foot fuzzel power-profiles-daemon
+# services enabled in step 5
+doas xbps-install -S chrony nftables rtkit turnstile power-profiles-daemon
+# dwl session
+doas xbps-install -S pipewire wireplumber easyeffects swayidle waylock wlopm wl-clipboard foot fuzzel
 ```
 
 > Each machine keeps its own lists - refresh them with:
@@ -285,8 +300,11 @@ done
 ## 6. Shell and editor
 
 ```sh
+doas xbps-install -S starship zoxide fzf eza bat dust duf procs fastfetch neovim
 git clone https://github.com/zdharma-continuum/zinit.git ~/.local/share/zinit/zinit.git
 ```
+
+(`gh` completion in `.zshrc` needs `github-cli` from step 2)
 
 - Neovim: lazy.nvim bootstraps itself on first launch
 - dwl is started by typing `dwl` on tty1 (function in `.zshrc`)
@@ -298,25 +316,29 @@ Already handled by the dotfiles:
 - EasyEffects mic chain: `~/.config/easyeffects/db/` (gate, compressor, rnnoise)
 
 Manual:
-- [ ] pick default devices in pavucontrol (headset sink, `easyeffects_source` as mic)
+- [ ] pick default devices (headset sink, `easyeffects_source` as mic) - pavucontrol, or
+      `wpctl status` to find the IDs and `wpctl set-default <id>`
 - [ ] laptop: set built-in speakers profile to Off if not wanted
 
 ## 8. Built from source (`~/.local/src`)
 
 ### dwl
 ```sh
+doas xbps-install -S base-devel pkg-config wlroots0.20-devel wayland-devel wayland-protocols \
+    libinput-devel libxkbcommon-devel xcb-util-wm-devel
 git clone git@github.com:bradleycross07/void-dwl-config.git ~/.local/src/dwl
 cd ~/.local/src/dwl
 git remote add upstream https://codeberg.org/dwl/dwl.git
+git checkout desktop          # desktop only
 make && doas make install
 ```
+(check the exact `-devel` names with `xbps-query -Rs wlroots` if one isn't found)
 - desktop: use the `desktop` branch (monitor rule, no brightness keys, no Mod+v clipboard picker)
 - dwl runs `~/.local/bin/autostart.sh` at startup (a template):
   - laptop: keyring, polkit agent, PipeWire + EasyEffects + audio idle inhibit, kanshi,
     xsettingsd, gammastep, clipboard history, swayidle (lock, screen off, poweroff after 3 h)
   - desktop: PipeWire, EasyEffects (mic for Discord) and swayidle (lock after 10 min, screen off after 15 - protects the OLED)
 - quitting dwl stops everything autostart.sh started (the autostart patch kills its process group)
-- needs: `wlroots0.20-devel` and dwl's other build deps
 
 ### Aurelia
 - own tweaks on the `local` branch, rebased onto `origin/main`
