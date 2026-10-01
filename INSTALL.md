@@ -18,11 +18,14 @@ Do these first - follow the rest of this file on the laptop screen.
       `ls /var/service > ~/.config/system-configs/services-void.txt`
 - [ ] `chezmoi diff` is empty, then commit + push the dotfiles
 - [ ] dwl: commit + push `main` (create the `desktop` branch now or during step 8)
+- [ ] InputPlumber's runit service is hand-made - back it up too:
+      `cp -r /etc/sv/inputplumber ~/.config/system-configs/sv-inputplumber && chezmoi add ~/.config/system-configs/sv-inputplumber`
 
 ### Ventoy USB
 - [ ] Void live ISO on it (an older ISO is fine - `xbps-install -Su` brings everything up to date)
-- [ ] folder `ssh key` on the Ventoy data partition with `github-void` and `github-void.pub`
-      (exFAT has no Unix permissions - the `chmod` in step 2 fixes that after copying)
+- [ ] folder `ssh key` on the Ventoy data partition with `github-void`, `github-void.pub` and `config`
+      from `~/.ssh/` (the key has a non-default name, so `config` is what tells SSH to use it for GitHub;
+      exFAT has no Unix permissions - the `chmod` in step 2 fixes that after copying)
 - [ ] game saves: `~/.config/unity3d` from the laptop
 - [ ] `/etc/wireguard/windscribe.conf` only if the VPN is wanted on this machine
 - [ ] after setup: delete the key from the USB
@@ -103,6 +106,15 @@ Inside the chroot, confirm before rebooting:
 xbps-query -l | grep linux   # want linux-mainline, NOT plain linux
 ```
 
+Still in the chroot, enable networking so the first boot is online (in a chroot, services are enabled
+in `/etc/runit/runsvdir/default/`, not `/var/service/`):
+
+```sh
+ln -s /etc/sv/dhcpcd /etc/runit/runsvdir/default/          # desktop + laptop ethernet
+ln -s /etc/sv/dbus /etc/runit/runsvdir/default/
+ln -s /etc/sv/iwd /etc/runit/runsvdir/default/             # laptop only (wifi)
+```
+
 > Don't apply the dotfiles in the chroot - you're root there, so chezmoi would set up `/root`.
 > Boot into the new system first and log in as `bradley`.
 
@@ -169,9 +181,11 @@ doas xbps-install -S chezmoi git
 chezmoi init --branch void-linux --apply https://github.com/bradleycross07/dot_files.git
 ```
 
-- [ ] SSH key for GitHub + commit signing: copy `github-void` and `github-void.pub` from USB 2
-      into `~/.ssh/`, then `chmod 700 ~/.ssh && chmod 600 ~/.ssh/github-void`
+- [ ] SSH key for GitHub + commit signing: copy `github-void`, `github-void.pub` and `config` from the
+      Ventoy USB's `ssh key` folder into `~/.ssh/`, then
+      `chmod 700 ~/.ssh && chmod 600 ~/.ssh/github-void ~/.ssh/config`
       (same filename, so `.gitconfig` works unchanged; already on GitHub for auth + signing)
+      test with: `ssh -T git@github.com`
 - [ ] `gh auth login` (token stays local, never commit `~/.config/gh`)
 - [ ] switch the chezmoi remote to SSH if pushing from this machine
 
@@ -246,10 +260,11 @@ Not backed up on purpose (machine-specific or secret): `/etc/fstab`, `/etc/wireg
 Per-machine lists saved as `~/.config/system-configs/services-<hostname>.txt`.
 
 ```sh
-# both machines:
-for s in dbus udevd dhcpcd chronyd nftables rtkit inputplumber; do
+# both machines (dbus and dhcpcd were already enabled in step 1):
+for s in udevd chronyd nftables rtkit; do
   doas ln -s /etc/sv/$s /var/service/
 done
+# inputplumber: after it's built in step 8
 
 # laptop only:
 for s in elogind iwd unbound tlp zramen earlyoom cronie socklog-unix nanoklogd; do
@@ -263,6 +278,7 @@ done
 # then, once: powerprofilesctl set performance   (the choice is remembered across reboots)
 ```
 
+- [ ] after restoring the configs in step 4: `doas sv restart dhcpcd` and `doas sysctl --system`
 - [ ] only keep `agetty-tty1` and `agetty-tty2`: `doas rm /var/service/agetty-tty{3,4,5,6}`
 - [ ] irqbalance, bluetoothd, NetworkManager, wpa_supplicant: leave disabled
 
@@ -308,7 +324,10 @@ make && doas make install
 - game library: `~/Games/Aurelia`
 
 ### InputPlumber
-- build per its README, enable the `inputplumber` service (step 4)
+- build per its README
+- restore its service and enable it:
+  `doas cp -r ~/.config/system-configs/sv-inputplumber /etc/sv/inputplumber && doas ln -s /etc/sv/inputplumber /var/service/`
+  - desktop: then `doas rm -r /etc/sv/inputplumber/log` - it sends output to syslog (vlogger), which the desktop doesn't run
 
 ### void-packages (restricted: Discord, Spotify)
 ```sh
@@ -339,7 +358,8 @@ chmod 755 ~/.config/autostart ~/.config/menus
 
 ## 10. Secrets and personal setup (never in the repo)
 
-- [ ] WireGuard: download a Windscribe config to `/etc/wireguard/windscribe.conf` (`vpnup` / `vpndown`)
+- [ ] WireGuard (optional): copy `windscribe.conf` from the Ventoy USB to `/etc/wireguard/`, install
+      `wireguard-tools` (`vpnup` / `vpndown`)
 - [ ] eduroam: run the university CAT installer (laptop)
 - [ ] game saves: restore `~/.config/unity3d` from backup
 
@@ -363,10 +383,10 @@ chmod 755 ~/.config/autostart ~/.config/menus
 - [ ] session packages to skip (autostart.sh doesn't run them on the desktop):
       `kanshi`, `gammastep`, `xsettingsd`, `polkit-gnome`, `gnome-keyring`, `cliphist`,
       `sway-audio-idle-inhibit` - keep `wl-clipboard` (screenshots), `swayidle`, `waylock`, `wlopm`, `easyeffects`
-- [ ] laptop-only apps, skip on the desktop: VS Code, ProjectLibre, Vivado, `tailscale`
-      - `mimeapps.list` opens code/text files with `code.desktop`: set those to `nvim.desktop` on the desktop
       - optional: `wl-clip-persist` keeps the clipboard after the source app closes (no history)
       - add `gnome-keyring` back if signing into VS Code/GitHub on the desktop
+- [ ] laptop-only apps, skip on the desktop: VS Code, ProjectLibre, Vivado, `tailscale`
+      - `mimeapps.list` opens code/text files with `code.desktop`: set those to `nvim.desktop` on the desktop
 - [ ] power: `power-profiles-daemon` set to `performance` (never run it alongside TLP)
 - [ ] `rc.conf` KEYMAP `us` (US keyboard only) - automatic via the `rc.conf` template
 - [ ] bootloader: Limine instead of GRUB - full steps in step 1 (EFI at `/boot`, kernel hook)
