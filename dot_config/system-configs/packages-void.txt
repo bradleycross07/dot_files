@@ -139,7 +139,6 @@ starship-1.26.0_1
 streamlink-8.6.1_1
 sway-audio-idle-inhibit-0.2.0_1
 swayidle-1.9.0_1
-tailscale-1.102.4_1
 thunar-archive-plugin-0.6.0_1
 thunar-volman-4.20.0_1
 tlp-1.10.2_1
@@ -176,7 +175,6 @@ xorg-server-xwayland-24.1.13_2
 xsettingsd-1.0.4_1
 xtools-0.70_1
 xwininfo-1.1.7_1
-yarn-1.22.22_1
 yt-dlp-2026.08.19_1
 zip-3.0_6
 zoxide-0.10.0_1
