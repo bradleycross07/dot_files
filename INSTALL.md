@@ -1,17 +1,18 @@
 # Void Linux + dwl install checklist
 
-Rebuilding this setup on a fresh machine. Hostnames: laptop is `void`, desktop is `void-desktop`
-(see `.chezmoiignore` for what each machine skips).
+Rebuilding this setup on a fresh machine. Hostnames: laptop is `void`, new pc is `void-desktop`
+
+(look at .chezmoiignore to see what the machines skip)
 
 Repos:
-- dotfiles: `github.com/bradleycross07/dot_files` (branch `void-linux`)
+- dotfiles: `github.com/bradleycross07/dot_files` (public; branch `void-linux`)
 - dwl: `github.com/bradleycross07/void-dwl-config` (private; upstream is Codeberg dwl)
 
 ---
 
-## 0. Before you start
+## 0. Before starting
 
-Do these first - follow the rest of this file on the laptop screen.
+Do these first - then follow the rest of the install on the laptop screen as a second monitor.
 
 ### Save and push everything
 - [ ] refresh the lists: `xbps-query -m > ~/.config/system-configs/packages-void.txt` and
@@ -22,21 +23,18 @@ Do these first - follow the rest of this file on the laptop screen.
       (`run` and `log/run` only - never `supervise`, that's runit's runtime state)
 
 ### Ventoy USB
-- [ ] Void live ISO on it (an older ISO is fine - `xbps-install -Su` brings everything up to date)
+- [x] Void live ISO on it (an older ISO is fine - `xbps-install -Su` brings everything up to date)
 - [ ] folder `ssh key` on the Ventoy data partition with `github-void`, `github-void.pub` and `config`
       from `~/.ssh/` (the key has a non-default name, so `config` is what tells SSH to use it for GitHub;
       exFAT has no Unix permissions - the `chmod` in step 2 fixes that after copying)
 - [ ] game saves: `~/.config/unity3d` from the laptop
-- [ ] `/etc/wireguard/windscribe.conf` only if the VPN is wanted on this machine
 - [ ] after setup: delete the key from the USB
 
-### Backing up the old Windows drives (the old PC can't boot, so do it from Linux)
-Plan: free space on the SATA SSD, copy the NVMe's data onto it, install Void on the NVMe, then
-sort the backup out from the finished desktop, and only then format the SATA SSD.
+### Backing up the old Windows drives (Doing it from Live Environment to skip Windows BS)
+The plan: free space on the SATA SSD (delete Games folder), copy the NVMe's needed backup onto it, install Void on the NVMe, then sort the backup out from the finished new pc, and only then format the SATA SSD at the very end.
 
-1. Boot the Void live ISO on the new PC and log in as `root` (password `voidlinux`)
-2. Find the partitions: `lsblk -f` (the big NTFS partition on each drive). The names below are examples -
-   the Ventoy USB is also an `sdX` device, so check sizes before mounting anything
+1. Boot the Void live ISO on the new PC and log in as `root`
+2. Find the partitions: `lsblk -f` or `fdisk -l` (the big NTFS partition on each drive). The names below are examples - the Ventoy USB is also an `sdX` drive, probably sda, so check the sizes before mounting anything.
 3. Mount both:
    ```sh
    xbps-install -Su xbps             # an older ISO's xbps must be updated before anything else installs
@@ -45,41 +43,39 @@ sort the backup out from the finished desktop, and only then format the SATA SSD
    mount -t ntfs3 -o ro /dev/nvme0n1pX /mnt/win      # Windows drive, read-only
    mount -t ntfs3 /dev/sdaX /mnt/sata                # SATA SSD, read-write
    ```
-   If the SATA mount refuses ("dirty" volume - Windows Fast Startup), run `ntfsfix -d /dev/sdaX` and retry.
-4. Delete the games from `/mnt/sata` to make room (they can be redownloaded)
+   If the SATA mount refuses ("dirty" volume - Windows Fast Startup), I disabled fast startup completely anyways in Windows but worth the check to run `ntfsfix -d /dev/sdXX` and retry.
+4. Delete the games from `/mnt/sata` to make room on the SATA if needed
 5. Copy what's wanted from the Windows drive, e.g.
    ```sh
    mkdir -p /mnt/sata/backup
-   cp -a "/mnt/win/Users/<name>/Documents" /mnt/sata/backup/
-   cp -a /mnt/win/Xilinx /mnt/sata/backup/            # year 1 Vivado projects
+   cp -a "/mnt/win/Users/Bradley/Documents" /mnt/sata/backup/ # my user on windows is just "Bradley"
+   cp -a /mnt/win/Xilinx /mnt/sata/backup/            # Year 1 Vivado projects
    ```
-   Also worth a look: `Users/<name>/Pictures`, `Desktop` and `Downloads` (AppData isn't needed -
-   game saves are already backed up elsewhere)
+   Also worth a look: `Pictures`, `Desktop` and `Downloads`
 6. `umount /mnt/win /mnt/sata` - then carry on with step 1 (which wipes only the NVMe)
-7. Once the desktop is set up: upload the phone photos (~50 GB) and anything else to the uni
-   Google Drive from Firefox, copy the rest to `~`, THEN reformat the SATA SSD as ext4 for games
+7. Once the desktop is set up: upload the phone photos (~50 GB) and anything else to the uni Google Drive from Firefox, copy the rest to `~`, THEN reformat the SATA SSD as ext4 for games
 
 ### Disk layout
-- NVMe: EFI 512 MiB FAT32 mounted at **/boot** (Limine reads the kernel from it - see step 1)
-  + ext4 root, no swap
+- NVMe: EFI 512 MiB FAT32 mounted at /boot (Limine reads the kernel from it)
+  - ext4 root, no swap
 - SATA SSD: ext4, games (`~/Games`), formatted only after the backup is safe
-  (Linux reads/writes NTFS fine via the kernel ntfs3 driver, but games and Proton need ext4: permissions, symlinks)
+  (Linux reads/writes NTFS fine via the kernel ntfs3 driver)
 
 ### BIOS / UEFI (desktop)
-- [ ] update the BIOS first (newest AGESA for the 7800X3D and B850)
-- [ ] UEFI only: CSM off, Secure Boot off, TPM off
+- [ ] update the BIOS first (newest for B850)
+- [ ] UEFI only: CSM off, Secure Boot off & TPM off
 - [ ] EXPO on for the DDR5-6000 CL30 kit - first boot can sit on a black screen for a few
-      minutes while the memory trains; that's normal
-- [ ] Resizable BAR (and Above 4G Decoding) on for the RX 9070
+      minutes (longer on KLEVV FITs)
+- [ ] Resizable BAR (and Above 4G Decoding) on for the RX 9070 (free performance boost)
 
 ### Things to expect
 - [ ] the live ISO's kernel may be too old for the RX 9070 (RDNA4) - fine for a TTY install;
       full GPU support comes with `linux-mainline` + recent Mesa
-- [ ] ethernet cable plugged in (the onboard wifi isn't used)
+- [x] ethernet cable plugged in (the onboard wifi isn't used, no iwd)
 
 ## 1. Base install
 
-Manual chroot install following https://docs.voidlinux.org (glibc, x86_64).
+Manual advanced chroot install following https://docs.voidlinux.org (glibc, x86_64).
 
 In order: partition and mount, set the xbps pins, install `base-minimal` plus the extras below, then chroot.
 
@@ -95,8 +91,7 @@ printf 'ignorepkg=linux-firmware-nvidia\n' > /mnt/etc/xbps.d/ignore.conf
 
 ### Install the base system (`base-minimal`, not `base-system`)
 
-`base-minimal` is the lean option, so everything the system needs to boot and get online is listed
-explicitly. Follow the Void docs for the rest of the command (copying the xbps keys, `XBPS_ARCH`):
+`base-minimal` is the lean option, so everything the system needs to boot and get online is listed explicitly. Follow the Void docs for the rest of the command (copying the xbps keys, `XBPS_ARCH`):
 
 ```sh
 # desktop
@@ -112,16 +107,12 @@ xbps-install -S -r /mnt -R https://repo-de.voidlinux.org/current \
     linux-firmware-amd wifi-firmware iwd grub-x86_64-efi socklog-void
 ```
 
-What each extra is for: `linux-mainline` + `dracut` kernel and its initramfs, `e2fsprogs` checks the ext4
-root at boot, `kbd` applies the `rc.conf` keymap, `ncurses` terminal handling, `iproute2`/`iputils`
-(`ip`, `ping`), `dhcpcd` network, `dbus` + `opendoas` + `zsh` for the user, `linux-firmware-amd` GPU/CPU
-firmware (the RX 9070 won't start without it), `linux-firmware-network` the onboard ethernet chip's firmware,
-`dosfstools` checks the FAT32 EFI partition (where Limine's kernels live), `seatd` seat management.
+What each extra is for: `linux-mainline` + `dracut` kernel and its initramfs, `e2fsprogs` checks the ext4 root at boot, `kbd` applies the `rc.conf` keymap, `ncurses` terminal handling, `iproute2`/`iputils` (`ip`, `ping`), `dhcpcd` network, `dbus` + `opendoas` + `zsh` for the user, `linux-firmware-amd` GPU/CPU firmware (the RX 9070 won't start without it), `linux-firmware-network` the onboard ethernet chip's firmware, `dosfstools` checks the FAT32 EFI partition (where Limine's kernels live), `seatd` seat management.
 
 Once inside the chroot, confirm:
 
 ```sh
-xbps-query -l | grep linux   # want linux-mainline, NOT plain linux
+xbps-query -l | grep linux   # want linux-mainline, hopefully showing the latest version
 ```
 
 ### Inside the chroot
@@ -153,8 +144,7 @@ ln -s /etc/sv/iwd /etc/runit/runsvdir/default/             # laptop only (wifi)
 ### Desktop bootloader: Limine (instead of GRUB)
 
 Limine only reads FAT, so the kernels and initramfs live on the EFI partition itself, mounted at `/boot`.
-That's why the EFI partition holds more than the laptop's (GRUB's) few hundred KB - each kernel +
-initramfs is tens of MB. 512 MiB is plenty if old kernels are cleaned up (`doas vkpurge rm all`).
+That's why the EFI partition holds more than the laptop's (GRUB's) few hundred KB - each kernel + initramfs is tens of MB. 512 MiB is plenty if old kernels are cleaned up (`doas vkpurge rm all`).
 
 Inside the chroot:
 
@@ -167,8 +157,7 @@ efibootmgr --create --disk /dev/nvme0n1 --part 1 --label "Void Linux" --loader '
 
 (check the real path of `BOOTX64.EFI` with `xbps-query -f limine | grep -i efi` - copy it again whenever the `limine` package updates)
 
-Kernel update hook - rewrites `/boot/limine.conf` for each new kernel, so an update never leaves a stale entry.
-Save as `/etc/kernel.d/post-install/60-limine` and `chmod +x` it:
+Kernel update hook - rewrites `/boot/limine.conf` for each new kernel, so an update never leaves a stale entry. Save as `/etc/kernel.d/post-install/60-limine` and `chmod +x` it:
 
 ```sh
 #!/bin/sh
