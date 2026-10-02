@@ -19,6 +19,9 @@ Do these first - then follow the rest of the install on the laptop screen as a s
       `ls /var/service > ~/.config/system-configs/services-void.txt`
 - [ ] `chezmoi diff` is empty, then commit + push the dotfiles
 - [ ] dwl: commit + push `main` (create the `desktop` branch now or during step 8)
+- [ ] spotatui: export the `local` branch's patches into the dotfiles repo (they only exist as local commits):
+      `cd ~/.local/src/spotatui && git format-patch origin/main -o "$(chezmoi source-path)/patches/spotatui"`
+      (`patches` is listed in `.chezmoiignore`, so it stays in the repo and is never copied into `~`)
 - [x] InputPlumber's runit service is hand-made, so it's backed up in `~/.config/system-configs/sv-inputplumber`
       (`run` and `log/run` only - never `supervise`, that's runit's runtime state)
 
@@ -233,7 +236,7 @@ Examples - packages the later steps rely on:
 # services enabled in step 5
 doas xbps-install -S chrony nftables rtkit turnstile power-profiles-daemon
 # dwl session
-doas xbps-install -S pipewire wireplumber easyeffects swayidle waylock wlopm wl-clipboard foot fuzzel
+doas xbps-install -S pipewire wireplumber alsa-pipewire easyeffects swayidle waylock wlopm wl-clipboard foot fuzzel
 ```
 
 > Each machine keeps its own lists - refresh them with:
@@ -326,6 +329,13 @@ Already handled by the dotfiles:
 - EasyEffects mic chain: `~/.config/easyeffects/db/` (gate, compressor, rnnoise)
 
 Manual:
+- [ ] route ALSA through PipeWire (spotatui plays through ALSA - without this it fails with
+      "Device default ... Busy"); needs `alsa-pipewire`:
+      ```sh
+      doas mkdir -p /etc/alsa/conf.d
+      doas ln -s /usr/share/alsa/alsa.conf.d/50-pipewire.conf /etc/alsa/conf.d/
+      doas ln -s /usr/share/alsa/alsa.conf.d/99-pipewire-default.conf /etc/alsa/conf.d/
+      ```
 - [ ] pick default devices (headset sink, `easyeffects_source` as mic) - pavucontrol, or
       `wpctl status` to find the IDs and `wpctl set-default <id>`
 - [ ] laptop: set built-in speakers profile to Off if not wanted
@@ -363,14 +373,38 @@ make && doas make install
   `doas cp -r ~/.config/system-configs/sv-inputplumber /etc/sv/inputplumber && doas ln -s /etc/sv/inputplumber /var/service/`
   - desktop: then `doas rm -r /etc/sv/inputplumber/log` - it sends output to syslog (vlogger), which the desktop doesn't run
 
+### spotatui (terminal Spotify client, ~50 MB RAM vs 1 GB+ for the official app)
+```sh
+doas xbps-install -S rust cargo pkg-config alsa-lib-devel openssl-devel libxcb-devel
+git clone https://github.com/LargeModGames/spotatui.git ~/.local/src/spotatui
+cd ~/.local/src/spotatui
+git checkout -b local
+git am "$(chezmoi source-path)"/patches/spotatui/*.patch     # smooth playbar + 100 ms position updates
+cargo build --release --locked --no-default-features \
+    --features tui,streaming,audio-viz-cpal,discord-rpc,mpris,scripting
+cp target/release/spotatui ~/.local/bin/
+cargo clean
+```
+- needs Rust 1.90+ (`rustc --version`) and the ALSA -> PipeWire links from step 7
+- no `self-update` (would replace the self-built binary) and no `telemetry` in the build; the song counter
+  is also off in `config.yml` (`enable_global_song_count: false`)
+- `discord-rpc` can be dropped from `--features` - Discord's own Spotify connection already shows the activity
+- update: `git fetch origin && git rebase origin/main`, then build, `cp`, `cargo clean` as above
+- config: `~/.config/spotatui/config.yml` comes from chezmoi (theme, keys, settings);
+  `client.yml` and the login caches are NOT in the repo
+- first run: choose option 2 (own Spotify app), port 8888, paste the Client ID from the
+  Spotify Developer Dashboard (the same app works on both machines), then pick the `spotatui` device with `d`
+- edit `config.yml` only while spotatui is closed, or change things in its settings screen and save with `Alt-s`
+
 ### void-packages (restricted: Discord, Spotify)
+Spotify's official client is now only needed for offline downloads - spotatui can't play offline.
 ```sh
 git clone https://github.com/void-linux/void-packages.git ~/.local/src/void-packages
 cd ~/.local/src/void-packages
 ./xbps-src binary-bootstrap
 echo XBPS_ALLOW_RESTRICTED=yes >> etc/conf
 ./xbps-src pkg discord && doas xbps-install -R hostdir/binpkgs/nonfree discord
-./xbps-src pkg spotify && doas xbps-install -R hostdir/binpkgs/nonfree spotify
+./xbps-src pkg spotify && doas xbps-install -R hostdir/binpkgs/nonfree spotify   # optional, offline only
 ```
 
 ## 9. Manually installed apps
@@ -392,7 +426,7 @@ chmod 755 ~/.config/autostart ~/.config/menus
 
 ## 10. Secrets and personal setup (never in the repo)
 
-- [ ] laptop only - WireGuard: restore `windscribe.conf` to `/etc/wireguard/` (or download a fresh one from Windscribe), install `wireguard-tools` (`vpnup` / `vpndown`)      `wireguard-tools` (`vpnup` / `vpndown`)
+- [ ] laptop only - WireGuard: restore `windscribe.conf` to `/etc/wireguard/` (or download a fresh one from Windscribe), install `wireguard-tools` (`vpnup` / `vpndown`)
 - [ ] eduroam: run the university CAT installer (laptop)
 - [ ] game saves: restore `~/.config/unity3d` from backup
 

@@ -1,0 +1,123 @@
+keybindings:
+  back: q
+  move_up: k
+  move_down: j
+  move_left: h
+  move_right: l
+  next_page: ctrl-d
+  previous_page: ctrl-u
+  jump_to_start: ctrl-a
+  jump_to_end: ctrl-e
+  jump_to_album: a
+  jump_to_artist_album: A
+  jump_to_context: o
+  manage_devices: d
+  decrease_volume: '-'
+  increase_volume: +
+  toggle_playback: space
+  seek_backwards: <
+  seek_forwards: '>'
+  next_track: n
+  previous_track: p
+  force_previous_track: P
+  help: '?'
+  shuffle: ctrl-s
+  repeat: ctrl-r
+  search: /
+  submit: enter
+  copy_song_url: c
+  copy_album_url: C
+  audio_analysis: v
+  lyrics_view: B
+  miniplayer_view: T
+  cover_art_view: G
+  add_item_to_queue: z
+  show_queue: Q
+  remove_from_queue: x
+  open_settings: alt-,
+  save_settings: alt-s
+  listening_party: ctrl-p
+  like_track: F
+  generate_recap: R
+behavior:
+  seek_milliseconds: 2000
+  volume_increment: 5
+  tick_rate_milliseconds: 150
+  animation_tick_rate_milliseconds: 15
+  enable_text_emphasis: true
+  banner_gradient: false
+  show_loading_indicator: false
+  enforce_wide_search_bar: true
+  group_folders_first: true
+  enable_global_song_count: false
+  disable_mouse_inputs: true
+  enable_discord_rpc: false
+  discord_rpc_client_id: null
+  enable_announcements: false
+  announcement_feed_url: null
+  enable_monthly_recap_prompt: false
+  pin_community_playlist: false
+  liked_icon: ♥
+  shuffle_icon: 🔀
+  repeat_track_icon: 🔂
+  repeat_context_icon: 🔁
+  playing_icon: ▶
+  paused_icon: ⏸
+  set_window_title: false
+  visualizer_style: Cava
+  relay_server_url: wss://spotatui-party.spotatui.workers.dev/ws
+  stop_after_current_track: false
+  startup_behavior: continue
+  disable_auto_update: false
+  auto_update_delay: '0'
+  keepawake_enabled: true
+  enable_media_keys: false
+  sync_token: null
+  local_music_path: /home/bradley/Music
+  subsonic_url: null
+  subsonic_username: null
+  subsonic_password: null
+  ytdlp_path: null
+  qobuz_quality: 6
+  gauge_filled_icon: ⋮
+  gauge_unfilled_icon: ·
+  active_source_icon: ●
+  episode_played_icon: ✔
+  sort_ascending_icon: ↑
+  sort_descending_icon: ↓
+  list_highlight_icon: ▶
+  playbar_control_labels: null
+  status_message_ttl_percent: 100
+  playback_poll_seconds: 3
+  table_scroll_padding: 4
+  like_animation_frames: 15
+  startup_route: stats
+  default_sort_playlist_tracks: date_added
+  default_sort_saved_albums: name
+  default_sort_saved_artists: name
+  default_sort_recently_played: artist
+  sidebar_position: left
+  playbar_position: bottom
+  small_terminal_width: 150
+  small_terminal_height: 45
+theme:
+  preset: Custom
+  active: 246, 242, 175
+  banner: 240, 194, 66
+  error_border: 224, 108, 117
+  error_text: 224, 108, 117
+  hint: 194, 157, 103
+  hovered: 201, 161, 119
+  inactive: 120, 90, 68
+  playbar_background: Reset
+  playbar_progress: 240, 194, 66
+  playbar_progress_text: 245, 230, 202
+  playbar_text: 245, 230, 202
+  selected: 246, 242, 175
+  text: 245, 230, 202
+  background: Reset
+  header: Reset
+  highlighted_lyrics: 240, 194, 66
+plugin_commands: null
+format: null
+tables: null

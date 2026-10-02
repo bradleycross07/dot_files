@@ -1,0 +1,44 @@
+From 34ab8a99c4d75ce339c102ddb58917feafca883f Mon Sep 17 00:00:00 2001
+From: bradleycross07 <182443649+bradleycross07@users.noreply.github.com>
+Date: Fri, 2 Oct 2026 01:07:34 +0100
+Subject: [PATCH 2/2] smooth playbar progress
+
+---
+ src/tui/ui/player.rs | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/src/tui/ui/player.rs b/src/tui/ui/player.rs
+index cbf28d7..d25da4c 100644
+--- a/src/tui/ui/player.rs
++++ b/src/tui/ui/player.rs
+@@ -1141,7 +1141,12 @@ fn render_local_playbar(f: &mut Frame<'_>, app: &App, layout_chunk: Rect, view:
+         .fg(app.user_config.theme.playbar_background.into())
+         .add_modifier(modifier),
+     )
+-    .ratio(perc as f64 / 100.0)
++    // exact position instead of whole-percent steps, so the bar moves smoothly
++    .ratio(if view.live || view.duration_ms == 0 {
++      perc as f64 / 100.0
++    } else {
++      (view.position_ms as f64 / view.duration_ms as f64).clamp(0.0, 1.0)
++    })
+     .filled_symbol(app.user_config.behavior.gauge_filled_icon.as_str())
+     .unfilled_symbol(app.user_config.behavior.gauge_unfilled_icon.as_str())
+     .label(Span::styled(
+@@ -1454,7 +1459,12 @@ pub fn draw_playbar(f: &mut Frame<'_>, app: &App, layout_chunk: Rect) {
+             .fg(app.user_config.theme.playbar_background.into())
+             .add_modifier(modifier),
+         )
+-        .ratio(perc as f64 / 100.0)
++        // exact position instead of whole-percent steps, so the bar moves smoothly
++        .ratio(if display_duration_ms == 0 {
++          perc as f64 / 100.0
++        } else {
++          (progress_ms as f64 / display_duration_ms as f64).clamp(0.0, 1.0)
++        })
+         .filled_symbol(app.user_config.behavior.gauge_filled_icon.as_str())
+         .unfilled_symbol(app.user_config.behavior.gauge_unfilled_icon.as_str())
+         .label(Span::styled(
+-- 
+2.55.0
+

@@ -1,0 +1,25 @@
+From 039c95f5c8aab1bb911745d5f5a3ffde5b6c8a06 Mon Sep 17 00:00:00 2001
+From: bradleycross07 <182443649+bradleycross07@users.noreply.github.com>
+Date: Fri, 2 Oct 2026 00:53:28 +0100
+Subject: [PATCH 1/2] report playback position every 100ms
+
+---
+ src/infra/player/streaming.rs | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/src/infra/player/streaming.rs b/src/infra/player/streaming.rs
+index 8207ee2..3b4a5a8 100644
+--- a/src/infra/player/streaming.rs
++++ b/src/infra/player/streaming.rs
+@@ -824,7 +824,7 @@ impl StreamingPlayer {
+         _ => librespot_playback::config::Bitrate::Bitrate320,
+       },
+       // Enable periodic position updates for real-time playbar progress
+-      position_update_interval: Some(std::time::Duration::from_secs(1)),
++      position_update_interval: Some(std::time::Duration::from_millis(100)),
+       ..Default::default()
+     };
+ 
+-- 
+2.55.0
+
