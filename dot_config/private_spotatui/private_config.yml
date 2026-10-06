@@ -40,9 +40,9 @@ keybindings:
   like_track: F
   generate_recap: R
 behavior:
-  seek_milliseconds: 2000
+  seek_milliseconds: 5000
   volume_increment: 5
-  tick_rate_milliseconds: 150
+  tick_rate_milliseconds: 500
   animation_tick_rate_milliseconds: 15
   enable_text_emphasis: true
   banner_gradient: false
@@ -88,11 +88,11 @@ behavior:
   list_highlight_icon: ▶
   playbar_control_labels: null
   status_message_ttl_percent: 100
-  playback_poll_seconds: 3
-  table_scroll_padding: 4
+  playback_poll_seconds: 10
+  table_scroll_padding: 3
   like_animation_frames: 15
   startup_route: stats
-  default_sort_playlist_tracks: date_added
+  default_sort_playlist_tracks: default
   default_sort_saved_albums: name
   default_sort_saved_artists: name
   default_sort_recently_played: artist

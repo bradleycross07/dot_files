@@ -1,5 +1,8 @@
 # ~/.zshrc configuration
 
+# for spotatui
+fpath=(~/.local/share/zsh/site-functions $fpath)
+
 # zinit: plugin manager
 source ~/.local/share/zinit/zinit.git/zinit.zsh
 
@@ -52,6 +55,8 @@ dwl() {
 
   # stop audio left running after quitting out of dwl
   pkill -u "$USER" -x 'pipewire|wireplumber'
+  # stop Aurelia daemon too
+  aurelia daemon stop >/dev/null 2>&1
 }
 
 # open ff automatically

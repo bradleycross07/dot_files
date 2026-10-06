@@ -3,6 +3,8 @@
 typeset -U path
 path=(~/.local/bin ~/.spicetify ~/.cargo/bin $path)
 
+export XDG_DATA_DIRS="$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share:${XDG_DATA_DIRS:-/usr/local/share:/usr/share}"
+
 export NO_AT_BRIDGE=1
 export GTK_A11Y=none
 
