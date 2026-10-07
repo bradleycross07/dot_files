@@ -44,13 +44,13 @@ Do these first, then keep this checklist open on the laptop while installing on 
       chezmoi re-add
       chezmoi diff                       # should print nothing now
       chezmoi git -- add -A
-      chezmoi git -- status              # check: lists, fonts-*.txt, ~/.local/share/fonts, patches/aurelia, INSTALL.md
+      chezmoi git -- status              # check the refreshed lists, fonts-*.txt and patches/aurelia are listed
       chezmoi git -- commit -m "Prepare for desktop install" && chezmoi git -- push
       ```
       (if `fonts-confd.txt` is empty, chezmoi may skip it - that's fine, step 3 copes with it missing)
 - [ ] dwl: commit + push `main`, then create and push the `desktop` branch now
       (step 8 checks it out from a fresh clone, so it must already be on GitHub):
-      `git switch -c desktop && git push -u origin desktop && git switch main`
+      `cd ~/.local/src/dwl && git switch -c desktop && git push -u origin desktop && git switch main`
       (switch back to `main` afterwards, or the laptop's next `make` builds the desktop config)
 - [x] InputPlumber's runit service is hand-made, so it's backed up in `~/.config/system-configs/sv-inputplumber`
       (`run` and `log/run` only - never `supervise`, that's runit's runtime state)
@@ -87,9 +87,10 @@ The plan: free space on the SATA SSD (delete the Games folder), copy what's need
    ```
    Also worth a look: `Pictures`, `Desktop` and `Downloads`
 6. `umount /mnt/win /mnt/sata` - then carry on with section 1 (which wipes only the NVMe)
-7. Once the desktop is set up: mount the SATA SSD (`doas mount -t ntfs3 -o uid=1000,gid=1000 /dev/sdXN /mnt`, so the files belong to you), upload the phone photos
-   (~50 GB) and anything else to the uni Google Drive from Firefox, copy the rest to `~`, `doas umount /mnt`,
-   THEN reformat the SATA SSD as ext4 for games (last item in section 11)
+7. Once the desktop is set up: mount the SATA SSD with
+   `doas mount -t ntfs3 -o uid=1000,gid=1000 /dev/sdXN /mnt` (so the files belong to you), upload the phone
+   photos (~50 GB) and anything else to the uni Google Drive from Firefox, copy the rest to `~`, then
+   `doas umount /mnt`. Only THEN reformat the SATA SSD as ext4 for games (last item in section 11).
 
 ### Disk layout
 - NVMe: EFI 512 MiB FAT32 mounted at `/boot` (Limine reads the kernel from it)
@@ -142,23 +143,27 @@ printf 'ignorepkg=linux-firmware-nvidia\nignorepkg=linux-firmware-intel\n' > /mn
 ```
 
 (`mainline.conf` keeps the plain `linux` kernel out, since `linux-mainline` replaces it. `ignore.conf` keeps the
-NVIDIA and Intel firmware out for good, even if something depends on them - the desktop is AMD only, and
+NVIDIA and Intel firmware out for good, even if something depends on them - and something does: the kernel's
+`linux-base` package pulls in `linux-firmware-intel` and `linux-firmware-nvidia` on x86_64. The desktop is AMD only, and
 `linux-firmware-amd` + `linux-firmware-network` cover everything it needs, including the CPU microcode.
 Only pin `linux-firmware-intel` on a machine with no Intel CPU, GPU or wifi.)
 
 ### Install the base system (`base-minimal`, not `base-system`)
 
-`base-minimal` is the lean option, so everything the system needs to boot and get online is listed explicitly. Follow the Void docs for the rest of the command (copying the xbps keys, `XBPS_ARCH`):
+`base-minimal` is the lean option, so everything the system needs to boot and get online is listed explicitly.
+Copy the live system's xbps signing keys first, so the new root trusts the repo:
 
 ```sh
+mkdir -p /mnt/var/db/xbps/keys && cp /var/db/xbps/keys/* /mnt/var/db/xbps/keys/
+
 # desktop
-xbps-install -S -r /mnt -R https://repo-de.voidlinux.org/current \
+XBPS_ARCH=x86_64 xbps-install -S -r /mnt -R https://repo-de.voidlinux.org/current \
     base-minimal linux-mainline dracut eudev kmod e2fsprogs kbd ncurses iproute2 iputils \
     dhcpcd dbus opendoas zsh openssh less pciutils usbutils file acpid \
     linux-firmware-amd linux-firmware-network dosfstools seatd
 
 # laptop (for reference)
-xbps-install -S -r /mnt -R https://repo-de.voidlinux.org/current \
+XBPS_ARCH=x86_64 xbps-install -S -r /mnt -R https://repo-de.voidlinux.org/current \
     base-minimal linux-mainline dracut eudev kmod e2fsprogs kbd ncurses iproute2 iputils \
     dhcpcd dbus opendoas zsh openssh less pciutils usbutils file acpid \
     linux-firmware-amd wifi-firmware iwd grub-x86_64-efi dosfstools socklog-void
@@ -187,9 +192,10 @@ Once inside the chroot, confirm:
 
 ### Inside the chroot
 
-- [ ] check `/etc/fstab` (generated above): ext4 root with `noatime`, add `/tmp` as tmpfs (`defaults,nosuid,nodev`),
-      EFI on `/boot/efi` (laptop, GRUB) or on `/boot` (desktop, Limine)
-- [ ] set the hostname (`void` or `void-desktop`) - chezmoi relies on it
+- [ ] check `/etc/fstab` (generated above): ext4 root with `noatime`, EFI on `/boot/efi` (laptop, GRUB) or on
+      `/boot` (desktop, Limine), and add `/tmp` as tmpfs:
+      `tmpfs /tmp tmpfs defaults,nosuid,nodev 0 0`
+- [ ] set the hostname - chezmoi relies on it: `echo void-desktop > /etc/hostname` (laptop: `void`)
 - [ ] timezone: `ln -sf /usr/share/zoneinfo/Europe/London /etc/localtime`
 - [ ] locale (glibc): uncomment `en_GB.UTF-8 UTF-8` in `/etc/default/libc-locales`, set `LANG=en_GB.UTF-8` in
       `/etc/locale.conf` (`glibc-locales` comes with `base-minimal`; `xbps-reconfigure -fa` at the end generates it)
@@ -214,7 +220,7 @@ in `/etc/runit/runsvdir/default/`, not `/var/service/`):
 ```sh
 ln -s /etc/sv/dhcpcd /etc/runit/runsvdir/default/          # desktop + laptop ethernet
 ln -s /etc/sv/dbus /etc/runit/runsvdir/default/
-ln -s /etc/sv/udevd /etc/runit/runsvdir/default/
+ln -sf /etc/sv/udevd /etc/runit/runsvdir/default/          # usually already enabled by runit-void; -f avoids "File exists"
 ln -s /etc/sv/iwd /etc/runit/runsvdir/default/             # laptop only (wifi)
 ```
 
@@ -240,14 +246,23 @@ efibootmgr --create --disk /dev/nvme0n1 --part 1 --label "Void Linux" --loader '
 `\EFI\BOOT\BOOTX64.EFI` is also the firmware's fallback path, so the PC still boots it even if `efibootmgr` fails
 in the chroot.)
 
-Kernel update hook - rewrites `/boot/limine.conf` for each new kernel, so an update never leaves a stale entry. Save as `/etc/kernel.d/post-install/60-limine` and `chmod +x` it:
+Kernel update hook - rewrites `/boot/limine.conf` for each new kernel, so an update never leaves a stale entry.
+Save as `/etc/kernel.d/post-install/60-limine` and `chmod +x` it (xbps skips hooks that aren't executable; the
+`60-` makes it run after dracut's `20-initramfs`, so the initramfs exists first):
 
 ```sh
 #!/bin/sh
 # called by xbps after installing a kernel: $1 = package, $2 = version
+# xbps runs kernel hooks from the target root directory, so paths are relative
+# (same as Void's own dracut hook, which writes boot/initramfs-$VERSION.img)
 VERSION="$2"
-ROOT_UUID=$(findmnt -no UUID /)
-cat > /boot/limine.conf <<CONF
+ROOT_UUID=$(findmnt -no UUID -T .)
+# never write an unbootable entry: keep the old limine.conf if anything is missing
+if [ -z "$VERSION" ] || [ -z "$ROOT_UUID" ] || [ ! -f "boot/vmlinuz-$VERSION" ]; then
+    echo "60-limine: missing version, root UUID or kernel - limine.conf NOT updated" >&2
+    exit 1
+fi
+cat > boot/limine.conf <<CONF
 timeout: 3
 
 /Void Linux ($VERSION)
@@ -276,10 +291,10 @@ cat /boot/limine.conf      # desktop: check the entry
 ls /boot                   # vmlinuz-<version> and initramfs-<version>.img must both be there
 ```
 
-If `limine.conf` is missing, run the hook by hand:
+If `limine.conf` is missing, run the hook by hand - from `/`, since it uses relative paths:
 
 ```sh
-/etc/kernel.d/post-install/60-limine linux-mainline "$(ls /boot | sed -n 's/^vmlinuz-//p' | sort -V | tail -1)"
+cd / && /etc/kernel.d/post-install/60-limine linux-mainline "$(ls /boot | sed -n 's/^vmlinuz-//p' | sort -V | tail -1)"
 ```
 
 ### Remove leftover Windows boot entries
@@ -291,17 +306,26 @@ efibootmgr                     # list entries
 efibootmgr -b 0001 -B          # delete one by its number (e.g. Boot0001 "Windows Boot Manager")
 ```
 
+### Leave the chroot and reboot
+
+```sh
+exit                           # leave the chroot
+umount -R /mnt
+reboot                         # pull the Ventoy USB out once the screen goes blank
+```
+
 ## 2. First boot: dotfiles (chezmoi)
 
 Log in as `bradley` on tty1 (dhcpcd from step 1 should already have you online - check with `ping -c 3 voidlinux.org`).
-zsh shows its first-run setup menu because there's no `~/.zshrc` yet - press `q` to skip it (chezmoi brings the real one). Then:
+zsh may show its first-run setup menu because there's no `~/.zshrc` yet - press `q` to skip it (chezmoi brings the real one). Then:
 
 ```sh
 doas xbps-install -S chezmoi git
 chezmoi init --branch void-linux --apply https://github.com/bradleycross07/dot_files.git
 ```
 
-> The applied `.zshrc` expects its tools - until step 6 is done, new shells will print errors. Do step 6 straight after this one.
+> The applied `.zshrc` expects its tools - until step 6 is done, new shells will print errors. They're harmless;
+> finish this step, then do step 6 before steps 3-5 if they get annoying.
 
 - [ ] SSH key for GitHub + commit signing: mount the Ventoy data partition (partition 1) and copy the key over:
       ```sh
@@ -337,9 +361,11 @@ Examples - packages the later steps rely on:
 # services enabled in step 5
 doas xbps-install -S chrony nftables rtkit turnstile power-profiles-daemon
 # dwl session
-doas xbps-install -S pipewire wireplumber alsa-pipewire easyeffects swayidle waylock wlopm wl-clipboard foot fuzzel
+doas xbps-install -S pipewire wireplumber alsa-pipewire easyeffects pavucontrol swayidle waylock wlopm wl-clipboard foot fuzzel
 # graphics - dwl won't start without a Mesa driver (desktop: radeonsi + RADV for the RX 9070)
 doas xbps-install -S mesa-dri mesa-vulkan-radeon vulkan-loader
+# hardware video decoding (VA-API) - mpv's hwdec, Firefox and Discord video use it
+doas xbps-install -S mesa-vaapi
 # fonts - base-minimal has none, and foot/fuzzel fail to start without one: install the laptop's exact set
 # (saved in step 0), re-enable the same fontconfig tweaks, then rebuild the font cache.
 # ~/.config/fontconfig and ~/.local/share/fonts already came back with the dotfiles in step 2.
@@ -381,8 +407,8 @@ Copies live in `~/.config/system-configs` (applied by chezmoi in step 2).
 | `unbound.conf`       | `/etc/unbound/unbound.conf`   | laptop only; `unbound-checkconf` |
 | `zramen.conf`        | `/etc/sv/zramen/conf`         | laptop only               |
 | `dhcpcd.conf`        | `/etc/dhcpcd.conf`            | template: unbound on laptop, Cloudflare on desktop |
-| `60-limine`          | `/etc/kernel.d/post-install/` | desktop only; `chmod +x`  |
-| `xbps.d/*.conf`      | `/etc/xbps.d/`                | the pins from step 1      |
+| `60-limine`          | `/etc/kernel.d/post-install/` | desktop only; `chmod +x`; already in place from step 1 - only for a future reinstall |
+| `xbps.d/*.conf`      | `/etc/xbps.d/`                | the pins - already in place from step 1; only for a future reinstall |
 
 ```sh
 cd ~/.config/system-configs
@@ -431,9 +457,11 @@ done
 # then, once: doas powerprofilesctl set performance   (no polkit agent without elogind; the choice is remembered across reboots)
 ```
 
-- [ ] desktop: log out and back in on tty1, then check `echo $XDG_RUNTIME_DIR` prints `/run/user/1000`.
-      If it's empty, set `manage_rundir = yes` in `/etc/turnstile/turnstiled.conf`, restart `turnstiled` and log in
-      again - dwl, PipeWire, foot and the portals all need it, so sort it before step 7
+- [ ] desktop: log out and back in on tty1, then check `echo $XDG_RUNTIME_DIR` prints `/run/user/1000` -
+      dwl, PipeWire, foot and the portals all need it, so sort it before step 7. Void's turnstile manages the
+      rundir by default and its PAM hook is already in `/etc/pam.d/system-login`, so it should just work. If it's
+      empty, check `manage_rundir` isn't set to `no` in `/etc/turnstile/turnstiled.conf`, that `pam_turnstile.so`
+      is still in `system-login`, and that `turnstiled` is running (`doas sv status turnstiled`)
 
 - [ ] after restoring the configs in step 4: `doas sv restart dhcpcd` and `doas sysctl --system`
 - [ ] only keep `agetty-tty1` and `agetty-tty2`: `doas rm /var/service/agetty-tty{3,4,5,6}`
@@ -568,6 +596,7 @@ export GDK_BACKEND=wayland,x11                  # GTK apps
 export SDL_VIDEODRIVER=wayland,x11              # SDL2 games and apps (SDL3 already prefers Wayland)
 export ELECTRON_OZONE_PLATFORM_HINT=auto        # Electron apps: Discord, Obsidian, Motrix, VS Code
 ```
+(newer Electron versions pick Wayland on their own and ignore the last variable, so it's harmless either way)
 
 Firefox and foot are native Wayland already. Check what's still on XWayland with `xlsclients` (from the
 `xlsclients` package) while things are running - anything it lists is an X11 client.
@@ -577,6 +606,10 @@ anyway for the few Wine/Proton games that still need X11 - it costs nothing when
 Wine's Wayland driver is the way to try native Wayland first: `PROTON_ENABLE_WAYLAND=1` on GE-Proton, or for
 plain Wine, unset `DISPLAY` for that game so Wine picks its Wayland driver. Not every game works with it yet,
 so treat it as per-game.
+
+The laptop dropped multilib, so there are no 32-bit graphics libraries. If a Wine/Proton game needs them (older
+32-bit games), add them on the desktop:
+`doas xbps-install -S void-repo-multilib && doas xbps-install -S mesa-dri-32bit vulkan-loader-32bit mesa-vulkan-radeon-32bit`
 
 ### Aurelia
 - needs `rust cargo mold` (and possibly `openssl-devel` - it's on the laptop's list)
@@ -634,7 +667,7 @@ and `update-vscode` to install those two, and download Motrix, Archipelago and L
 | ProjectLibre  | `/usr/share/projectlibre`        | jar; icon in hicolor 128x128 (laptop only) |
 | Vivado 2023.2 | `/tools/Xilinx`                  | ML Standard, Zynq-7000; launch via `~/.local/bin/vivado` (laptop only) |
 
-After installing Vivado, fix the folders its installer makes world-writable:
+Laptop only - after installing Vivado, fix the folders its installer makes world-writable:
 ```sh
 chmod 755 ~/.config/autostart ~/.config/menus
 ```
@@ -642,7 +675,7 @@ chmod 755 ~/.config/autostart ~/.config/menus
 ## 10. Secrets and personal setup (never in the repo)
 
 - [ ] laptop only - WireGuard: restore `windscribe.conf` to `/etc/wireguard/` (or download a fresh one from Windscribe), install `wireguard-tools` (`vpnup` / `vpndown`)
-- [ ] eduroam: run the university CAT installer (laptop)
+- [ ] laptop only - eduroam: run the university CAT installer
 - [ ] game saves: restore `~/.config/unity3d` from the Ventoy USB
 
 ## 11. Desktop-specific (void-desktop)
@@ -650,7 +683,8 @@ chmod 755 ~/.config/autostart ~/.config/menus
 - [ ] GPU (RX 9070, RDNA4): Mesa + `mesa-vulkan-radeon` (installed in step 3), AMD firmware, mainline kernel -
       check with `lspci -k` that the GPU uses the `amdgpu` driver
 - [ ] dwl `desktop` branch: monitor rule for the XG27ACDNG, 2560x1440 @ 360 Hz
-- [ ] mpv: `gpu-api=vulkan`, heavier scalers, add `av1` to `hwdec-codecs`
+- [ ] mpv: `gpu-api=vulkan`, heavier scalers, add `av1` to `hwdec-codecs` (needs `mesa-vaapi` from step 3;
+      `vainfo` from `libva-utils` lists what the GPU can decode)
 - [ ] minimal service set - no TLP, zram, earlyoom, iwd, unbound, cronie or logging:
       ethernet only, 32 GB RAM, amd-pstate-epp handles the 7800X3D
 - [ ] seat management: `seatd` + `turnstile` instead of elogind
