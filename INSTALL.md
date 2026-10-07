@@ -179,6 +179,7 @@ What each extra is for: `linux-mainline` + `dracut` kernel and its initramfs, `e
 
 Before chrooting:
 ```sh
+xbps-install -S xtools-minimal         # provides xgenfstab + xchroot (the live ISO usually has it already)
 xgenfstab -U /mnt > /mnt/etc/fstab     # then check it inside the chroot (below)
 cp /etc/resolv.conf /mnt/etc/          # DNS, so xbps-install works inside the chroot
 xchroot /mnt /bin/bash                 # bash is there as a dracut dependency
@@ -586,17 +587,19 @@ make && doas make install
 
 ### Native Wayland by default
 
-Toolkits each pick their own backend, so tell them to prefer Wayland - in the `dwl` function in `.zshrc`, next to
-`XDG_CURRENT_DESKTOP`, before dwl starts. Each one lists X11 second, so an app without Wayland support still
-starts through XWayland instead of crashing:
+Most toolkits already pick Wayland when it's there: GTK 3/4 (Firefox, pavucontrol, EasyEffects), SDL3 and foot.
+Two need telling - in the `dwl` function in `.zshrc`, next to `XDG_CURRENT_DESKTOP`, before dwl starts:
 
 ```sh
-export QT_QPA_PLATFORM="wayland;xcb"            # Qt apps (the vivado wrapper still forces xcb for itself)
-export GDK_BACKEND=wayland,x11                  # GTK apps
-export SDL_VIDEODRIVER=wayland,x11              # SDL2 games and apps (SDL3 already prefers Wayland)
+export QT_QPA_PLATFORM="wayland;xcb"            # Qt apps, X11 as fallback (needs qt6-wayland / qt5-wayland
+                                                # for any Qt app you use; the vivado wrapper still forces xcb)
 export ELECTRON_OZONE_PLATFORM_HINT=auto        # Electron apps: Discord, Obsidian, Motrix, VS Code
 ```
-(newer Electron versions pick Wayland on their own and ignore the last variable, so it's harmless either way)
+(newer Electron versions pick Wayland on their own and ignore the second variable, so it's harmless either way)
+
+Don't set `SDL_VIDEODRIVER` globally: games often bundle their own SDL2, and versions older than 2.0.22 don't
+understand a fallback list like `wayland,x11` - they'd fail to open a window. If a particular SDL2 game runs
+on XWayland and you want it native, set it for that game only: `SDL_VIDEODRIVER=wayland <game>`.
 
 Firefox and foot are native Wayland already. Check what's still on XWayland with `xlsclients` (from the
 `xlsclients` package) while things are running - anything it lists is an X11 client.
@@ -694,7 +697,7 @@ chmod 755 ~/.config/autostart ~/.config/menus
       - poweroff/suspend: `doas poweroff`, `doas zzz` (no loginctl)
       - polkit prompts (e.g. mounting drives in Thunar) generally need elogind - use doas instead
 - [ ] DNS: Cloudflare directly via dhcpcd (no local cache/DoT); comes from the `dhcpcd.conf` template
-- [ ] locate: no cron, so refresh by hand when needed - `doas updatedb`
+- [ ] locate (only if you install one, e.g. `plocate`): no cron, so refresh its database by hand - `doas updatedb`
 - [ ] TRIM: manual, no job and no `discard` - run every month or so:
       `doas fstrim -av` (trims every mounted filesystem that supports it and shows how much)
 - [ ] IPv4 only: `ipv6.disable=1` on the kernel command line; nftables.conf stays the same as the laptop's
