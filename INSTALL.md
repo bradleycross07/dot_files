@@ -17,15 +17,41 @@ Do these first, then keep this checklist open on the laptop while installing on 
 ### Save and push everything
 - [ ] refresh the lists: `xbps-query -m > ~/.config/system-configs/packages-void.txt` and
       `ls /var/service > ~/.config/system-configs/services-void.txt`
-- [ ] `chezmoi diff` is empty, then commit + push the dotfiles
-- [ ] dwl: commit + push `main`, then create and push the `desktop` branch now
-      (step 8 checks it out from a fresh clone, so it must already be on GitHub):
-      `git switch -c desktop && git push -u origin desktop`
+- [ ] fonts: save the laptop's font setup so the desktop gets exactly the same (restored in step 3):
+      ```sh
+      # every installed font package, including ones pulled in as dependencies (e.g. by libreoffice-fonts),
+      # names only - the filter skips font *libraries* like fontconfig, freetype and libXft
+      xbps-query -l | awk '{print $2}' | xargs -n1 xbps-uhelper getpkgname \
+          | command grep -Ei '^(font-|noto-fonts|amiri-font|culmus|source-sans-pro)|fonts?(-ttf)?$' \
+          | command grep -Ev '^font-(alias|util)$' > ~/.config/system-configs/fonts-void.txt
+      # fontconfig tweaks enabled by hand in /etc (symlinks no package owns)
+      for f in /etc/fonts/conf.d/*; do xbps-query -o "$f" >/dev/null 2>&1 || basename "$f"; done \
+          > ~/.config/system-configs/fonts-confd.txt
+      ```
+      check the lists look right (`fonts-confd.txt` is empty right now - no system-wide tweaks - which is fine),
+      and make sure `~/.config/fontconfig/fonts.conf` and `~/.local/share/fonts/` (DepartureMono Nerd Font,
+      the monospace font) are in chezmoi - `chezmoi managed | command grep -E 'fontconfig|share/fonts'`
+      should list both; if not: `chezmoi add ~/.config/fontconfig ~/.local/share/fonts`
 - [ ] Aurelia: export the `local` branch's patches into the dotfiles repo (they only exist as local commits):
       `cd ~/.local/src/Aurelia && git format-patch origin/main..local -o "$(chezmoi source-path)/patches/aurelia"`
-- [ ] optional - spotatui: same for its `local` branch:
-      `cd ~/.local/src/spotatui && git format-patch origin/main..local -o "$(chezmoi source-path)/patches/spotatui"`
       (`patches` is listed in `.chezmoiignore`, so it stays in the repo and is never copied into `~`)
+- [ ] commit + push the dotfiles (after the steps above, so the lists, fonts and Aurelia patches are included).
+      The font lists are new files, so chezmoi has to be told about them; the refreshed package/service lists
+      changed on disk, so `re-add` pulls those changes into the source; the patches were written straight into
+      the source repo, so `add -A` picks them up:
+      ```sh
+      chezmoi add ~/.config/system-configs/fonts-void.txt ~/.config/system-configs/fonts-confd.txt
+      chezmoi re-add
+      chezmoi diff                       # should print nothing now
+      chezmoi git -- add -A
+      chezmoi git -- status              # check: lists, fonts-*.txt, ~/.local/share/fonts, patches/aurelia, INSTALL.md
+      chezmoi git -- commit -m "Prepare for desktop install" && chezmoi git -- push
+      ```
+      (if `fonts-confd.txt` is empty, chezmoi may skip it - that's fine, step 3 copes with it missing)
+- [ ] dwl: commit + push `main`, then create and push the `desktop` branch now
+      (step 8 checks it out from a fresh clone, so it must already be on GitHub):
+      `git switch -c desktop && git push -u origin desktop && git switch main`
+      (switch back to `main` afterwards, or the laptop's next `make` builds the desktop config)
 - [x] InputPlumber's runit service is hand-made, so it's backed up in `~/.config/system-configs/sv-inputplumber`
       (`run` and `log/run` only - never `supervise`, that's runit's runtime state)
 
@@ -41,17 +67,17 @@ Do these first, then keep this checklist open on the laptop while installing on 
 The plan: free space on the SATA SSD (delete the Games folder), copy what's needed from the NVMe onto it, install Void on the NVMe, sort the backup out from the finished PC, and only then format the SATA SSD at the very end.
 
 1. Boot the Void live ISO on the new PC and log in as `root`
-2. Find the partitions: `lsblk -f` or `fdisk -l` (the big NTFS partition on each drive). The names below are examples - the Ventoy USB is also an `sdX` drive, probably `sda`, so check the sizes before mounting anything.
+2. Find the partitions: `lsblk -f` or `fdisk -l` (the big NTFS partition on each drive). The names below are examples - the SATA SSD and the Ventoy USB are both `sdX` drives and either can be `sda`, so check the sizes before mounting anything.
 3. Mount both:
    ```sh
    xbps-install -Su xbps             # an older ISO's xbps must be updated before anything else installs
    xbps-install -S ntfs-3g           # live session only, for ntfsfix if needed
    mkdir -p /mnt/win /mnt/sata
-   mount -t ntfs3 -o ro /dev/nvme0n1pX /mnt/win      # Windows drive, read-only
-   mount -t ntfs3 /dev/sdbX /mnt/sata                # SATA SSD, read-write
+   mount -t ntfs3 -o ro /dev/nvme0n1pX /mnt/win      # Windows drive, read-only: copying FROM it still works
+   mount -t ntfs3 /dev/sdXN /mnt/sata                # SATA SSD, read-write
    ```
    Fast Startup is already disabled in Windows, but if the SATA mount still refuses ("dirty" volume),
-   run `ntfsfix -d /dev/sdbX` and retry.
+   run `ntfsfix -d /dev/sdXN` and retry.
 4. Delete the games from `/mnt/sata` to make room if needed
 5. Copy what's wanted from the Windows drive (`--preserve=timestamps` instead of `-a`, since NTFS can't store Unix owners/permissions), e.g.
    ```sh
@@ -61,7 +87,9 @@ The plan: free space on the SATA SSD (delete the Games folder), copy what's need
    ```
    Also worth a look: `Pictures`, `Desktop` and `Downloads`
 6. `umount /mnt/win /mnt/sata` - then carry on with section 1 (which wipes only the NVMe)
-7. Once the desktop is set up: upload the phone photos (~50 GB) and anything else to the uni Google Drive from Firefox, copy the rest to `~`, THEN reformat the SATA SSD as ext4 for games
+7. Once the desktop is set up: mount the SATA SSD (`doas mount -t ntfs3 -o uid=1000,gid=1000 /dev/sdXN /mnt`, so the files belong to you), upload the phone photos
+   (~50 GB) and anything else to the uni Google Drive from Firefox, copy the rest to `~`, `doas umount /mnt`,
+   THEN reformat the SATA SSD as ext4 for games (last item in section 11)
 
 ### Disk layout
 - NVMe: EFI 512 MiB FAT32 mounted at `/boot` (Limine reads the kernel from it)
@@ -87,6 +115,22 @@ Manual chroot install following https://docs.voidlinux.org (glibc, x86_64).
 
 In order: partition and mount, set the xbps pins, install `base-minimal` plus the extras below, then chroot.
 
+### Partition and mount (desktop NVMe)
+
+`cfdisk /dev/nvme0n1` - GPT, delete the Windows partitions, then: partition 1 = 512 MiB, type "EFI System";
+partition 2 = the rest, type "Linux filesystem". The `efibootmgr --part 1` line later assumes the EFI partition is 1.
+
+```sh
+mkfs.vfat -F32 -n EFI /dev/nvme0n1p1
+mkfs.ext4 -L void /dev/nvme0n1p2
+mount /dev/nvme0n1p2 /mnt
+mkdir -p /mnt/boot && mount /dev/nvme0n1p1 /mnt/boot    # desktop: EFI at /boot (laptop: /mnt/boot/efi)
+```
+
+> The EFI partition **must** be mounted at `/mnt/boot` before installing anything. The kernel and initramfs are
+> written into `/boot` during the install; if the EFI partition isn't mounted yet, they land on the ext4 root
+> instead, and mounting the EFI partition over `/boot` afterwards hides them - Limine would find no kernel.
+
 ### xbps pins: do this in the live environment, BEFORE installing anything
 
 With the new root mounted at `/mnt`:
@@ -94,8 +138,13 @@ With the new root mounted at `/mnt`:
 ```sh
 mkdir -p /mnt/etc/xbps.d
 printf 'ignorepkg=linux\nignorepkg=linux-headers\n' > /mnt/etc/xbps.d/mainline.conf
-printf 'ignorepkg=linux-firmware-nvidia\n' > /mnt/etc/xbps.d/ignore.conf
+printf 'ignorepkg=linux-firmware-nvidia\nignorepkg=linux-firmware-intel\n' > /mnt/etc/xbps.d/ignore.conf
 ```
+
+(`mainline.conf` keeps the plain `linux` kernel out, since `linux-mainline` replaces it. `ignore.conf` keeps the
+NVIDIA and Intel firmware out for good, even if something depends on them - the desktop is AMD only, and
+`linux-firmware-amd` + `linux-firmware-network` cover everything it needs, including the CPU microcode.
+Only pin `linux-firmware-intel` on a machine with no Intel CPU, GPU or wifi.)
 
 ### Install the base system (`base-minimal`, not `base-system`)
 
@@ -104,18 +153,31 @@ printf 'ignorepkg=linux-firmware-nvidia\n' > /mnt/etc/xbps.d/ignore.conf
 ```sh
 # desktop
 xbps-install -S -r /mnt -R https://repo-de.voidlinux.org/current \
-    base-minimal linux-mainline dracut eudev e2fsprogs kbd ncurses iproute2 iputils \
-    dhcpcd dbus opendoas zsh \
+    base-minimal linux-mainline dracut eudev kmod e2fsprogs kbd ncurses iproute2 iputils \
+    dhcpcd dbus opendoas zsh openssh less pciutils usbutils file acpid \
     linux-firmware-amd linux-firmware-network dosfstools seatd
 
 # laptop (for reference)
 xbps-install -S -r /mnt -R https://repo-de.voidlinux.org/current \
-    base-minimal linux-mainline dracut eudev e2fsprogs kbd ncurses iproute2 iputils \
-    dhcpcd dbus opendoas zsh \
-    linux-firmware-amd wifi-firmware iwd grub-x86_64-efi socklog-void
+    base-minimal linux-mainline dracut eudev kmod e2fsprogs kbd ncurses iproute2 iputils \
+    dhcpcd dbus opendoas zsh openssh less pciutils usbutils file acpid \
+    linux-firmware-amd wifi-firmware iwd grub-x86_64-efi dosfstools socklog-void
 ```
 
-What each extra is for: `linux-mainline` + `dracut` kernel and its initramfs, `eudev` device manager (udevd - dwl, libinput and seatd need it), `e2fsprogs` checks the ext4 root at boot, `kbd` applies the `rc.conf` keymap, `ncurses` terminal handling, `iproute2`/`iputils` (`ip`, `ping`), `dhcpcd` network, `dbus` + `opendoas` + `zsh` for the user, `linux-firmware-amd` GPU/CPU firmware (the RX 9070 won't start without it), `linux-firmware-network` the onboard ethernet chip's firmware, `dosfstools` checks the FAT32 EFI partition (where Limine's kernels live), `seatd` seat management.
+`base-minimal` is just `base-container`, which already includes `glibc-locales`. Everything else `base-system` adds
+is either listed above or deliberately skipped: `sudo` (doas instead), `wpa_supplicant` and `iw` (dhcpcd on the desktop,
+iwd on the laptop), `btrfs-progs`/`xfsprogs`/`f2fs-tools` (ext4 only), `void-artwork`, `traceroute`, `ethtool`,
+`man-pages`/`mdocml`, and the plain `linux` kernel (`linux-mainline` instead). `bash` isn't listed because zsh is the
+shell, but it still gets installed as a dependency of `dracut`, and `xbps-src` in step 8 needs it too.
+
+What each extra is for: `linux-mainline` + `dracut` kernel and its initramfs, `eudev` device manager (udevd - dwl, libinput and seatd need it), `kmod` loads kernel modules (`modprobe`, needed by eudev and dracut), `openssh` SSH for GitHub (pushing, the private dwl repo, commit signing), `less` the pager git and `man` expect, `pciutils`/`usbutils` `lspci`/`lsusb` (check the GPU and USB devices are detected), `file` identifies file types, `acpid` handles ACPI events like the power button (service enabled on the desktop only - on the laptop, elogind and `lid-handler.sh` already handle the lid; check `/etc/acpi/handler.sh` for what each button does), `e2fsprogs` checks the ext4 root at boot, `kbd` applies the `rc.conf` keymap, `ncurses` terminal handling, `iproute2`/`iputils` (`ip`, `ping`), `dhcpcd` network, `dbus` + `opendoas` + `zsh` for the user, `linux-firmware-amd` GPU/CPU firmware (the RX 9070 won't start without it), `linux-firmware-network` the onboard ethernet chip's firmware, `dosfstools` checks the FAT32 EFI partition (where Limine's kernels live), `seatd` seat management.
+
+Before chrooting:
+```sh
+xgenfstab -U /mnt > /mnt/etc/fstab     # then check it inside the chroot (below)
+cp /etc/resolv.conf /mnt/etc/          # DNS, so xbps-install works inside the chroot
+xchroot /mnt /bin/bash                 # bash is there as a dracut dependency
+```
 
 Once inside the chroot, confirm:
 
@@ -125,18 +187,18 @@ Once inside the chroot, confirm:
 
 ### Inside the chroot
 
-- [ ] `/etc/fstab` (generated with `xgenfstab -U /mnt > /mnt/etc/fstab` before chrooting, then checked):
-      ext4 root with `noatime`, `/tmp` as tmpfs (`defaults,nosuid,nodev`),
+- [ ] check `/etc/fstab` (generated above): ext4 root with `noatime`, add `/tmp` as tmpfs (`defaults,nosuid,nodev`),
       EFI on `/boot/efi` (laptop, GRUB) or on `/boot` (desktop, Limine)
 - [ ] set the hostname (`void` or `void-desktop`) - chezmoi relies on it
 - [ ] timezone: `ln -sf /usr/share/zoneinfo/Europe/London /etc/localtime`
 - [ ] locale (glibc): uncomment `en_GB.UTF-8 UTF-8` in `/etc/default/libc-locales`, set `LANG=en_GB.UTF-8` in
-      `/etc/locale.conf` (install `glibc-locales` first if it's missing; `xbps-reconfigure -fa` at the end generates it)
+      `/etc/locale.conf` (`glibc-locales` comes with `base-minimal`; `xbps-reconfigure -fa` at the end generates it)
 - [ ] root password, as a way back in if `doas.conf` ever breaks: `passwd`
 - [ ] user `bradley` with shell `zsh` and a password, in groups `wheel users audio video input plugdev`,
       plus `_seatd` on the desktop or `socklog` on the laptop (those groups exist because the packages were installed above):
       ```sh
       useradd -m -s /bin/zsh -G wheel,users,audio,video,input,plugdev,_seatd bradley   # desktop
+      useradd -m -s /bin/zsh -G wheel,users,audio,video,input,plugdev,socklog bradley  # laptop
       passwd bradley
       ```
 - [ ] `opendoas` instead of sudo - give it a minimal config so `doas` works on first boot
@@ -174,7 +236,9 @@ cp /usr/share/limine/BOOTX64.EFI /boot/EFI/BOOT/
 efibootmgr --create --disk /dev/nvme0n1 --part 1 --label "Void Linux" --loader '\EFI\BOOT\BOOTX64.EFI'
 ```
 
-(check the real path of `BOOTX64.EFI` with `xbps-query -f limine | grep -i efi` - copy it again whenever the `limine` package updates)
+(check the real path of `BOOTX64.EFI` with `xbps-query -f limine | grep -i efi` - copy it again whenever the `limine` package updates.
+`\EFI\BOOT\BOOTX64.EFI` is also the firmware's fallback path, so the PC still boots it even if `efibootmgr` fails
+in the chroot.)
 
 Kernel update hook - rewrites `/boot/limine.conf` for each new kernel, so an update never leaves a stale entry. Save as `/etc/kernel.d/post-install/60-limine` and `chmod +x` it:
 
@@ -193,6 +257,13 @@ timeout: 3
     cmdline: root=UUID=$ROOT_UUID ro loglevel=4 nowatchdog mitigations=off ipv6.disable=1
 CONF
 ```
+
+### Laptop bootloader: GRUB (for reference)
+
+```sh
+grub-install --target=x86_64-efi --efi-directory=/boot/efi --bootloader-id=void
+```
+(`/etc/default/grub` is restored from the backup in step 4)
 
 ### Finish the chroot (both machines)
 
@@ -222,10 +293,11 @@ efibootmgr -b 0001 -B          # delete one by its number (e.g. Boot0001 "Window
 
 ## 2. First boot: dotfiles (chezmoi)
 
-Log in as `bradley` on tty1 (dhcpcd from step 1 should already have you online - check with `ping -c 3 voidlinux.org`), then:
+Log in as `bradley` on tty1 (dhcpcd from step 1 should already have you online - check with `ping -c 3 voidlinux.org`).
+zsh shows its first-run setup menu because there's no `~/.zshrc` yet - press `q` to skip it (chezmoi brings the real one). Then:
 
 ```sh
-doas xbps-install -S chezmoi git openssh
+doas xbps-install -S chezmoi git
 chezmoi init --branch void-linux --apply https://github.com/bradleycross07/dot_files.git
 ```
 
@@ -266,6 +338,23 @@ Examples - packages the later steps rely on:
 doas xbps-install -S chrony nftables rtkit turnstile power-profiles-daemon
 # dwl session
 doas xbps-install -S pipewire wireplumber alsa-pipewire easyeffects swayidle waylock wlopm wl-clipboard foot fuzzel
+# graphics - dwl won't start without a Mesa driver (desktop: radeonsi + RADV for the RX 9070)
+doas xbps-install -S mesa-dri mesa-vulkan-radeon vulkan-loader
+# fonts - base-minimal has none, and foot/fuzzel fail to start without one: install the laptop's exact set
+# (saved in step 0), re-enable the same fontconfig tweaks, then rebuild the font cache.
+# ~/.config/fontconfig and ~/.local/share/fonts already came back with the dotfiles in step 2.
+doas xbps-install -S $(cat ~/.config/system-configs/fonts-void.txt)
+[ -s ~/.config/system-configs/fonts-confd.txt ] && while read -r c; do
+    doas ln -sf "/usr/share/fontconfig/conf.avail/$c" /etc/fonts/conf.d/
+done < ~/.config/system-configs/fonts-confd.txt    # skipped when there are no tweaks (empty or missing)
+fc-cache -f
+for f in monospace sans-serif serif emoji; do printf '%-11s ' "$f"; fc-match "$f"; done
+# should match the laptop: monospace = DepartureMono Nerd Font Mono (from ~/.local/share/fonts),
+# sans-serif = Noto Sans, serif = Noto Serif, emoji = Noto Color Emoji
+# downloads for the update scripts and manual apps (update-obsidian, update-vscode)
+doas xbps-install -S curl jq
+# browser (uni Google Drive upload, screen share test)
+doas xbps-install -S firefox
 ```
 
 > Each machine keeps its own lists - refresh them with:
@@ -334,12 +423,17 @@ for s in elogind iwd unbound tlp zramen earlyoom cronie socklog-unix nanoklogd; 
   doas ln -s /etc/sv/$s /var/service/
 done
 
-# desktop only: seatd + turnstile instead of elogind, power-profiles-daemon instead of TLP
-for s in seatd turnstiled power-profiles-daemon; do
+# desktop only: seatd + turnstile instead of elogind, power-profiles-daemon instead of TLP,
+# acpid for the power button (no elogind to handle it)
+for s in seatd turnstiled power-profiles-daemon acpid; do
   doas ln -s /etc/sv/$s /var/service/
 done
 # then, once: doas powerprofilesctl set performance   (no polkit agent without elogind; the choice is remembered across reboots)
 ```
+
+- [ ] desktop: log out and back in on tty1, then check `echo $XDG_RUNTIME_DIR` prints `/run/user/1000`.
+      If it's empty, set `manage_rundir = yes` in `/etc/turnstile/turnstiled.conf`, restart `turnstiled` and log in
+      again - dwl, PipeWire, foot and the portals all need it, so sort it before step 7
 
 - [ ] after restoring the configs in step 4: `doas sv restart dhcpcd` and `doas sysctl --system`
 - [ ] only keep `agetty-tty1` and `agetty-tty2`: `doas rm /var/service/agetty-tty{3,4,5,6}`
@@ -357,15 +451,20 @@ git clone https://github.com/zdharma-continuum/zinit.git ~/.local/share/zinit/zi
 - Neovim: lazy.nvim bootstraps itself on first launch
 - dwl is started by typing `dwl` on tty1 (function in `.zshrc`)
 
-## 7. Audio
+## 7. Audio and screen sharing
+
+> Do the installs and config edits here now, but the checks that need a running session (picking default
+> devices, the screen share test) only work once dwl is built in step 8 - come back to them then.
+
+### Audio
 
 Already handled by the dotfiles:
 - `~/.config/pipewire/pipewire.conf.d/` - rates + symlinks that make PipeWire launch WirePlumber and pipewire-pulse
 - EasyEffects mic chain: `~/.config/easyeffects/db/` (gate, compressor, rnnoise)
 
 Manual:
-- [ ] route ALSA through PipeWire (spotatui plays through ALSA - without this it fails with
-      "Device default ... Busy"); needs `alsa-pipewire`:
+- [ ] route ALSA through PipeWire, so apps and games that only talk ALSA play through PipeWire instead of
+      grabbing the sound card directly ("Device default ... Busy"); needs `alsa-pipewire`:
       ```sh
       doas mkdir -p /etc/alsa/conf.d
       doas ln -s /usr/share/alsa/alsa.conf.d/50-pipewire.conf /etc/alsa/conf.d/
@@ -374,6 +473,62 @@ Manual:
 - [ ] pick default devices (headset sink, `easyeffects_source` as mic) - pavucontrol, or
       `wpctl status` to find the IDs and `wpctl set-default <id>`
 - [ ] laptop: set built-in speakers profile to Off if not wanted
+
+### Screen sharing (Discord, Firefox, OBS)
+
+On Wayland, apps can't capture the screen themselves. They ask **xdg-desktop-portal**, which hands the request to
+a backend for the compositor; for wlroots compositors like dwl that's **xdg-desktop-portal-wlr**, which captures
+the screen and streams it to the app through **PipeWire**. Nothing here needs a runit service: the portals are
+started on demand by the D-Bus session bus that `dbus-run-session` gives dwl.
+
+Needs: PipeWire running (autostart.sh), the D-Bus session bus, and `XDG_RUNTIME_DIR` (turnstile on the desktop,
+elogind on the laptop - checked in step 5).
+
+```sh
+doas xbps-install -S xdg-desktop-portal xdg-desktop-portal-wlr xdg-desktop-portal-gtk
+```
+(`-gtk` provides the file-picker dialogs; `-wlr` only does screen capture and screenshots)
+
+- [ ] tell the portals which desktop this is - dwl doesn't set `XDG_CURRENT_DESKTOP`, and the portal picks its
+      backend from it. In the `dwl` function in `.zshrc`, before dwl starts:
+      ```sh
+      export XDG_CURRENT_DESKTOP=wlroots
+      ```
+- [ ] pass the Wayland variables to the D-Bus session, so the portals it starts can find the compositor.
+      In `~/.local/bin/autostart.sh` (both machines; it's a template, so `chezmoi edit ~/.local/bin/autostart.sh`),
+      outside any per-machine block and before anything else:
+      ```sh
+      dbus-update-activation-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+      ```
+- [ ] choose which backend handles what - `~/.config/xdg-desktop-portal/portals.conf`:
+      ```ini
+      [preferred]
+      default=gtk
+      org.freedesktop.impl.portal.ScreenCast=wlr
+      org.freedesktop.impl.portal.Screenshot=wlr
+      ```
+- [ ] pick the monitor with fuzzel instead of the default (`slurp`, not installed) -
+      `~/.config/xdg-desktop-portal-wlr/config`:
+      ```ini
+      [screencast]
+      chooser_type=dmenu
+      chooser_cmd=fuzzel --dmenu
+      max_fps=60
+      ```
+      (desktop: `max_fps` caps the stream, not the monitor - leave it at 60, since Discord can't send 360 Hz anyway)
+- [ ] add both config files to chezmoi: `chezmoi add ~/.config/xdg-desktop-portal ~/.config/xdg-desktop-portal-wlr`
+- [ ] test: start a screen share in Discord - fuzzel should pop up with the monitor name. Firefox's
+      https://mozilla.github.io/webrtc-landing/gum_test.html (Screen capture) is a quick second check.
+      If nothing appears, `pgrep -a xdg-desktop-portal` shows whether both portals started
+
+Notes:
+- whole-monitor sharing is the main use, but single windows can be shared too: dwl 0.9 exposes
+  `ext_image_copy_capture_manager_v1`, `ext_foreign_toplevel_list_v1` and
+  `ext_foreign_toplevel_image_capture_source_manager_v1` (confirmed on the laptop with
+  `wayland-info | grep -E 'ext_image_copy|ext_foreign_toplevel'`, from `wayland-utils`). Whether windows show up
+  in the fuzzel picker depends on the xdg-desktop-portal-wlr version - check with `xbps-query xdg-desktop-portal-wlr`
+- the official Discord client (Nitro) is used on purpose: it streams 1440p 60 fps, where Vesktop topped out at
+  1080p 30 fps in testing and used more memory. Stream *audio* is still hit and miss on Linux
 
 ## 8. Built from source (`~/.local/src`)
 
@@ -401,17 +556,50 @@ make && doas make install
   - desktop: PipeWire, EasyEffects (mic for Discord) and swayidle (lock after 10 min, screen off after 15 - protects the OLED)
 - quitting dwl stops everything autostart.sh started (the autostart patch kills its process group)
 
+### Native Wayland by default
+
+Toolkits each pick their own backend, so tell them to prefer Wayland - in the `dwl` function in `.zshrc`, next to
+`XDG_CURRENT_DESKTOP`, before dwl starts. Each one lists X11 second, so an app without Wayland support still
+starts through XWayland instead of crashing:
+
+```sh
+export QT_QPA_PLATFORM="wayland;xcb"            # Qt apps (the vivado wrapper still forces xcb for itself)
+export GDK_BACKEND=wayland,x11                  # GTK apps
+export SDL_VIDEODRIVER=wayland,x11              # SDL2 games and apps (SDL3 already prefers Wayland)
+export ELECTRON_OZONE_PLATFORM_HINT=auto        # Electron apps: Discord, Obsidian, Motrix, VS Code
+```
+
+Firefox and foot are native Wayland already. Check what's still on XWayland with `xlsclients` (from the
+`xlsclients` package) while things are running - anything it lists is an X11 client.
+
+Hollow Knight and Silksong (native Linux builds via Aurelia) already run on Wayland. Keep XWayland built into dwl
+anyway for the few Wine/Proton games that still need X11 - it costs nothing when nothing's using it. For those,
+Wine's Wayland driver is the way to try native Wayland first: `PROTON_ENABLE_WAYLAND=1` on GE-Proton, or for
+plain Wine, unset `DISPLAY` for that game so Wine picks its Wayland driver. Not every game works with it yet,
+so treat it as per-game.
+
 ### Aurelia
 - needs `rust cargo mold` (and possibly `openssl-devel` - it's on the laptop's list)
-- restore the local tweaks from the dotfiles repo onto a `local` branch:
+- clone it, then restore the local tweaks from the dotfiles repo onto a `local` branch
+  (if `git am` stops on a conflict because upstream changed, fix the file, `git add` it, then `git am --continue`):
   ```sh
+  git clone https://github.com/Drackrath/Aurelia.git ~/.local/src/Aurelia
   cd ~/.local/src/Aurelia
   git checkout -b local
   git am "$(chezmoi source-path)"/patches/aurelia/*.patch
   ```
-- build with the same flags as spotatui below, copy the binary to `~/.local/bin/aurelia`, then `cargo clean`
-  (`update-aurelia` from the dotfiles handles later updates)
-- game library: `~/Games/Aurelia`
+- build for the fastest binary (full speed optimisation, tuned for this CPU, linked with mold), install, then clean:
+  ```sh
+  CARGO_PROFILE_RELEASE_OPT_LEVEL=3 \
+  RUSTFLAGS="-C target-cpu=native -C link-arg=-fuse-ld=mold" \
+  cargo build --release
+  cp target/release/aurelia ~/.local/bin/
+  cargo clean
+  ```
+  `target-cpu=native` tunes for the machine it's built on, so each machine builds its own.
+  `update-aurelia` from the dotfiles handles later updates.
+- game library: `~/Games/Aurelia` - don't install games until the SATA SSD is formatted and mounted on `~/Games`
+  (end of section 11); anything installed there before would end up on the NVMe, hidden under the mount
 
 ### InputPlumber
 - needs `rust cargo libevdev-devel libiio-devel dbus-devel` (as on the laptop; its README has the full list)
@@ -420,46 +608,21 @@ make && doas make install
   `doas cp -r ~/.config/system-configs/sv-inputplumber /etc/sv/inputplumber && doas ln -s /etc/sv/inputplumber /var/service/`
   - desktop: then `doas rm -r /etc/sv/inputplumber/log` - it sends output to syslog (vlogger), which the desktop doesn't run
 
-### spotatui (terminal Spotify client, ~50 MB RAM vs 1 GB+ for the official app)
-```sh
-doas xbps-install -S pkg-config alsa-lib-devel openssl-devel libxcb-devel
-git clone https://github.com/LargeModGames/spotatui.git ~/.local/src/spotatui
-cd ~/.local/src/spotatui
-git checkout -b local
-git am "$(chezmoi source-path)"/patches/spotatui/*.patch     # only if the patches were exported in step 0
-CARGO_PROFILE_RELEASE_OPT_LEVEL=3 \
-RUSTFLAGS="-C target-cpu=native -C link-arg=-fuse-ld=mold" \
-cargo build --release --locked --no-default-features \
-    --features tui,streaming,audio-viz-cpal,scripting
-cp target/release/spotatui ~/.local/bin/
-cargo clean
-```
-- needs Rust 1.90+ (`rustc --version`) and the ALSA -> PipeWire links from step 7
-- no `self-update` (would replace the self-built binary), no `telemetry`, no `mpris` (media keys aren't used)
-  and no `discord-rpc` (Discord's own Spotify connection already shows the activity); the song counter
-  is also off in `config.yml` (`enable_global_song_count: false`)
-- `target-cpu=native` tunes for the machine it's built on, so each machine builds its own
-- update: `git fetch origin && git rebase origin/main`, then build, `cp`, `cargo clean` as above
-- config: `~/.config/spotatui/config.yml` comes from chezmoi (theme, keys, settings);
-  `client.yml` and the login caches are NOT in the repo
-- first run: choose option 2 (own Spotify app), port 8888, paste the Client ID from the
-  Spotify Developer Dashboard (the same app works on both machines), then pick the `spotatui` device with `d`
-- edit `config.yml` only while spotatui is closed, or change things in its settings screen and save with `Alt-s`
-
 ### void-packages (restricted: Discord, Spotify)
-Spotify's official client is now only needed for offline downloads - spotatui can't play offline.
 ```sh
 git clone https://github.com/void-linux/void-packages.git ~/.local/src/void-packages
 cd ~/.local/src/void-packages
 ./xbps-src binary-bootstrap
 echo XBPS_ALLOW_RESTRICTED=yes >> etc/conf
 ./xbps-src pkg discord && doas xbps-install -R hostdir/binpkgs/nonfree discord
-./xbps-src pkg spotify && doas xbps-install -R hostdir/binpkgs/nonfree spotify   # optional, offline only
+./xbps-src pkg spotify && doas xbps-install -R hostdir/binpkgs/nonfree spotify
 ```
 
 ## 9. Manually installed apps (`~/.local/opt`)
 
-Each has a small `exec` wrapper in `~/.local/bin` (VS Code is a symlink to its own `bin/code` instead).
+Each has a small `exec` wrapper in `~/.local/bin` (VS Code is a symlink to its own `bin/code` instead). The wrappers
+and update scripts come back with the dotfiles; the apps themselves are downloaded fresh - run `update-obsidian`
+and `update-vscode` to install those two, and download Motrix, Archipelago and Lumafly into the paths below.
 
 | App           | Location                         | Notes                                   |
 | ------------- | -------------------------------- | --------------------------------------- |
@@ -484,7 +647,8 @@ chmod 755 ~/.config/autostart ~/.config/menus
 
 ## 11. Desktop-specific (void-desktop)
 
-- [ ] GPU (RX 9070, RDNA4): recent Mesa + `mesa-vulkan-radeon`, AMD firmware; mainline kernel helps
+- [ ] GPU (RX 9070, RDNA4): Mesa + `mesa-vulkan-radeon` (installed in step 3), AMD firmware, mainline kernel -
+      check with `lspci -k` that the GPU uses the `amdgpu` driver
 - [ ] dwl `desktop` branch: monitor rule for the XG27ACDNG, 2560x1440 @ 360 Hz
 - [ ] mpv: `gpu-api=vulkan`, heavier scalers, add `av1` to `hwdec-codecs`
 - [ ] minimal service set - no TLP, zram, earlyoom, iwd, unbound, cronie or logging:
@@ -492,8 +656,7 @@ chmod 755 ~/.config/autostart ~/.config/menus
 - [ ] seat management: `seatd` + `turnstile` instead of elogind
       (see https://docs.voidlinux.org/config/session-management.html)
       - don't run elogind and seatd together
-      - after logging in, check `echo $XDG_RUNTIME_DIR` prints `/run/user/1000` - if it's empty, enable
-        `manage_rundir = yes` in `/etc/turnstile/turnstiled.conf` (dwl, PipeWire and foot need it)
+      - `XDG_RUNTIME_DIR` must be set by turnstile - checked in step 5
       - poweroff/suspend: `doas poweroff`, `doas zzz` (no loginctl)
       - polkit prompts (e.g. mounting drives in Thunar) generally need elogind - use doas instead
 - [ ] DNS: Cloudflare directly via dhcpcd (no local cache/DoT); comes from the `dhcpcd.conf` template
@@ -501,6 +664,7 @@ chmod 755 ~/.config/autostart ~/.config/menus
 - [ ] TRIM: manual, no job and no `discard` - run every month or so:
       `doas fstrim -av` (trims every mounted filesystem that supports it and shows how much)
 - [ ] IPv4 only: `ipv6.disable=1` on the kernel command line; nftables.conf stays the same as the laptop's
+- [ ] screen sharing: portals set up in section 7 (same config on both machines)
 - [ ] session packages to skip (autostart.sh doesn't run them on the desktop):
       `kanshi`, `gammastep`, `xsettingsd`, `polkit-gnome`, `gnome-keyring`, `cliphist`,
       `sway-audio-idle-inhibit` - keep `wl-clipboard` (screenshots), `swayidle`, `waylock`, `wlopm`, `easyeffects`
@@ -509,9 +673,15 @@ chmod 755 ~/.config/autostart ~/.config/menus
 - [ ] laptop-only apps, skip on the desktop: VS Code, ProjectLibre, Vivado
       - `mimeapps.list` opens code/text files with `code.desktop`: set those to `nvim.desktop` on the desktop
 - [ ] power: `power-profiles-daemon` set to `performance` (never run it alongside TLP)
-- [ ] optional, test before keeping: sched_ext scheduler (`scx`, `scx-loader`, e.g. `scx_lavd`) - compare frame
+- [ ] optional, test before keeping: sched_ext scheduler (the `scx` package, as on the laptop, e.g. `scx_lavd`) - compare frame
       times with MangoHud with and without it; only keep it if it measurably helps
 - [ ] `rc.conf` KEYMAP `us` (US keyboard only) - automatic via the `rc.conf` template
 - [ ] bootloader: Limine instead of GRUB - full steps in section 1 (EFI at `/boot`, kernel hook)
       - kernel options: the laptop's `loglevel=4 nowatchdog mitigations=off`, plus `ipv6.disable=1` (IPv4 only)
-- [ ] once the backup is safe: format the SATA SSD as ext4 and mount it for `~/Games`
+- [ ] once the backup is safe: format the SATA SSD as ext4 and mount it for `~/Games`:
+      ```sh
+      doas mkfs.ext4 -L games /dev/sdXN          # check the device with lsblk first - this wipes it
+      mkdir -p ~/Games
+      echo "UUID=$(doas blkid -s UUID -o value /dev/sdXN) /home/bradley/Games ext4 defaults,noatime 0 2" | doas tee -a /etc/fstab
+      doas mount ~/Games && doas chown bradley:bradley ~/Games
+      ```
