@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Vesktop
+Comment=Discord client with Vencord
+Exec=/home/bradley/.local/opt/Vesktop/vesktop --enable-blink-features=MiddleClickAutoscroll --disable-font-subpixel-positioning --ignore-gpu-blocklist --enable-gpu-rasterization --enable-zero-copy --enable-features=AcceleratedVideoDecoder,AcceleratedVideoDecodeLinuxGL,VaapiVideoDecodeLinuxGL --disable-features=AcceleratedVideoEncoder,VaapiVideoEncoder %U
+Icon=discord
+Type=Application
+Categories=Network;InstantMessaging;
+MimeType=x-scheme-handler/discord;
+StartupWMClass=vesktop

@@ -1,0 +1,171 @@
+/* ==========================================================================
+   userContent.css
+   Monospace font is set via the generic "monospace" keyword so Firefox uses
+   font.size.monospace.x-western (22). fontconfig maps monospace ->
+   DepartureMono Nerd Font Mono.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   All sites: slightly roomier lines.
+   -------------------------------------------------------------------------- */
+
+@-moz-document regexp("^https?://.*") {
+  :where(*:not(input, textarea, .ddgsi)) {
+    line-height: 1.5 !important;
+  }
+}
+
+/* --------------------------------------------------------------------------
+   YouTube
+   -------------------------------------------------------------------------- */
+@-moz-document domain("youtube.com") { 
+
+  /* font */
+  * {
+    font-family: monospace !important;
+    font-size: 22px !important;
+  }
+
+  /* 5 videos per row */
+  ytd-two-column-browse-results-renderer.grid {
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  ytd-rich-grid-renderer {
+    --ytd-rich-grid-items-per-row: 5 !important;
+    --ytd-rich-grid-posts-per-row: 5 !important;
+  }
+
+  /* channel header: remove centred/max-width layout */
+  ytd-tabbed-page-header,
+  ytd-tabbed-page-header #page-header {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* banner */
+  ytd-tabbed-page-header #page-header-banner-sizer,
+  ytd-tabbed-page-header #page-header-banner {
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  /* remove the inset padding from the banner */
+  ytd-tabbed-page-header[has-inset-banner] #page-header-banner {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  /* channel-info container */
+  ytd-tabbed-page-header .ytImageBannerViewModelHost,
+  ytd-tabbed-page-header .ytImageBannerViewModelInset,
+  ytd-tabbed-page-header .ytImageBannerViewModelPositionAbsolute {
+    max-width: none !important;
+  }
+
+  /* align tabs with channel information */
+  tp-yt-paper-tabs#tabs {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+}
+
+
+/* --------------------------------------------------------------------------
+   Claude
+   -------------------------------------------------------------------------- */
+@-moz-document domain("claude.ai") {
+  * {
+    font-family: monospace !important;
+    font-size: 22px !important;
+  }
+ 
+  /* slightly roomier lines (inputs excluded so text boxes stay centred) */
+  *:not(input):not(textarea) {
+    line-height: 30px !important;
+  }
+ 
+  /* roomier sidebar rows: claude.ai sizes them with --df-row-h */
+  [data-testid="sidebar"] {
+    --df-row-h: 40px !important;
+  }
+ 
+  /* keep Claude's icon font */
+  [data-cds="Icon"] {
+    font-family: var(--font-anthropicons, Anthropicons-Variable) !important;
+  }
+}
+
+
+
+/* --------------------------------------------------------------------------
+   GitHub, Stack Overflow, Reddit: Departure Mono at 11px
+   -------------------------------------------------------------------------- */
+@-moz-document domain("github.com"), domain("stackoverflow.com"), domain("reddit.com") {
+  * {
+    font-family: monospace !important;
+    font-size: 11px !important;
+  }
+}
+ 
+/* Stack Overflow, Reddit: slightly roomier lines */
+@-moz-document domain("stackoverflow.com"), domain("reddit.com") {
+  *:not(input):not(textarea) {
+    line-height: 17px !important;
+  }
+}
+
+/* whole-pixel line height so text doesn't land on half pixels */
+@-moz-document domain("github.com") {
+  * { 
+    line-height: 20px !important;
+  }
+
+  /* tighter lines in code blocks so ASCII art has no gaps.*/
+  pre, pre * { 
+    line-height: 11px !important; 
+  }
+}
+
+/* --------------------------------------------------------------------------
+   DuckDuckGo: Departure Mono at 22px
+   -------------------------------------------------------------------------- */
+@-moz-document domain("duckduckgo.com") {
+  /* :not(.ddgsi) leaves DuckDuckGo's icon font alone */
+  *:not(.ddgsi) {
+    font-family: monospace !important;
+  }
+  * {
+    font-size: 22px !important;
+  }
+ 
+  /* slightly roomier lines (inputs and icons excluded so they stay centred) */
+  *:not(input):not(textarea):not(.ddgsi) {
+    line-height: 30px !important;
+  }
+ 
+  /* homepage search box only: room for descenders (g, y, p) */
+  #searchbox_homepage textarea[name="q"] {
+    height: auto !important;
+    line-height: 28px !important;
+  }
+ 
+  /* clear "X" in settings text fields: centre it in the field */
+  .frm__input__clear {
+    font-size: 18px !important;
+    line-height: 44px !important;
+  }
+ 
+  /* homepage suggestions: give every row identical spacing */
+  #searchbox-suggestions > li {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
