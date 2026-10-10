@@ -42,8 +42,8 @@ keybindings:
 behavior:
   seek_milliseconds: 5000
   volume_increment: 5
-  tick_rate_milliseconds: 500
-  animation_tick_rate_milliseconds: 15
+  tick_rate_milliseconds: 100
+  animation_tick_rate_milliseconds: 33
   enable_text_emphasis: true
   banner_gradient: false
   show_loading_indicator: false
@@ -68,7 +68,7 @@ behavior:
   relay_server_url: wss://spotatui-party.spotatui.workers.dev/ws
   stop_after_current_track: false
   startup_behavior: continue
-  disable_auto_update: false
+  disable_auto_update: true
   auto_update_delay: '0'
   keepawake_enabled: true
   enable_media_keys: false
@@ -88,10 +88,10 @@ behavior:
   list_highlight_icon: ▶
   playbar_control_labels: null
   status_message_ttl_percent: 100
-  playback_poll_seconds: 10
+  playback_poll_seconds: 5
   table_scroll_padding: 3
-  like_animation_frames: 15
-  startup_route: stats
+  like_animation_frames: 4
+  startup_route: home
   default_sort_playlist_tracks: default
   default_sort_saved_albums: name
   default_sort_saved_artists: name
