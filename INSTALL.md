@@ -23,27 +23,51 @@ Do these first, then keep this checklist open on the laptop while installing on 
       `ls /var/service > ~/.config/system-configs/services-void.txt`
 - [ ] fonts: save the laptop's font setup so the desktop gets exactly the same (restored in step 3):
       ```sh
-      # every installed font package, including ones pulled in as dependencies (e.g. by libreoffice-fonts),
-      # names only - the filter skips font *libraries* like fontconfig, freetype and libXft
-      xbps-query -l | awk '{print $2}' | xargs -n1 xbps-uhelper getpkgname \
-          | command grep -Ei '^(font-|noto-fonts|amiri-font|culmus|source-sans-pro)|fonts?(-ttf)?$' \
-          | command grep -Ev '^font-(alias|util)$' > ~/.config/system-configs/fonts-void.txt
-      # fontconfig tweaks enabled by hand in /etc (symlinks no package owns)
-      for f in /etc/fonts/conf.d/*; do xbps-query -o "$f" >/dev/null 2>&1 || basename "$f"; done \
-          > ~/.config/system-configs/fonts-confd.txt
+      cd ~/.config/system-configs
+
+      # 1. the name of every installed package (including dependencies, e.g. fonts pulled in by libreoffice-fonts)
+      xbps-query -l | awk '{print $2}' | xargs -n1 xbps-uhelper getpkgname > /tmp/all-pkgs.txt
+
+      # 2. keep only the font packages (font *libraries* like fontconfig, freetype and libXft don't match)
+      command grep -Ei '^(font-|noto-fonts|amiri-font|culmus|source-sans-pro)|fonts?(-ttf)?$' /tmp/all-pkgs.txt > /tmp/font-pkgs.txt
+
+      # 3. drop the two font tools that aren't fonts
+      command grep -Ev '^font-(alias|util)$' /tmp/font-pkgs.txt > fonts-void.txt
+
+      # 4. fontconfig tweaks enabled by hand in /etc (symlinks no package owns)
+      #    xbps-query -o exits 0 even when nothing owns the file, so check its output instead
+      for f in /etc/fonts/conf.d/*; do
+          owner=$(xbps-query -o "$f" 2>/dev/null)
+          [ -n "$owner" ] || basename "$f"
+      done > fonts-confd.txt
       ```
       check the lists look right (`fonts-confd.txt` is empty right now - no system-wide tweaks - which is fine),
       and make sure `~/.config/fontconfig/fonts.conf` and `~/.local/share/fonts/` (DepartureMono Nerd Font,
       the monospace font) are in chezmoi - `chezmoi managed | command grep -E 'fontconfig|share/fonts'`
       should list both; if not: `chezmoi add ~/.config/fontconfig ~/.local/share/fonts`
 - [ ] themes: save which packages provide the GTK theme, icons, cursor and Qt styling (restored in step 6).
-      `xbps-query -o` takes one pattern at a time, hence the loop:
+      `xbps-query -o` takes one pattern at a time, hence the loop (and it exits 0 even when nothing matches,
+      so the loop checks its output):
       ```sh
-      for p in '*Breeze-Dark/gtk-3.0/gtk.css' '*Papirus-Dark/index.theme' '*Bibata-Modern-Classic/index.theme' \
-               '*/bin/qt6ct' '*styles/breeze6.so' '*qqc2-desktop-style*'; do
-          xbps-query -o "$p" || echo "NOT FROM A PACKAGE: $p" >&2
-      done | sed 's/: .*//' | xargs -n1 xbps-uhelper getpkgname | sort -u \
-          > ~/.config/system-configs/themes-void.txt
+      cd ~/.config/system-configs
+
+      # 1. which package owns one file from each theme / Qt style
+      for p in '*Breeze-Dark/gtk-3.0/gtk.css' \
+               '*Papirus-Dark/index.theme' \
+               '*Bibata-Modern-Classic/index.theme' \
+               '*/bin/qt6ct' \
+               '*styles/breeze6.so' \
+               '*qqc2-desktop-style*'; do
+          owner=$(xbps-query -o "$p")
+          if [ -n "$owner" ]; then
+              echo "$owner"
+          else
+              echo "NOT FROM A PACKAGE: $p" >&2
+          fi
+      done > /tmp/theme-owners.txt
+
+      # 2. turn "pkgver: file" lines into plain package names, one each
+      sed 's/: .*//' /tmp/theme-owners.txt | xargs -n1 xbps-uhelper getpkgname | sort -u > themes-void.txt
       ```
       anything reported as "NOT FROM A PACKAGE" was installed by hand (e.g. Bibata in `~/.local/share/icons/`) -
       `chezmoi add` that folder instead

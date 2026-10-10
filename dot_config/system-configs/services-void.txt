@@ -12,7 +12,6 @@ nanoklogd -> /etc/sv/nanoklogd
 nftables -> /etc/sv/nftables
 rtkit -> /etc/sv/rtkit
 socklog-unix -> /etc/sv/socklog-unix
-tailscaled -> /etc/sv/tailscaled
 tlp -> /etc/sv/tlp
 udevd -> /etc/sv/udevd
 unbound -> /etc/sv/unbound
