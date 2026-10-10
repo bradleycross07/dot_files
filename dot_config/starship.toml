@@ -80,7 +80,7 @@ format = '[ $symbol ($version) ]($style)'
 
 [docker_context]
 symbol = " "
-style = "bg:#3B2A1A fg:#2E1E10"
+style = "bg:#D6C6A5 fg:#2E1E10"
 format = '[ $symbol $context ]($style)'
 
 [elixir]

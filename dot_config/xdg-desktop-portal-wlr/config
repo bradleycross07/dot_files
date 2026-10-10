@@ -1,2 +1,4 @@
 [screencast]
 max_fps=60
+chooser_type=dmenu
+chooser_cmd=fuzzel --dmenu -p "Share: "

@@ -3,8 +3,8 @@
 LID_STATE=$(cat /proc/acpi/button/lid/*/state | awk '{print $2}')
 
 if [ "$LID_STATE" = "closed" ]; then
-    wlr-randr --output eDP-1 --off
+    kanshictl switch external_only 2>/dev/null || wlr-randr --output eDP-1 --off
     waylock
 else
-    wlr-randr --output eDP-1 --on
+    kanshictl switch docked 2>/dev/null || wlr-randr --output eDP-1 --on
 fi

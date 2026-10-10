@@ -88,7 +88,7 @@ behavior:
   list_highlight_icon: ▶
   playbar_control_labels: null
   status_message_ttl_percent: 100
-  playback_poll_seconds: 5
+  playback_poll_seconds: 10
   table_scroll_padding: 3
   like_animation_frames: 4
   startup_route: home

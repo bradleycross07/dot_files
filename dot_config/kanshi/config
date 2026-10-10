@@ -12,4 +12,5 @@ profile laptop_only {
 # only external monitor
 profile external_only {
 	output HDMI-A-1 enable mode 2560x1440@144Hz position 0,0
+	output eDP-1 disable
 }
