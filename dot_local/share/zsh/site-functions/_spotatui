@@ -1,0 +1,777 @@
+#compdef spotatui
+
+autoload -U is-at-least
+
+_spotatui() {
+    typeset -A opt_args
+    typeset -a _arguments_options
+    local ret=1
+
+    if is-at-least 5.2; then
+        _arguments_options=(-s -S -C)
+    else
+        _arguments_options=(-s -C)
+    fi
+
+    local context curcontext="$curcontext" state line
+    _arguments "${_arguments_options[@]}" : \
+'-t+[Set the normal UI tick rate in milliseconds.]: :_default' \
+'--tick-rate=[Set the normal UI tick rate in milliseconds.]: :_default' \
+'-c+[Specify configuration file path.]: :_default' \
+'--config=[Specify configuration file path.]: :_default' \
+'--play-file=[Play a local audio file on startup (requires the local-files build feature).]:PATH:_default' \
+'--completions=[Generates completions for your preferred shell]:SHELL:(bash zsh fish powershell elvish)' \
+'--reconfigure-auth[Rerun client authentication setup wizard]' \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+'-V[Print version]' \
+'--version[Print version]' \
+":: :_spotatui_commands" \
+"*::: :->spotatui" \
+&& ret=0
+    case $state in
+    (spotatui)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:spotatui-command-$line[1]:"
+        case $line[1] in
+            (playback)
+_arguments "${_arguments_options[@]}" : \
+'-d+[Specifies the Spotify device to use]:DEVICE:_default' \
+'--device=[Specifies the Spotify device to use]:DEVICE:_default' \
+'-f+[Specifies the output format]:FORMAT:_default' \
+'--format=[Specifies the output format]:FORMAT:_default' \
+'--transfer=[Transfers the playback to new DEVICE]:DEVICE:_default' \
+'--seek=[Jumps SECONDS forwards (+) or backwards (-)]:±SECONDS:_default' \
+'-v+[Sets the volume of a device to VOLUME (0 - 100)]:VOLUME:_default' \
+'--volume=[Sets the volume of a device to VOLUME (0 - 100)]:VOLUME:_default' \
+'-t[Pauses/resumes the playback of a device]' \
+'--toggle[Pauses/resumes the playback of a device]' \
+'-s[Prints out the current status of a device (default)]' \
+'--status[Prints out the current status of a device (default)]' \
+'--share-track[Returns the URL to the current track]' \
+'--share-album[Returns the URL to the album of the current track]' \
+'--like[Likes the current song if possible]' \
+'--dislike[Dislikes the current song if possible]' \
+'--shuffle[Toggles shuffle mode]' \
+'--repeat[Switches between repeat modes]' \
+'*-n[Jumps to the next song]' \
+'*--next[Jumps to the next song]' \
+'*-p[Jumps to the previous song]' \
+'*--previous[Jumps to the previous song]' \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+(pb)
+_arguments "${_arguments_options[@]}" : \
+'-d+[Specifies the Spotify device to use]:DEVICE:_default' \
+'--device=[Specifies the Spotify device to use]:DEVICE:_default' \
+'-f+[Specifies the output format]:FORMAT:_default' \
+'--format=[Specifies the output format]:FORMAT:_default' \
+'--transfer=[Transfers the playback to new DEVICE]:DEVICE:_default' \
+'--seek=[Jumps SECONDS forwards (+) or backwards (-)]:±SECONDS:_default' \
+'-v+[Sets the volume of a device to VOLUME (0 - 100)]:VOLUME:_default' \
+'--volume=[Sets the volume of a device to VOLUME (0 - 100)]:VOLUME:_default' \
+'-t[Pauses/resumes the playback of a device]' \
+'--toggle[Pauses/resumes the playback of a device]' \
+'-s[Prints out the current status of a device (default)]' \
+'--status[Prints out the current status of a device (default)]' \
+'--share-track[Returns the URL to the current track]' \
+'--share-album[Returns the URL to the album of the current track]' \
+'--like[Likes the current song if possible]' \
+'--dislike[Dislikes the current song if possible]' \
+'--shuffle[Toggles shuffle mode]' \
+'--repeat[Switches between repeat modes]' \
+'*-n[Jumps to the next song]' \
+'*--next[Jumps to the next song]' \
+'*-p[Jumps to the previous song]' \
+'*--previous[Jumps to the previous song]' \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+(play)
+_arguments "${_arguments_options[@]}" : \
+'-d+[Specifies the Spotify device to use]:DEVICE:_default' \
+'--device=[Specifies the Spotify device to use]:DEVICE:_default' \
+'-f+[Specifies the output format]:FORMAT:_default' \
+'--format=[Specifies the output format]:FORMAT:_default' \
+'-u+[Plays the URI]:URI:_default' \
+'--uri=[Plays the URI]:URI:_default' \
+'-n+[Plays the first match with NAME from the specified category]:NAME:_default' \
+'--name=[Plays the first match with NAME from the specified category]:NAME:_default' \
+'(-b --album -a --artist -p --playlist -w --show)-q[Adds track to queue instead of playing it directly]' \
+'(-b --album -a --artist -p --playlist -w --show)--queue[Adds track to queue instead of playing it directly]' \
+'(-t --track -b --album -a --artist -w --show)-r[Plays a random track (only works with playlists)]' \
+'(-t --track -b --album -a --artist -w --show)--random[Plays a random track (only works with playlists)]' \
+'-b[Looks for an album]' \
+'--album[Looks for an album]' \
+'-a[Looks for an artist]' \
+'--artist[Looks for an artist]' \
+'-t[Looks for a track]' \
+'--track[Looks for a track]' \
+'-w[Looks for a show]' \
+'--show[Looks for a show]' \
+'-p[Looks for a playlist]' \
+'--playlist[Looks for a playlist]' \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+(p)
+_arguments "${_arguments_options[@]}" : \
+'-d+[Specifies the Spotify device to use]:DEVICE:_default' \
+'--device=[Specifies the Spotify device to use]:DEVICE:_default' \
+'-f+[Specifies the output format]:FORMAT:_default' \
+'--format=[Specifies the output format]:FORMAT:_default' \
+'-u+[Plays the URI]:URI:_default' \
+'--uri=[Plays the URI]:URI:_default' \
+'-n+[Plays the first match with NAME from the specified category]:NAME:_default' \
+'--name=[Plays the first match with NAME from the specified category]:NAME:_default' \
+'(-b --album -a --artist -p --playlist -w --show)-q[Adds track to queue instead of playing it directly]' \
+'(-b --album -a --artist -p --playlist -w --show)--queue[Adds track to queue instead of playing it directly]' \
+'(-t --track -b --album -a --artist -w --show)-r[Plays a random track (only works with playlists)]' \
+'(-t --track -b --album -a --artist -w --show)--random[Plays a random track (only works with playlists)]' \
+'-b[Looks for an album]' \
+'--album[Looks for an album]' \
+'-a[Looks for an artist]' \
+'--artist[Looks for an artist]' \
+'-t[Looks for a track]' \
+'--track[Looks for a track]' \
+'-w[Looks for a show]' \
+'--show[Looks for a show]' \
+'-p[Looks for a playlist]' \
+'--playlist[Looks for a playlist]' \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+(list)
+_arguments "${_arguments_options[@]}" : \
+'-f+[Specifies the output format]:FORMAT:_default' \
+'--format=[Specifies the output format]:FORMAT:_default' \
+'--limit=[Specifies the maximum number of results (1 - 50)]: :_default' \
+'-d[Lists devices]' \
+'--devices[Lists devices]' \
+'-p[Lists playlists]' \
+'--playlists[Lists playlists]' \
+'--liked[Lists liked songs]' \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+(l)
+_arguments "${_arguments_options[@]}" : \
+'-f+[Specifies the output format]:FORMAT:_default' \
+'--format=[Specifies the output format]:FORMAT:_default' \
+'--limit=[Specifies the maximum number of results (1 - 50)]: :_default' \
+'-d[Lists devices]' \
+'--devices[Lists devices]' \
+'-p[Lists playlists]' \
+'--playlists[Lists playlists]' \
+'--liked[Lists liked songs]' \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+'-V[Print version]' \
+'--version[Print version]' \
+&& ret=0
+;;
+(history)
+_arguments "${_arguments_options[@]}" : \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+":: :_spotatui__subcmd__history_commands" \
+"*::: :->history" \
+&& ret=0
+
+    case $state in
+    (history)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:spotatui-history-command-$line[1]:"
+        case $line[1] in
+            (recap)
+_arguments "${_arguments_options[@]}" : \
+'--period=[Time range to include in the recap]: :(7d 30d month year all)' \
+'-o+[Path to write the HTML recap file]:PATH:_default' \
+'--output=[Path to write the HTML recap file]:PATH:_default' \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" : \
+":: :_spotatui__subcmd__history__subcmd__help_commands" \
+"*::: :->help" \
+&& ret=0
+
+    case $state in
+    (help)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:spotatui-history-help-command-$line[1]:"
+        case $line[1] in
+            (recap)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+        esac
+    ;;
+esac
+;;
+(search)
+_arguments "${_arguments_options[@]}" : \
+'-f+[Specifies the output format]:FORMAT:_default' \
+'--format=[Specifies the output format]:FORMAT:_default' \
+'--limit=[Specifies the maximum number of results (1 - 10)]: :_default' \
+'-b[Looks for albums]' \
+'--albums[Looks for albums]' \
+'-a[Looks for artists]' \
+'--artists[Looks for artists]' \
+'-p[Looks for playlists]' \
+'--playlists[Looks for playlists]' \
+'-t[Looks for tracks]' \
+'--tracks[Looks for tracks]' \
+'-w[Looks for shows]' \
+'--shows[Looks for shows]' \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+'-V[Print version]' \
+'--version[Print version]' \
+':search -- Specifies the search query:_default' \
+&& ret=0
+;;
+(s)
+_arguments "${_arguments_options[@]}" : \
+'-f+[Specifies the output format]:FORMAT:_default' \
+'--format=[Specifies the output format]:FORMAT:_default' \
+'--limit=[Specifies the maximum number of results (1 - 10)]: :_default' \
+'-b[Looks for albums]' \
+'--albums[Looks for albums]' \
+'-a[Looks for artists]' \
+'--artists[Looks for artists]' \
+'-p[Looks for playlists]' \
+'--playlists[Looks for playlists]' \
+'-t[Looks for tracks]' \
+'--tracks[Looks for tracks]' \
+'-w[Looks for shows]' \
+'--shows[Looks for shows]' \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+'-V[Print version]' \
+'--version[Print version]' \
+':search -- Specifies the search query:_default' \
+&& ret=0
+;;
+(sync)
+_arguments "${_arguments_options[@]}" : \
+'--link=[Sync only the link with this master playlist name or id]:NAME:_default' \
+'--dry-run[Report what would change without writing anything]' \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+&& ret=0
+;;
+(plugin)
+_arguments "${_arguments_options[@]}" : \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+'-V[Print version]' \
+'--version[Print version]' \
+":: :_spotatui__subcmd__plugin_commands" \
+"*::: :->plugin" \
+&& ret=0
+
+    case $state in
+    (plugin)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:spotatui-plugin-command-$line[1]:"
+        case $line[1] in
+            (add)
+_arguments "${_arguments_options[@]}" : \
+'-f[Reinstall if the plugin is already present]' \
+'--force[Reinstall if the plugin is already present]' \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+':repo -- owner/repo (GitHub) or a full git URL:_default' \
+&& ret=0
+;;
+(list)
+_arguments "${_arguments_options[@]}" : \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+&& ret=0
+;;
+(ls)
+_arguments "${_arguments_options[@]}" : \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+&& ret=0
+;;
+(remove)
+_arguments "${_arguments_options[@]}" : \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+':name -- Name of the plugin to remove:_default' \
+&& ret=0
+;;
+(rm)
+_arguments "${_arguments_options[@]}" : \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+':name -- Name of the plugin to remove:_default' \
+&& ret=0
+;;
+(update)
+_arguments "${_arguments_options[@]}" : \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+'::name -- Plugin to update (updates all plugins if omitted):_default' \
+&& ret=0
+;;
+(new)
+_arguments "${_arguments_options[@]}" : \
+'-f[Overwrite an existing plugin directory of the same name]' \
+'--force[Overwrite an existing plugin directory of the same name]' \
+'--debug[Enable verbose debug logging for bug reports (also SPOTATUI_LOG=debug)]' \
+'-h[Print help (see more with '\''--help'\'')]' \
+'--help[Print help (see more with '\''--help'\'')]' \
+':name -- Name of the plugin to create:_default' \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" : \
+":: :_spotatui__subcmd__plugin__subcmd__help_commands" \
+"*::: :->help" \
+&& ret=0
+
+    case $state in
+    (help)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:spotatui-plugin-help-command-$line[1]:"
+        case $line[1] in
+            (add)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(list)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(remove)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(update)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(new)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(help)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+        esac
+    ;;
+esac
+;;
+(help)
+_arguments "${_arguments_options[@]}" : \
+":: :_spotatui__subcmd__help_commands" \
+"*::: :->help" \
+&& ret=0
+
+    case $state in
+    (help)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:spotatui-help-command-$line[1]:"
+        case $line[1] in
+            (playback)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(play)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(list)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(history)
+_arguments "${_arguments_options[@]}" : \
+":: :_spotatui__subcmd__help__subcmd__history_commands" \
+"*::: :->history" \
+&& ret=0
+
+    case $state in
+    (history)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:spotatui-help-history-command-$line[1]:"
+        case $line[1] in
+            (recap)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+(search)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(sync)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(plugin)
+_arguments "${_arguments_options[@]}" : \
+":: :_spotatui__subcmd__help__subcmd__plugin_commands" \
+"*::: :->plugin" \
+&& ret=0
+
+    case $state in
+    (plugin)
+        words=($line[1] "${words[@]}")
+        (( CURRENT += 1 ))
+        curcontext="${curcontext%:*:*}:spotatui-help-plugin-command-$line[1]:"
+        case $line[1] in
+            (add)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(list)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(remove)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(update)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+(new)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+(help)
+_arguments "${_arguments_options[@]}" : \
+&& ret=0
+;;
+        esac
+    ;;
+esac
+;;
+        esac
+    ;;
+esac
+}
+
+(( $+functions[_spotatui_commands] )) ||
+_spotatui_commands() {
+    local commands; commands=(
+'playback:Interacts with the playback of a device' \
+'pb:Interacts with the playback of a device' \
+'play:Plays a URI or another Spotify item by name' \
+'p:Plays a URI or another Spotify item by name' \
+'list:Lists devices, liked songs and playlists' \
+'l:Lists devices, liked songs and playlists' \
+'history:Work with spotatui local listening history' \
+'search:Searches for tracks, albums and more' \
+'s:Searches for tracks, albums and more' \
+'sync:Sync your linked playlists across sources' \
+'plugin:Install and manage Lua plugins' \
+'help:Print this message or the help of the given subcommand(s)' \
+    )
+    _describe -t commands 'spotatui commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__help_commands] )) ||
+_spotatui__subcmd__help_commands() {
+    local commands; commands=(
+'playback:Interacts with the playback of a device' \
+'play:Plays a URI or another Spotify item by name' \
+'list:Lists devices, liked songs and playlists' \
+'history:Work with spotatui local listening history' \
+'search:Searches for tracks, albums and more' \
+'sync:Sync your linked playlists across sources' \
+'plugin:Install and manage Lua plugins' \
+'help:Print this message or the help of the given subcommand(s)' \
+    )
+    _describe -t commands 'spotatui help commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__help__subcmd__help_commands] )) ||
+_spotatui__subcmd__help__subcmd__help_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui help help commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__help__subcmd__history_commands] )) ||
+_spotatui__subcmd__help__subcmd__history_commands() {
+    local commands; commands=(
+'recap:Generate a shareable HTML recap from local listening history' \
+    )
+    _describe -t commands 'spotatui help history commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__help__subcmd__history__subcmd__recap_commands] )) ||
+_spotatui__subcmd__help__subcmd__history__subcmd__recap_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui help history recap commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__help__subcmd__list_commands] )) ||
+_spotatui__subcmd__help__subcmd__list_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui help list commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__help__subcmd__play_commands] )) ||
+_spotatui__subcmd__help__subcmd__play_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui help play commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__help__subcmd__playback_commands] )) ||
+_spotatui__subcmd__help__subcmd__playback_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui help playback commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__help__subcmd__plugin_commands] )) ||
+_spotatui__subcmd__help__subcmd__plugin_commands() {
+    local commands; commands=(
+'add:Install a plugin from a git repository' \
+'list:List installed plugins' \
+'remove:Remove an installed plugin' \
+'update:Update installed plugins to their latest commit' \
+'new:Scaffold a new plugin to start from' \
+    )
+    _describe -t commands 'spotatui help plugin commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__help__subcmd__plugin__subcmd__add_commands] )) ||
+_spotatui__subcmd__help__subcmd__plugin__subcmd__add_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui help plugin add commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__help__subcmd__plugin__subcmd__list_commands] )) ||
+_spotatui__subcmd__help__subcmd__plugin__subcmd__list_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui help plugin list commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__help__subcmd__plugin__subcmd__new_commands] )) ||
+_spotatui__subcmd__help__subcmd__plugin__subcmd__new_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui help plugin new commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__help__subcmd__plugin__subcmd__remove_commands] )) ||
+_spotatui__subcmd__help__subcmd__plugin__subcmd__remove_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui help plugin remove commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__help__subcmd__plugin__subcmd__update_commands] )) ||
+_spotatui__subcmd__help__subcmd__plugin__subcmd__update_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui help plugin update commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__help__subcmd__search_commands] )) ||
+_spotatui__subcmd__help__subcmd__search_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui help search commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__help__subcmd__sync_commands] )) ||
+_spotatui__subcmd__help__subcmd__sync_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui help sync commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__history_commands] )) ||
+_spotatui__subcmd__history_commands() {
+    local commands; commands=(
+'recap:Generate a shareable HTML recap from local listening history' \
+'help:Print this message or the help of the given subcommand(s)' \
+    )
+    _describe -t commands 'spotatui history commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__history__subcmd__help_commands] )) ||
+_spotatui__subcmd__history__subcmd__help_commands() {
+    local commands; commands=(
+'recap:Generate a shareable HTML recap from local listening history' \
+'help:Print this message or the help of the given subcommand(s)' \
+    )
+    _describe -t commands 'spotatui history help commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__history__subcmd__help__subcmd__help_commands] )) ||
+_spotatui__subcmd__history__subcmd__help__subcmd__help_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui history help help commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__history__subcmd__help__subcmd__recap_commands] )) ||
+_spotatui__subcmd__history__subcmd__help__subcmd__recap_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui history help recap commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__history__subcmd__recap_commands] )) ||
+_spotatui__subcmd__history__subcmd__recap_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui history recap commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__list_commands] )) ||
+_spotatui__subcmd__list_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui list commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__play_commands] )) ||
+_spotatui__subcmd__play_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui play commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__playback_commands] )) ||
+_spotatui__subcmd__playback_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui playback commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__plugin_commands] )) ||
+_spotatui__subcmd__plugin_commands() {
+    local commands; commands=(
+'add:Install a plugin from a git repository' \
+'list:List installed plugins' \
+'ls:List installed plugins' \
+'remove:Remove an installed plugin' \
+'rm:Remove an installed plugin' \
+'update:Update installed plugins to their latest commit' \
+'new:Scaffold a new plugin to start from' \
+'help:Print this message or the help of the given subcommand(s)' \
+    )
+    _describe -t commands 'spotatui plugin commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__plugin__subcmd__add_commands] )) ||
+_spotatui__subcmd__plugin__subcmd__add_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui plugin add commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__plugin__subcmd__help_commands] )) ||
+_spotatui__subcmd__plugin__subcmd__help_commands() {
+    local commands; commands=(
+'add:Install a plugin from a git repository' \
+'list:List installed plugins' \
+'remove:Remove an installed plugin' \
+'update:Update installed plugins to their latest commit' \
+'new:Scaffold a new plugin to start from' \
+'help:Print this message or the help of the given subcommand(s)' \
+    )
+    _describe -t commands 'spotatui plugin help commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__plugin__subcmd__help__subcmd__add_commands] )) ||
+_spotatui__subcmd__plugin__subcmd__help__subcmd__add_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui plugin help add commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__plugin__subcmd__help__subcmd__help_commands] )) ||
+_spotatui__subcmd__plugin__subcmd__help__subcmd__help_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui plugin help help commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__plugin__subcmd__help__subcmd__list_commands] )) ||
+_spotatui__subcmd__plugin__subcmd__help__subcmd__list_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui plugin help list commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__plugin__subcmd__help__subcmd__new_commands] )) ||
+_spotatui__subcmd__plugin__subcmd__help__subcmd__new_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui plugin help new commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__plugin__subcmd__help__subcmd__remove_commands] )) ||
+_spotatui__subcmd__plugin__subcmd__help__subcmd__remove_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui plugin help remove commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__plugin__subcmd__help__subcmd__update_commands] )) ||
+_spotatui__subcmd__plugin__subcmd__help__subcmd__update_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui plugin help update commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__plugin__subcmd__list_commands] )) ||
+_spotatui__subcmd__plugin__subcmd__list_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui plugin list commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__plugin__subcmd__new_commands] )) ||
+_spotatui__subcmd__plugin__subcmd__new_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui plugin new commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__plugin__subcmd__remove_commands] )) ||
+_spotatui__subcmd__plugin__subcmd__remove_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui plugin remove commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__plugin__subcmd__update_commands] )) ||
+_spotatui__subcmd__plugin__subcmd__update_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui plugin update commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__search_commands] )) ||
+_spotatui__subcmd__search_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui search commands' commands "$@"
+}
+(( $+functions[_spotatui__subcmd__sync_commands] )) ||
+_spotatui__subcmd__sync_commands() {
+    local commands; commands=()
+    _describe -t commands 'spotatui sync commands' commands "$@"
+}
+
+if [ "$funcstack[1]" = "_spotatui" ]; then
+    _spotatui "$@"
+else
+    compdef _spotatui spotatui
+fi

@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+cd ~/.local/src/Aurelia
+git checkout local
+git fetch
+if [ "$(git merge-base HEAD origin/main)" = "$(git rev-parse origin/main)" ]; then
+    echo "Aurelia already up to date"
+    exit 0
+fi
+git rebase origin/main
+cargo build --release
+cp target/release/aurelia ~/.local/bin/aurelia.new
+mv ~/.local/bin/aurelia.new ~/.local/bin/aurelia
+cargo clean

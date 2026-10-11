@@ -1,0 +1,3 @@
+if [ "$reason" = "BOUND" ] || [ "$reason" = "REBOOT" ]; then
+    tc qdisc replace dev "$interface" root fq 2>/dev/null
+fi

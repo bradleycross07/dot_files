@@ -1,0 +1,28 @@
+#!/bin/sh
+set -eu
+
+dest="$HOME/.local/opt/Obsidian"
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+ver=$(curl -fsSL https://api.github.com/repos/obsidianmd/obsidian-releases/releases/latest \
+      | jq -r .tag_name | sed 's/^v//')
+
+[ -n "$ver" ] && [ "$ver" != null ] || { echo "Couldn't get latest version" >&2; exit 1; }
+
+if [ -f "$dest/.version" ] && [ "$(cat "$dest/.version")" = "$ver" ]; then
+    echo "Obsidian $ver already installed"
+    exit 0
+fi
+
+echo "Installing Obsidian $ver"
+cd "$tmp"
+curl -fLO "https://github.com/obsidianmd/obsidian-releases/releases/download/v$ver/Obsidian-$ver.AppImage"
+chmod +x "Obsidian-$ver.AppImage"
+"./Obsidian-$ver.AppImage" --appimage-extract >/dev/null
+echo "$ver" > squashfs-root/.version
+
+rm -rf "$dest.old"
+[ -d "$dest" ] && mv "$dest" "$dest.old"
+mv squashfs-root "$dest"
+echo "Done. Old version kept at $dest.old"

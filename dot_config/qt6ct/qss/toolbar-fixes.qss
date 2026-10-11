@@ -1,0 +1,13 @@
+QToolButton {
+    color: #fcfcfc;
+}
+QToolBar QToolButton {
+    color: #fcfcfc;
+}
+
+QMenuBar {
+    color: #fcfcfc;
+}
+QMenuBar::item {
+    color: #fcfcfc;
+}

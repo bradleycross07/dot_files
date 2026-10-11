@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Neovim (foot)
+Exec=foot nvim %F
+Terminal=false
+Type=Application
+Icon=nvim
+MimeType=text/plain;text/markdown;text/x-csrc;text/x-chdr;text/x-c++src;text/x-c++hdr;text/x-python;text/x-shellscript;application/json;application/xml;text/xml;application/yaml;application/x-yaml;
+NoDisplay=true

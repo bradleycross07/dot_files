@@ -1,0 +1,8 @@
+#!/bin/sh
+exec "$HOME/.local/opt/Vesktop/vesktop" \
+  --enable-blink-features=MiddleClickAutoscroll \
+  --disable-font-subpixel-positioning \
+  --enable-gpu-rasterization \
+  --enable-features=AcceleratedVideoDecoder,AcceleratedVideoDecodeLinuxGL,VaapiVideoDecodeLinuxGL \
+  --disable-features=AcceleratedVideoEncoder,VaapiVideoEncoder \
+  "$@"

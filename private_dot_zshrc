@@ -11,7 +11,10 @@ eval "$(starship init zsh)"
 
 # completion
 autoload -Uz compinit
-compinit -d "${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump-$ZSH_VERSION"
+zcompdump="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump-$ZSH_VERSION"
+[[ -d ${zcompdump:h} ]] || mkdir -p ${zcompdump:h}
+compinit -d "$zcompdump"
+unset zcompdump
 
 # autocomplete suggestions
 zinit light zsh-users/zsh-autosuggestions

@@ -1,0 +1,4 @@
+player=mpv
+player-args=--cache=yes --demuxer-max-bytes=750k
+twitch-low-latency
+twitch-disable-ads

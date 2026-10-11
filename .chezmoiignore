@@ -52,3 +52,13 @@ INSTALL.md
 {{- if ne .chezmoi.hostname "void-desktop" }}
 # empty as of now since no new pc
 {{- end }}
+
+# files that live in the repo but should never be applied to $HOME
+README.md
+INSTALL.md
+patches
+
+# re-downloaded on each machine instead of stored (large, have their own upstream)
+.config/spicetify/Themes
+.config/spicetify/CustomApps
+.local/share/icons/Bibata-Modern-Classic

@@ -1,0 +1,5 @@
+breeze-gtk
+breeze-qt6
+kf6-qqc2-desktop-style
+papirus-icon-theme
+qt6ct
