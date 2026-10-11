@@ -645,7 +645,8 @@ doas ln -s /etc/sv/inputplumber /var/service/
   cp "$(chezmoi source-path)"/dot_config/private_mozilla/private_firefox/*/chrome/userContent.css "$p/chrome/"
   ```
   then in `about:config` set `toolkit.legacyUserProfileCustomizations.stylesheets` to `true` and restart Firefox
-- [ ] Vesktop: log in to Discord (the session isn't copied - only the settings come with the dotfiles)
+- [ ] Vesktop: log in to Discord. Neither the session nor the Vencord settings are in the dotfiles - import them
+  (Settings → Backup & Restore, exported on the laptop) or set them up again
 
 ## 8. Audio
 
@@ -749,7 +750,7 @@ Copies live in `~/.config/system-configs` (applied by chezmoi in step 6).
 | `99-nofile.conf`     | `/etc/security/limits.d/`     | raised open-files limit; applies at next login |
 | `inputplumber/*.yaml`| `/etc/inputplumber/devices.d/`| DualSense device config - already restored in step 7 |
 | `60-limine`          | `/etc/kernel.d/post-install/` | `chmod +x`; already in place from step 1 (fetched from the repo) - only for a future reinstall |
-| `xbps.d/*.conf`      | `/etc/xbps.d/`                | pins already in place from step 1, mirrors restored in step 2 - only for a future reinstall |
+| `xbps.d/*.conf`      | `/etc/xbps.d/`                | mirrors restored in step 2. Don't restore the pins from here: `ignore.conf` is the laptop's (NVIDIA only) - the desktop's are written in step 1 |
 
 ```sh
 cd ~/.config/system-configs
