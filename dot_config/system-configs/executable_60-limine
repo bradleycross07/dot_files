@@ -1,0 +1,33 @@
+#!/bin/sh
+# /etc/kernel.d/post-install/60-limine
+# Rewrites /boot/limine.conf after each kernel install: the new kernel first,
+# the previous one as a fallback entry. xbps runs it from / with $2 = version.
+VERSION="$2"
+ROOT_UUID=$(findmnt -no UUID -T .)
+# never write an unbootable entry: keep the old limine.conf if anything is missing
+if [ -z "$VERSION" ] || [ -z "$ROOT_UUID" ] || [ ! -f "boot/vmlinuz-$VERSION" ]; then
+    echo "60-limine: missing version, root UUID or kernel - not updated" >&2
+    exit 1
+fi
+CMDLINE="root=UUID=$ROOT_UUID ro loglevel=4 nowatchdog mitigations=off ipv6.disable=1"
+
+# newest other kernel that still has an initramfs (the fallback entry)
+PREV=$(for k in boot/vmlinuz-*; do
+           v=${k#boot/vmlinuz-}
+           [ "$v" != "$VERSION" ] && [ -f "boot/initramfs-$v.img" ] && echo "$v"
+       done | sort -V | tail -1)
+
+# one boot menu entry: $1 = kernel version, $2 = title
+entry() {
+    printf '\n/Void Linux (%s)\n' "$2"
+    printf '    protocol: linux\n'
+    printf '    path: boot():/vmlinuz-%s\n' "$1"
+    printf '    module_path: boot():/initramfs-%s.img\n' "$1"
+    printf '    cmdline: %s\n' "$CMDLINE"
+}
+
+{
+    printf 'timeout: 3\n'
+    entry "$VERSION" "$VERSION"
+    if [ -n "$PREV" ]; then entry "$PREV" "$PREV, previous"; fi
+} > boot/limine.conf.new && mv boot/limine.conf.new boot/limine.conf
