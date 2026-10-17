@@ -476,8 +476,7 @@ so treat it as per-game.
   (end of section 11); anything installed there before would end up on the NVMe, hidden under the mount.
   Aurelia's `config.json` isn't in the dotfiles, so set the library path to `~/Games/Aurelia` on first run
 - launch scripts (`~/.config/Aurelia/scripts/<appid>.sh`) come with the dotfiles; adjust them for this
-  monitor in section 11. Any script with a hard-coded game path (HuniePop's defaults to
-  `~/.local/share/Steam/steamapps/common`, the laptop's library) needs pointing at `~/Games/Aurelia` instead:
+  monitor in section 11. Any script with a hard-coded game path needs pointing at `~/Games/Aurelia` instead:
   ```sh
   rg -n 'local/share/Steam' ~/.config/Aurelia/scripts/
   ```
