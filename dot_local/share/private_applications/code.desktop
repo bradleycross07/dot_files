@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Visual Studio Code
+Comment=Code Editing. Redefined.
+Exec=/home/bradley/.local/opt/VSCode-linux-x64/code --ozone-platform-hint=auto --password-store=gnome-libsecret %F
+Icon=/home/bradley/.local/opt/VSCode-linux-x64/resources/app/resources/linux/code.png
+Type=Application
+Categories=Development;IDE;TextEditor;
+StartupWMClass=Code
+MimeType=text/plain;inode/directory;

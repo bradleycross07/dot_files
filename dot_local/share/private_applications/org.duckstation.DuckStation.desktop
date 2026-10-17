@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=DuckStation
+GenericName=PlayStation 1 Emulator
+Comment=Fast PlayStation 1 emulator
+Icon=/home/bradley/.local/opt/DuckStation/usr/share/icons/hicolor/512x512/apps/org.duckstation.DuckStation.png
+Exec=duckstation %f
+Categories=Game;Emulator;Qt;

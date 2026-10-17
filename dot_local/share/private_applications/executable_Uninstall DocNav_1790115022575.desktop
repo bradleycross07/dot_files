@@ -1,0 +1,8 @@
+[Desktop Entry]
+NoDisplay=true
+Encoding=UTF-8
+Type=Application
+Name=Uninstall DocNav
+Comment=Uninstall DocNav
+Icon=/tools/Xilinx/.xinstall/DocNav/data/images/xlnx_logo-256x256.png
+Exec=/tools/Xilinx/.xinstall/DocNav/xsetup -Uninstall

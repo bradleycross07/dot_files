@@ -1,0 +1,8 @@
+[Desktop Entry]
+NoDisplay=true
+Encoding=UTF-8
+Type=Application
+Name=Xilinx Information Center
+Comment=Xilinx Information Center
+Icon=/tools/Xilinx/xic/data/images/xlnx_logo.png
+Exec=/tools/Xilinx/xic/xic 

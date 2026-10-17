@@ -1,0 +1,8 @@
+[Desktop Entry]
+NoDisplay=true
+Encoding=UTF-8
+Type=Application
+Name=Vivado 2023.2 Tcl Shell
+Comment=Vivado 2023.2 Tcl Shell
+Icon=/usr/share/icons/gnome/32x32/apps/terminal.png
+Exec=xterm -e /tools/Xilinx/Vivado/2023.2/bin/vivado -mode tcl

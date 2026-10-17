@@ -1,0 +1,7 @@
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Name=Vivado 2023.2
+Comment=Vivado 2023.2
+Icon=/tools/Xilinx/Vivado/2023.2/doc/images/vivado_logo.png
+Exec=env _JAVA_AWT_WM_NONREPARENTING=1 QT_QPA_PLATFORM=xcb /tools/Xilinx/Vivado/2023.2/bin/vivado

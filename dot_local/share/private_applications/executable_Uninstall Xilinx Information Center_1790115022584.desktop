@@ -1,0 +1,8 @@
+[Desktop Entry]
+NoDisplay=true
+Encoding=UTF-8
+Type=Application
+Name=Uninstall Xilinx Information Center
+Comment=Uninstall Xilinx Information Center
+Icon=/tools/Xilinx/.xinstall/xic/data/images/xlnx_logo-256x256.png
+Exec=/tools/Xilinx/.xinstall/xic/xsetup -Uninstall

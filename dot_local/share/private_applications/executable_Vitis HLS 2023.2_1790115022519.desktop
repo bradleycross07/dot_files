@@ -1,0 +1,8 @@
+[Desktop Entry]
+NoDisplay=true
+Encoding=UTF-8
+Type=Application
+Name=Vitis HLS 2023.2
+Comment=Vitis HLS 2023.2
+Icon=/tools/Xilinx/Vitis_HLS/2023.2/doc/images/vitis_hls_icon.png
+Exec=/tools/Xilinx/Vitis_HLS/2023.2/bin/vitis_hls 

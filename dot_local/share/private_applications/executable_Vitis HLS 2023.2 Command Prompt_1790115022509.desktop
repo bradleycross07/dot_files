@@ -1,0 +1,8 @@
+[Desktop Entry]
+NoDisplay=true
+Encoding=UTF-8
+Type=Application
+Name=Vitis HLS 2023.2 Command Prompt
+Comment=Vitis HLS 2023.2 Command Prompt
+Icon=/usr/share/icons/gnome/32x32/apps/terminal.png
+Exec=xterm -e /tools/Xilinx/Vitis_HLS/2023.2/bin/vitis_hls -i

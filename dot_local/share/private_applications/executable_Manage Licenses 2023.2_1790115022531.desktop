@@ -1,0 +1,8 @@
+[Desktop Entry]
+NoDisplay=true
+Encoding=UTF-8
+Type=Application
+Name=Manage Licenses 2023.2
+Comment=Manage Licenses 2023.2
+Icon=/tools/Xilinx/Vivado/2023.2/data/vlm/images/vlm_logo.png
+Exec=/tools/Xilinx/Vivado/2023.2/bin/vlm 

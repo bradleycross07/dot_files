@@ -1,0 +1,8 @@
+[Desktop Entry]
+NoDisplay=true
+Encoding=UTF-8
+Type=Application
+Name=Uninstall 2023.2
+Comment=Uninstall 2023.2
+Icon=/tools/Xilinx/.xinstall/Vivado_2023.2/data/images/xlnx_logo-256x256.png
+Exec=/tools/Xilinx/.xinstall/Vivado_2023.2/xsetup -Uninstall

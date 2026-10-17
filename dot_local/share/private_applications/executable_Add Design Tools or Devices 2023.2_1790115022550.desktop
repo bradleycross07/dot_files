@@ -1,0 +1,8 @@
+[Desktop Entry]
+NoDisplay=true
+Encoding=UTF-8
+Type=Application
+Name=Add Design Tools or Devices 2023.2
+Comment=Add Design Tools or Devices 2023.2
+Icon=/tools/Xilinx/.xinstall/Vivado_2023.2/data/images/upgrade.png
+Exec=/tools/Xilinx/.xinstall/Vivado_2023.2/xsetup 

@@ -1,0 +1,3 @@
+#!/bin/sh
+export QT_LOGGING_RULES="qt.qpa.wayland.textinput=false"
+exec "$HOME/.local/opt/PCSX2/AppRun" "$@"
