@@ -36,7 +36,7 @@ setopt AUTO_CD             # type a directory name to cd into it
 # needed shell aliases
 alias ff="fastfetch"
 alias ls="eza -lah --git --color=auto"
-alias lt="eza --tree -all --color=auto"
+alias lt="eza --tree -a --color=auto"
 alias df="duf"
 
 # VPN aliases (windscribe isn't on void manually installed it with config)

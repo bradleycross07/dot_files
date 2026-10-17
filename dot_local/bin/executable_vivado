@@ -1,4 +1,5 @@
 #!/bin/sh
+cd ~/VivadoProjects || exit 1
 _JAVA_AWT_WM_NONREPARENTING=1 \
 QT_QPA_PLATFORM=xcb \
 exec /tools/Xilinx/Vivado/2023.2/bin/vivado "$@"
