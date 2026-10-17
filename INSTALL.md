@@ -476,7 +476,21 @@ so treat it as per-game.
   (end of section 11); anything installed there before would end up on the NVMe, hidden under the mount.
   Aurelia's `config.json` isn't in the dotfiles, so set the library path to `~/Games/Aurelia` on first run
 - launch scripts (`~/.config/Aurelia/scripts/<appid>.sh`) come with the dotfiles; adjust them for this
-  monitor in section 11
+  monitor in section 11. Any script with a hard-coded game path (HuniePop's defaults to
+  `~/.local/share/Steam/steamapps/common`, the laptop's library) needs pointing at `~/Games/Aurelia` instead:
+  ```sh
+  rg -n 'local/share/Steam' ~/.config/Aurelia/scripts/
+  ```
+
+### OpenRazer (mouse DPI and polling rate)
+- install the driver, daemon and GUI, and join the `plugdev` group (log out and back in afterwards):
+  ```sh
+  doas xbps-install -S openrazer-meta razergenie
+  doas usermod -aG plugdev bradley
+  ```
+- the driver is a DKMS module, so the headers for the running kernel must be installed or it won't build
+- the daemon runs as your user, not as a runit service: start it the same way as on the laptop
+- set DPI and polling rate in RazerGenie; the daemon remembers them
 
 ### spotatui
 - needs `rust cargo mold` plus the build dependencies from its README (the laptop's package list has them)
