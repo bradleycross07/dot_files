@@ -6,24 +6,45 @@
    ========================================================================== */
 
 /* --------------------------------------------------------------------------
-   All sites: slightly roomier lines.
+   All sites except YouTube: slightly roomier lines.
+   Only text elements are targeted (not *), so buttons, badges and icon fonts
+   keep the site's own line-height and stay centred. Code blocks are left
+   alone so ASCII art has no gaps.
    -------------------------------------------------------------------------- */
-
-@-moz-document regexp("^https?://.*") {
-  :where(*:not(input, textarea, .ddgsi)) {
+@-moz-document regexp("^https?://(?!([^/]*\\.)?youtube\\.com/).*") {
+  :where(p, li, dd, dt, blockquote, figcaption, td, th) {
     line-height: 1.5 !important;
   }
 }
 
 /* --------------------------------------------------------------------------
-   YouTube
+   YouTube (not embedded players on other sites: /embed/ is excluded)
    -------------------------------------------------------------------------- */
-@-moz-document domain("youtube.com") { 
+@-moz-document regexp("^https://([^/]*\\.)?youtube\\.com/(?!embed/).*") {
 
-  /* font */
-  * {
+  /* font: everything except video players (main player and the hover
+     preview player) and the hover preview's mute/CC buttons, so player
+     controls and captions keep YouTube's own sizing */
+  *:not(.html5-video-player, .html5-video-player *,
+        yt-inline-player-controls, yt-inline-player-controls *) {
     font-family: monospace !important;
     font-size: 22px !important;
+  }
+
+  /* the hover preview's mute/CC buttons set no font size of their own, so
+     excluding them above isn't enough: they'd still inherit 22px from the
+     page, which makes the line around each 24px icon taller than the icon
+     and pushes it off-centre. Give them YouTube's base size instead. */
+  yt-inline-player-controls {
+    font-family: Roboto, Arial, sans-serif !important;
+    font-size: 10px !important;
+    line-height: normal !important;
+  }
+
+  /* roomier lines for text only: YouTube's text lives in these elements,
+     so icons and buttons keep YouTube's own line-height and stay centred */
+  :where(yt-formatted-string, .yt-core-attributed-string, #video-title, #content-text, p) {
+    line-height: 1.5 !important;
   }
 
   /* 5 videos per row */
@@ -82,21 +103,23 @@
    Claude
    -------------------------------------------------------------------------- */
 @-moz-document domain("claude.ai") {
-  * {
+  /* math (KaTeX) and SVG drawings are left alone: forcing one font and size
+     on them breaks fractions, superscripts and diagram labels */
+  *:not(.katex, .katex *, svg, svg *) {
     font-family: monospace !important;
     font-size: 22px !important;
   }
- 
+
   /* slightly roomier lines (inputs excluded so text boxes stay centred) */
-  *:not(input):not(textarea) {
+  *:not(input, textarea, .katex, .katex *) {
     line-height: 30px !important;
   }
- 
+
   /* roomier sidebar rows: claude.ai sizes them with --df-row-h */
   [data-testid="sidebar"] {
     --df-row-h: 40px !important;
   }
- 
+
   /* keep Claude's icon font */
   [data-cds="Icon"] {
     font-family: var(--font-anthropicons, Anthropicons-Variable) !important;
@@ -114,7 +137,7 @@
     font-size: 11px !important;
   }
 }
- 
+
 /* Stack Overflow, Reddit: slightly roomier lines */
 @-moz-document domain("stackoverflow.com"), domain("reddit.com") {
   *:not(input):not(textarea) {
@@ -124,13 +147,13 @@
 
 /* whole-pixel line height so text doesn't land on half pixels */
 @-moz-document domain("github.com") {
-  * { 
+  * {
     line-height: 20px !important;
   }
 
   /* tighter lines in code blocks so ASCII art has no gaps.*/
-  pre, pre * { 
-    line-height: 11px !important; 
+  pre, pre * {
+    line-height: 11px !important;
   }
 }
 
@@ -145,24 +168,24 @@
   * {
     font-size: 22px !important;
   }
- 
+
   /* slightly roomier lines (inputs and icons excluded so they stay centred) */
   *:not(input):not(textarea):not(.ddgsi) {
     line-height: 30px !important;
   }
- 
+
   /* homepage search box only: room for descenders (g, y, p) */
   #searchbox_homepage textarea[name="q"] {
     height: auto !important;
     line-height: 28px !important;
   }
- 
+
   /* clear "X" in settings text fields: centre it in the field */
   .frm__input__clear {
     font-size: 18px !important;
     line-height: 44px !important;
   }
- 
+
   /* homepage suggestions: give every row identical spacing */
   #searchbox-suggestions > li {
     margin: 0 !important;

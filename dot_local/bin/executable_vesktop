@@ -3,6 +3,6 @@ exec "$HOME/.local/opt/Vesktop/vesktop" \
   --enable-blink-features=MiddleClickAutoscroll \
   --disable-font-subpixel-positioning \
   --enable-gpu-rasterization \
-  --enable-features=AcceleratedVideoDecoder,AcceleratedVideoDecodeLinuxGL,VaapiVideoDecodeLinuxGL \
+  --enable-features=AcceleratedVideoDecoder,AcceleratedVideoDecodeLinuxGL,VaapiVideoDecodeLinuxGL,AcceleratedVideoDecodeLinuxZeroCopyGL,VaapiIgnoreDriverChecks \
   --disable-features=AcceleratedVideoEncoder,VaapiVideoEncoder \
   "$@"

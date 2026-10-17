@@ -1,7 +1,8 @@
 [Desktop Entry]
 Type=Application
 Name=Lumafly
-Exec=env AVALONIA_USE_WAYLAND=1 lumafly %u
+Exec=env AVALONIA_USE_WAYLAND=1 /home/bradley/.local/share/lumafly/Lumafly %u
+Path=/home/bradley/.local/share/lumafly
 Icon=lumafly
 Terminal=false
 MimeType=x-scheme-handler/lumafly;x-scheme-handler/scarab;

@@ -1,12 +1,6 @@
 #!/bin/sh
-# venmic-fix - rewire Vesktop's stream-audio loopbacks to the app they were meant to capture.
-#
-# venmic asks for each loopback's source with node.target, which WirePlumber ignores here,
-# so the loopback gets linked to the default mic instead: viewers hear your voice twice
-# and none of the app's audio. Run this after starting a stream (and again after adding
-# another app to it).
+# venmic-fix
 
-# the default source WirePlumber falls back to (easyeffects_source)
 mic=$(wpctl inspect @DEFAULT_AUDIO_SOURCE@ | sed -n 's/.*node.name = "\(.*\)"/\1/p')
 
 found=no

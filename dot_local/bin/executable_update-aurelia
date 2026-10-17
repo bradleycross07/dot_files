@@ -8,7 +8,7 @@ if [ "$(git merge-base HEAD origin/main)" = "$(git rev-parse origin/main)" ]; th
     exit 0
 fi
 git rebase origin/main
-RUSTFLAGS="-C target-cpu=native -C link-arg=-fuse-ld=mold" cargo build --release
+cargo build --release
 cp target/release/aurelia ~/.local/bin/aurelia.new
 mv ~/.local/bin/aurelia.new ~/.local/bin/aurelia
 cargo clean

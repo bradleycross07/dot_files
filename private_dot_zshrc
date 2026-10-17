@@ -26,6 +26,7 @@ source <(fzf --zsh)
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
+
 setopt SHARE_HISTORY
 setopt HIST_IGNORE_DUPS
 setopt HIST_REDUCE_BLANKS
@@ -34,14 +35,9 @@ setopt AUTO_CD             # type a directory name to cd into it
 
 # needed shell aliases
 alias ff="fastfetch"
-alias ls="eza --color=auto"
-alias lt="eza --tree --color=auto"
-alias cat="bat"
-alias nano="nvim"
-alias grep="rg"
-alias du="dust"
+alias ls="eza -lah --git --color=auto"
+alias lt="eza --tree -all --color=auto"
 alias df="duf"
-alias ps="procs"
 
 # VPN aliases (windscribe isn't on void manually installed it with config)
 alias vpnup='doas wg-quick up windscribe'

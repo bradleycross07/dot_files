@@ -46,7 +46,7 @@ text/x-python=nvim-foot.desktop
 text/x-shellscript=nvim-foot.desktop
 application/pdf=firefox.desktop
 x-scheme-handler/spotify=spotify.desktop
-x-scheme-handler/discord=Vesktop.desktop
+x-scheme-handler/discord=vesktop.desktop
 
 [Added Associations]
 application/schema+json=nvim-foot.desktop;
