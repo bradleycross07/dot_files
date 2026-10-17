@@ -1,0 +1,33 @@
+#!/bin/sh
+set -eu
+
+dest="$HOME/.local/opt/PCSX2"
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+release=$(curl -fsSL "https://api.github.com/repos/PCSX2/pcsx2/releases?per_page=1")
+
+ver=$(printf '%s' "$release" | jq -r '.[0].tag_name' | sed 's/^v//')
+url=$(printf '%s' "$release" | jq -r '.[0].assets[]
+      | select(.name | test("linux-appimage-x64-Qt\\.AppImage$"))
+      | .browser_download_url' | head -n1)
+
+[ -n "$ver" ] && [ "$ver" != null ] || { echo "Couldn't get latest version" >&2; exit 1; }
+[ -n "$url" ] || { echo "No Linux AppImage found for PCSX2 $ver" >&2; exit 1; }
+
+if [ -f "$dest/.version" ] && [ "$(cat "$dest/.version")" = "$ver" ]; then
+    echo "PCSX2 $ver already installed"
+    exit 0
+fi
+
+echo "Installing PCSX2 $ver"
+cd "$tmp"
+curl -fL -o pcsx2.AppImage "$url"
+chmod +x pcsx2.AppImage
+./pcsx2.AppImage --appimage-extract >/dev/null
+echo "$ver" > squashfs-root/.version
+
+rm -rf "$dest.old"
+[ -d "$dest" ] && mv "$dest" "$dest.old"
+mv squashfs-root "$dest"
+echo "Done. Old version kept at $dest.old"
