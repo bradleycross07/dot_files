@@ -18,7 +18,7 @@ Repos:
 
 Do these first, then keep this checklist open on the laptop while installing on the PC.
 
-Last updated: 11 Oct 2026.
+Last updated: 18 Oct 2026.
 
 ### Right before the install
 - [ ] refresh the lists, pull in any config changes made since, and push:
@@ -41,6 +41,11 @@ Last updated: 11 Oct 2026.
   # back to main, or the laptop's next `make` builds the desktop config
   git switch main
   ```
+- [ ] export the settings that aren't in the dotfiles or Firefox Sync onto the Ventoy USB (next to the SSH key,
+  saves and spotatui credentials - step 4):
+  - uBlock Origin: Settings → **Back up to file** (filter lists, `no-cosmetic-filtering` rules, settings)
+  - Vencord: Vesktop → Settings → **Backup & Restore** → export
+  - put both files in a `backups/` folder on the USB
 
 ### Backing up the old Windows drives (from the live environment, to avoid Windows altogether)
 The plan: free space on the SATA SSD (delete the Games folder), copy what's needed from the NVMe onto it,
@@ -373,6 +378,8 @@ tar -xzf /mnt/saves/unity3d.tar.gz -C ~
 tar -xzf /mnt/saves/celeste.tar.gz -C ~
 # spotatui's Spotify app credentials (not in the public repo)
 mkdir -p ~/.config/spotatui && cp /mnt/spotatui/client.yml ~/.config/spotatui/
+# uBlock Origin + Vencord backups (exported in step 0), restored from Firefox/Vesktop in step 7
+mkdir -p ~/backups && cp /mnt/backups/* ~/backups/
 # once ssh -T has greeted you: the key and credentials don't stay on the USB
 rm -r /mnt/ssh-key /mnt/spotatui
 doas umount /mnt
@@ -438,6 +445,12 @@ so treat it as per-game.
 
 ### Aurelia
 - needs `rust cargo mold` (and possibly `openssl-devel` - it's on the laptop's list)
+- the launch scripts run each game inside `bwrap --unshare-net` (its own network namespace, so the game never
+  hears about USB hotplugs - stops the Unity freeze when a controller/mouse is plugged in). Flatpak pulls
+  bubblewrap in too, but install it explicitly so the scripts don't depend on Flatpak:
+  ```sh
+  doas xbps-install -S bubblewrap
+  ```
 - 32-bit graphics libraries for Wine/Proton games (older 32-bit games need them):
   ```sh
   doas xbps-install -S void-repo-multilib
@@ -513,9 +526,23 @@ so treat it as per-game.
   `x-scheme-handler/discord=Vesktop.desktop` make it open `discord://` links (database refreshed in step 6)
 
 ### InputPlumber
-- needs `rust cargo libevdev-devel libiio-devel dbus-devel` (as on the laptop; its README has the full list)
-- clone and build per its README:
-  `git clone https://github.com/ShadowBlip/InputPlumber.git ~/.local/src/InputPlumber`
+- build dependencies. `clang` alone isn't enough: bindgen looks for the unversioned `libclang.so`, which only
+  the matching `clang<N>-devel` package provides (it was `clang21-devel` on the laptop - check the number with
+  `xbps-query clang` / `xbps-query -Rs clang` first):
+  ```sh
+  doas xbps-install -S rust cargo clang clang21-devel pkg-config eudev-libudev-devel libiio-devel
+  ```
+- clone, build as your user, install as root (building with doas would make cargo run as root):
+  ```sh
+  git clone https://github.com/ShadowBlip/InputPlumber.git ~/.local/src/InputPlumber
+  cd ~/.local/src/InputPlumber
+  make build
+  doas make install PREFIX=/usr
+  # the install also drops systemd units, which do nothing on Void
+  doas rm /usr/lib/systemd/system/inputplumber*.service
+  ```
+  (if the build ever stops on `couldn't find any valid shared libraries matching: ['libclang.so'...]`, the
+  `clang<N>-devel` version doesn't match - `find /usr/lib -name 'libclang*.so*'` shows which one is installed)
 - its install adds udev rules, hwdb entries and a D-Bus system policy, which only take effect once reloaded:
   ```sh
   doas udevadm hwdb --update && doas udevadm control --reload && doas udevadm trigger
@@ -579,6 +606,9 @@ flatpak install --user flathub cz.viceverse.serein
 ## 6. Dotfiles (chezmoi)
 
 ```sh
+# the laptop-only files must show up here - if the list only has README.md, INSTALL.md and patches,
+# the hostname isn't `void-desktop` and the laptop's TLP/kanshi/Vivado files would be applied
+chezmoi ignored
 chezmoi diff
 chezmoi apply
 ```
@@ -613,16 +643,19 @@ done
 doas powerprofilesctl set performance
 ```
 
-InputPlumber (built in step 4): restore its DualSense config and its service, drop the log service (it sends
-output to syslog via vlogger, which the desktop doesn't run), then enable it - in that order, so runit never
-starts the log service:
+InputPlumber (built in step 4): restore its DualSense config (`persist: true`, so the virtual Xbox pad survives
+a replug) and its service, then enable it. The log service writes its own log with svlogd to
+`/var/log/inputplumber`, so it works without socklog - keep it. Check it's that version first:
 
 ```sh
+# should be: exec svlogd -tt /var/log/inputplumber  (not vlogger)
+cat ~/.config/system-configs/sv-inputplumber/log/run
 doas mkdir -p /etc/inputplumber/devices.d
 doas cp ~/.config/system-configs/inputplumber/*.yaml /etc/inputplumber/devices.d/
 doas cp -r ~/.config/system-configs/sv-inputplumber /etc/sv/inputplumber
-doas rm -r /etc/sv/inputplumber/log
 doas ln -s /etc/sv/inputplumber /var/service/
+# with the DualSense plugged in: it should be detected and blocked, with a virtual Xbox 360 pad created
+doas tail /var/log/inputplumber/current
 ```
 
 - [ ] log out and back in on tty1, then check `echo $XDG_RUNTIME_DIR` prints `/run/user/1000` -
@@ -637,16 +670,28 @@ doas ln -s /etc/sv/inputplumber /var/service/
 
 - [ ] start it by typing `dwl` on tty1 (a function in `.zshrc`)
 - [ ] Firefox: sign in to Firefox Sync (bookmarks, passwords, history, extensions) instead of copying the profile
-- [ ] Firefox `userContent.css` (not applied by chezmoi on the desktop - the profile folder is named per
-  install): close Firefox after its first start, then copy it into the new profile and turn custom stylesheets on:
+- [ ] Firefox `user.js` (Betterfox + overrides), `userChrome.css` and `userContent.css` - not applied by chezmoi
+  on the desktop, since the profile folder is named per install. Start Firefox once, open `about:profiles`
+  and note the **Root Directory** of the profile in use (on the laptop it ended in `.default-default`, not
+  `.default-release`), close Firefox completely, then copy all three:
   ```sh
-  p=$(ls -d ~/.config/mozilla/firefox/*.default-release)
+  # paste the Root Directory from about:profiles
+  p=~/.config/mozilla/firefox/XXXXXXXX.default-default
+  src=$(echo "$(chezmoi source-path)"/dot_config/private_mozilla/private_firefox/*)
   mkdir -p "$p/chrome"
-  cp "$(chezmoi source-path)"/dot_config/private_mozilla/private_firefox/*/chrome/userContent.css "$p/chrome/"
+  cp "$src"/user.js "$p/"
+  cp "$src"/chrome/userChrome.css "$src"/chrome/userContent.css "$p/chrome/"
   ```
-  then in `about:config` set `toolkit.legacyUserProfileCustomizations.stylesheets` to `true` and restart Firefox
+  - `user.js` already turns on `toolkit.legacyUserProfileCustomizations.stylesheets`, so there's nothing to
+    set in `about:config`
+  - edit `user.js` for the desktop **before** the next start: delete `user_pref("media.av1.enabled", false);` -
+    that's only for the laptop's GPU, the RX 9070 decodes AV1 in hardware
+  - the `chrome` CSS is only read at startup: make sure `pgrep -a firefox` shows nothing before starting it
+  - check in `about:config`: `browser.contentblocking.category` = `standard`, `media.av1.enabled` = `true`
+  - `userChrome.css` hides the tab bar, so install Sidebery (via Sync) before relying on it
+- [ ] uBlock Origin: Settings → **Restore from file** → the backup in `~/backups` (the settings aren't in Sync)
 - [ ] Vesktop: log in to Discord. Neither the session nor the Vencord settings are in the dotfiles - import them
-  (Settings → Backup & Restore, exported on the laptop) or set them up again
+  from `~/backups` (Settings → Backup & Restore, exported on the laptop in step 0)
 
 ## 8. Audio
 
@@ -746,7 +791,9 @@ Copies live in `~/.config/system-configs` (applied by chezmoi in step 6).
 | `dhcpcd.conf`        | `/etc/dhcpcd.conf`            | template: Cloudflare DNS  |
 | `gamemode.ini`       | `/etc/gamemode.ini`           | set `gpu_device` for this PC (section 11) |
 | `dhcpcd.exit-hook`   | `/etc/dhcpcd.exit-hook`       | sets the fq qdisc on the interface when dhcpcd binds (pairs with BBR in `99-network.conf`) |
-| `99-local.rules`     | `/etc/udev/rules.d/`          | HyperX volume keys ignored by libinput, DualSense hidraw access (`MODE="0666"` - works without elogind's `uaccess`), DualSense touchpad off |
+| `99-local.rules`     | `/etc/udev/rules.d/`          | HyperX volume keys ignored by libinput. **No DualSense lines** - a `MODE="0666"` hidraw rule here would run after `71-dualsense-hide.rules` and reopen the raw controller to games |
+| `71-dualsense-hide.rules` | `/etc/udev/rules.d/`     | raw DualSense nodes root-only (only InputPlumber opens them), hidden from libinput/dwl |
+| `dualsense-no-audio.conf` | `/etc/modprobe.d/`       | `snd_usb_audio` refuses the DualSense's sound card - no audio-device hotplug, no game stutter on replug. Applies after a reboot |
 | `99-nofile.conf`     | `/etc/security/limits.d/`     | raised open-files limit; applies at next login |
 | `inputplumber/*.yaml`| `/etc/inputplumber/devices.d/`| DualSense device config - already restored in step 7 |
 | `60-limine`          | `/etc/kernel.d/post-install/` | `chmod +x`; already in place from step 1 (fetched from the repo) - only for a future reinstall |
@@ -762,8 +809,12 @@ doas cp rc.conf /etc/rc.conf          # KEYMAP already filled in by chezmoi
 doas cp dhcpcd.conf /etc/dhcpcd.conf   # DNS line already filled in by chezmoi
 doas cp gamemode.ini /etc/gamemode.ini # then check gpu_device (section 11)
 doas cp dhcpcd.exit-hook /etc/dhcpcd.exit-hook
-doas cp 99-local.rules /etc/udev/rules.d/
+# 99-local.rules must not contain a DualSense (054c) line - this should print nothing:
+rg -n 054c 99-local.rules
+doas cp 99-local.rules 71-dualsense-hide.rules /etc/udev/rules.d/
 doas udevadm control --reload && doas udevadm trigger
+# takes effect at the next reboot (check then: `doas dmesg | rg 054c` says "device (054c:0ce6) is disabled")
+doas cp dualsense-no-audio.conf /etc/modprobe.d/
 doas cp 99-nofile.conf /etc/security/limits.d/
 # apply them: the firewall, DNS + qdisc, and sysctls
 doas sv restart nftables dhcpcd
@@ -789,6 +840,10 @@ Not backed up on purpose (machine-specific): `/etc/fstab`.
   - mpv (`~/.config/mpv/mpv.conf`): `gpu-api=vulkan`, heavier scalers, add `av1` to `hwdec-codecs`, and loosen
     `ytdl-format` - the laptop caps YouTube at VP9 because its decoder can't do AV1, the RX 9070 can
     (`vainfo` lists what the GPU decodes)
+  - Vesktop wrapper (`~/.local/bin/vesktop`): hardware *encoding* is disabled
+    (`--disable-features=AcceleratedVideoEncoder,VaapiVideoEncoder`). The RX 9070 encodes H.264/HEVC/AV1, so
+    optionally drop that line and add `AcceleratedVideoEncoder` to `--enable-features`, then test a 1440p 60 stream;
+    put the line back if streams look worse or won't start
   - so chezmoi doesn't overwrite these with the laptop's values (or `re-add` the desktop's values back to the
     laptop): template the hardware lines on `.chezmoi.hostname`, or list the files in `.chezmoiignore`
     for `void-desktop` once they're edited
@@ -823,7 +878,16 @@ Not backed up on purpose (machine-specific): `/etc/fstab`.
   `doas fstrim -av` (trims every mounted filesystem that supports it and shows how much)
 - [ ] kernel options (in the Limine hook): `loglevel=4 nowatchdog mitigations=off ipv6.disable=1`
 - [ ] optional, test before keeping: sched_ext scheduler (the `scx` package, e.g. `scx_lavd`) - compare frame
-  times with MangoHud with and without it; only keep it if it measurably helps
+  times with MangoHud with and without it; only keep it if it measurably helps.
+  **On the laptop (Oct 2026) `scx_lavd` 1.1.3 froze the whole system on mainline 7.2** with both `--autopower`
+  and `--autopilot` (`sched_ext: ... disabled (runnable task stall)` in the kernel log) - the `scx` package was
+  older than the kernel's sched_ext interface. So:
+  - only try it once its output no longer shows `member ... not found in kernel` and the kernel log no
+    longer shows `sched_ext: Writing directly to p->scx.slice/dsq_vtime is deprecated`
+  - test by hand first (`doas scx_lavd --autopilot` in a terminal, Ctrl+C to stop) - **not** as a runit
+    service: a stalled scheduler gets kicked out once, but runit restarts it straight away and it freezes again
+  - check afterwards: `doas dmesg | rg 'runnable task stall'`
+  - the 7800X3D has a single CCD, so the "AMD 3D V-Cache optimizer" from CachyOS's wiki doesn't apply
 - [ ] move the backup off the SATA SSD: mount it with your ownership, upload the phone photos (~50 GB) and
   anything else to the uni Google Drive from Firefox, copy the rest into `~`, then unmount:
   ```sh
