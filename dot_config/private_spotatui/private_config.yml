@@ -54,6 +54,7 @@ behavior:
   enable_discord_rpc: false
   discord_rpc_client_id: null
   enable_announcements: false
+  enable_lyrics: false
   announcement_feed_url: null
   enable_monthly_recap_prompt: false
   pin_community_playlist: false
@@ -70,8 +71,20 @@ behavior:
   startup_behavior: continue
   disable_auto_update: true
   auto_update_delay: '0'
+  draw_cover_art: false
+  draw_cover_art_forced: false
+  playbar_cover_art_size_percent: 100
+  cover_art_theme: false
+  cover_art_dither: false
+  cover_art_dither_algorithm: stucki
+  cover_art_dither_pixel_scale: 1
   keepawake_enabled: true
   enable_media_keys: false
+  enable_streaming: true
+  streaming_device_name: spotatui
+  streaming_bitrate: 320
+  streaming_audio_cache: true
+  streaming_autoplay: false
   sync_token: null
   local_music_path: /home/bradley/Music
   subsonic_url: null
