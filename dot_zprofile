@@ -1,7 +1,7 @@
 # ~/.zprofile configuration
 
 typeset -U path
-path=(~/.local/bin ~/.spicetify ~/.cargo/bin $path)
+path=(~/.local/bin ~/.cargo/bin $path)
 
 export NO_AT_BRIDGE=1
 export GTK_A11Y=none
