@@ -18,7 +18,7 @@ Repos:
 
 Do these first, then keep this checklist open on the laptop while installing on the PC.
 
-Last updated: 18 Oct 2026.
+Last updated: 21 Oct 2026.
 
 ### Right before the install
 - [ ] refresh the lists, pull in any config changes made since, and push:
@@ -30,6 +30,13 @@ Last updated: 18 Oct 2026.
   chezmoi git -- status
   chezmoi git -- commit -m "Refresh before desktop install" && chezmoi git -- push
   ```
+- [ ] check the Limine kernel hook is in the pushed repo - step 1 fetches it straight from GitHub
+  (it should print `200`):
+  ```sh
+  curl -fsI https://raw.githubusercontent.com/bradleycross07/dot_files/void-linux/dot_config/system-configs/executable_60-limine | head -1
+  ```
+- [ ] add `.config/Aurelia/config.json` to the `void-desktop` part of `.chezmoiignore`: it holds the laptop's
+  game library path, and the desktop's library is `~/Games/Aurelia` (set on first run - step 4)
 - [ ] dwl: bring the `desktop` branch up to date with everything merged into `main` since it was created
   (e.g. `cursorsize`), then push it - step 4 clones it fresh:
   ```sh
@@ -41,8 +48,8 @@ Last updated: 18 Oct 2026.
   # back to main, or the laptop's next `make` builds the desktop config
   git switch main
   ```
-- [ ] export the settings that aren't in the dotfiles or Firefox Sync onto the Ventoy USB (next to the SSH key,
-  saves and spotatui credentials - step 4):
+- [ ] export the settings that aren't in the dotfiles or Firefox Sync onto the Ventoy USB (next to the SSH key
+  and saves - step 4):
   - uBlock Origin: Settings → **Back up to file** (filter lists, `no-cosmetic-filtering` rules, settings)
   - Vencord: Vesktop → Settings → **Backup & Restore** → export
   - put both files in a `backups/` folder on the USB
@@ -163,12 +170,14 @@ With the new root mounted at `/mnt`:
 ```sh
 mkdir -p /mnt/etc/xbps.d
 printf 'ignorepkg=linux\nignorepkg=linux-headers\n' > /mnt/etc/xbps.d/mainline.conf
-printf 'ignorepkg=linux-firmware-nvidia\nignorepkg=linux-firmware-intel\n' \
+printf 'ignorepkg=linux-firmware-nvidia\nignorepkg=linux-firmware-intel\nignorepkg=linux-firmware-broadcom\n' \
     > /mnt/etc/xbps.d/ignore.conf
 ```
 
-(`mainline.conf`: `linux-mainline` replaces the plain `linux` kernel. `ignore.conf`: Intel and NVIDIA
-firmware are ignored, as this is an AMD-only system (GPU and CPU); `linux-firmware-network` covers the rest.)
+(`mainline.conf`: `linux-mainline` replaces the plain `linux` kernel. `ignore.conf`: Intel, NVIDIA and Broadcom
+firmware are ignored, as this is an AMD-only system (GPU and CPU) with no Broadcom network chip;
+`linux-firmware-network` covers the rest. One package per `ignorepkg=` line - xbps reads a comma-separated list
+as a single package name and ignores none of them.)
 
 ### Install the base system
 
@@ -178,7 +187,7 @@ Copy the live system's xbps signing keys first, so the new root trusts the repo,
 mkdir -p /mnt/var/db/xbps/keys && cp /var/db/xbps/keys/* /mnt/var/db/xbps/keys/
 
 XBPS_ARCH=x86_64 xbps-install -S -r /mnt -R https://repo-de.voidlinux.org/current \
-    base-minimal linux-mainline dracut eudev kmod \
+    base-minimal linux-mainline linux-mainline-headers dracut eudev kmod \
     e2fsprogs kbd ncurses iproute2 iputils \
     dhcpcd dbus opendoas zsh openssh less pciutils usbutils file acpid \
     linux-firmware-amd linux-firmware-network dosfstools seatd
@@ -258,13 +267,17 @@ efibootmgr --create --disk /dev/nvme0n1 --part 1 \
 Copy `BOOTX64.EFI` again whenever the `limine` package updates.
 
 Kernel hook: Void's `limine` package doesn't update `limine.conf` and Limine has no wildcards, so this rewrites
-it after every kernel install (the new kernel first, the previous one as a fallback entry). Fetch it from the
-dotfiles (added in step 0):
+it from the kernels in `/boot` (the newest first, the one before it as a fallback entry; a kernel without an
+initramfs is skipped). It runs on kernel removal too, so `vkpurge` can't leave an entry pointing at a deleted
+kernel. Fetch it from the dotfiles (checked in step 0):
 
 ```sh
-mkdir -p /etc/kernel.d/post-install && cd /etc/kernel.d/post-install
+mkdir -p /etc/kernel.d/post-install /etc/kernel.d/post-remove
+cd /etc/kernel.d/post-install
 xbps-uhelper fetch https://raw.githubusercontent.com/bradleycross07/dot_files/void-linux/dot_config/system-configs/executable_60-limine
 mv executable_60-limine 60-limine && chmod +x 60-limine
+# the same script on removal (it checks which folder it was run from)
+ln -s ../post-install/60-limine ../post-remove/60-limine
 cat 60-limine
 ```
 
@@ -305,8 +318,9 @@ the clone, and the repo is public, so no SSH key is needed for this:
 # delta is .gitconfig's pager
 doas xbps-install -S void-repo-nonfree git chezmoi delta
 chezmoi init --branch void-linux https://github.com/bradleycross07/dot_files.git
-# git identity + commit signing, used by the patches in step 4
-chezmoi apply ~/.gitconfig
+# git identity + commit signing, used by the patches in step 4;
+# cargo config: every Rust build links with mold and tunes for this CPU
+chezmoi apply ~/.gitconfig ~/.cargo/config.toml
 # the laptop's mirrors, for main and nonfree (written by xmirror on the laptop)
 cd "$(chezmoi source-path)/dot_config/system-configs"
 doas cp xbps.d/00-repository-main.conf xbps.d/10-repository-nonfree.conf /etc/xbps.d/
@@ -323,8 +337,7 @@ Don't install on the desktop:
   `xsettingsd`, `polkit-gnome`, `gnome-keyring`, `cliphist`, `sway-audio-idle-inhibit`
   - optional: `wl-clip-persist` keeps the clipboard after the source app closes (no history)
   - add `gnome-keyring` back if signing into apps that need a keyring
-- laptop-only apps: VS Code, ProjectLibre, Vivado, Spotify + Spicetify, and the restricted `discord` package
-  (Vesktop instead)
+- laptop-only apps: VS Code, ProjectLibre, Vivado, and the restricted `discord` package (Vesktop instead)
 
 Packages the later steps rely on (still in the `system-configs` folder, for the font lists):
 
@@ -360,7 +373,7 @@ lazy.nvim bootstraps itself on Neovim's first launch after that.
 
 ## 4. Built from source (`~/.local/src`)
 
-### From the Ventoy USB: SSH key, game saves, spotatui credentials
+### From the Ventoy USB: SSH key, game saves
 
 The SSH key comes first: dwl is a private repo, and the patches below are signed commits.
 
@@ -376,19 +389,30 @@ ssh -T git@github.com
 tar -xzf /mnt/saves/unity3d.tar.gz -C ~
 # Celeste: on the laptop `Saves` linked into the game's install folder; here it's a normal folder
 tar -xzf /mnt/saves/celeste.tar.gz -C ~
-# spotatui's Spotify app credentials (not in the public repo)
-mkdir -p ~/.config/spotatui && cp /mnt/spotatui/client.yml ~/.config/spotatui/
 # uBlock Origin + Vencord backups (exported in step 0), restored from Firefox/Vesktop in step 7
 mkdir -p ~/backups && cp /mnt/backups/* ~/backups/
-# once ssh -T has greeted you: the key and credentials don't stay on the USB
-rm -r /mnt/ssh-key /mnt/spotatui
+# once ssh -T has greeted you: the key doesn't stay on the USB
+rm -r /mnt/ssh-key
 doas umount /mnt
 ```
 
 ### Rust builds
 
-Rust builds use mold and native CPU tuning from the command line (not `~/.cargo/config.toml`). The binaries go in
-`~/.local/bin`, which `.zprofile` puts on `PATH` from step 6:
+Rust builds use mold and native CPU tuning from `~/.cargo/config.toml` (applied in step 2), so a plain
+`cargo build --release` is enough - no `RUSTFLAGS`, which would replace those settings rather than add to them.
+
+Aurelia, spotatui and InputPlumber each also have a `.cargo/config.toml` inside their repo folder (in the
+dotfiles, kept out of the projects' own git): release builds use thin LTO and 16 codegen units instead of the
+slow single-core link at the end. Apply each one **right after** cloning - if chezmoi created the folder first,
+`git clone` would refuse to clone into it - and hide it from that repo's git:
+
+```sh
+# after `git clone ... ~/.local/src/<name>`:
+chezmoi apply ~/.local/src/<name>/.cargo/config.toml
+echo ".cargo/" >> ~/.local/src/<name>/.git/info/exclude
+```
+
+The binaries go in `~/.local/bin`, which `.zprofile` puts on `PATH` from step 6:
 
 ```sh
 mkdir -p ~/.local/bin
@@ -460,13 +484,15 @@ so treat it as per-game.
   (if `git am` stops on a conflict because upstream changed, fix the file, `git add` it, then `git am --continue`):
   ```sh
   git clone https://github.com/Drackrath/Aurelia.git ~/.local/src/Aurelia
+  chezmoi apply ~/.local/src/Aurelia/.cargo/config.toml
+  echo ".cargo/" >> ~/.local/src/Aurelia/.git/info/exclude
   cd ~/.local/src/Aurelia
   git checkout -b local
   git am "$(chezmoi source-path)"/patches/aurelia/*.patch
   ```
-- build for the fastest binary (tuned for this CPU, linked with mold), install, then clean:
+- build (tuned for this CPU and linked with mold, via `~/.cargo/config.toml`), install, then clean:
   ```sh
-  RUSTFLAGS="-C target-cpu=native -C link-arg=-fuse-ld=mold" cargo build --release
+  cargo build --release
   cp target/release/aurelia ~/.local/bin/
   cargo clean
   ```
@@ -474,7 +500,8 @@ so treat it as per-game.
   the desktop builds its own binary). `update-aurelia` from the dotfiles handles later updates.
 - game library: `~/Games/Aurelia` - don't install games until the SATA SSD is formatted and mounted on `~/Games`
   (end of section 11); anything installed there before would end up on the NVMe, hidden under the mount.
-  Aurelia's `config.json` isn't in the dotfiles, so set the library path to `~/Games/Aurelia` on first run
+  Aurelia's `config.json` is in the dotfiles but skipped on the desktop (`.chezmoiignore`, step 0) - it has the
+  laptop's library path - so set the library path to `~/Games/Aurelia` on first run
 - launch scripts (`~/.config/Aurelia/scripts/<appid>.sh`) come with the dotfiles; adjust them for this
   monitor in section 11. Any script with a hard-coded game path needs pointing at `~/Games/Aurelia` instead:
   ```sh
@@ -492,17 +519,31 @@ so treat it as per-game.
 - set DPI and polling rate in RazerGenie; the daemon remembers them
 
 ### spotatui
-- needs `rust cargo mold` plus the build dependencies from its README (the laptop's package list has them)
-- clone, restore the local patches, build:
+- build dependencies:
   ```sh
-  git clone https://github.com/LargeModGames/spotatui.git ~/.local/src/spotatui
+  doas xbps-install -S rust cargo mold pkg-config alsa-lib-devel dbus-devel openssl-devel
+  ```
+- clone the private repo (its `local` branch is the latest release plus the local patches), and add upstream
+  for updates - the same remotes as on the laptop:
+  ```sh
+  git clone -b local git@github.com:bradleycross07/spotatui-local.git ~/.local/src/spotatui
+  chezmoi apply ~/.local/src/spotatui/.cargo/config.toml
+  echo ".cargo/" >> ~/.local/src/spotatui/.git/info/exclude
   cd ~/.local/src/spotatui
-  git checkout -b local
-  git am "$(chezmoi source-path)"/patches/spotatui/*.patch
-  RUSTFLAGS="-C target-cpu=native -C link-arg=-fuse-ld=mold" cargo build --release
+  git remote add upstream https://github.com/LargeModGames/spotatui.git
+  git fetch upstream --tags
+  ```
+- build with only the features in use (`self-update` would replace the patched binary with an official
+  release; the macOS/Windows media features don't build on Linux anyway), install, clean:
+  ```sh
+  cargo build --release --no-default-features --features tui,streaming,discord-rpc,mpris,cover-art,scripting
   cp target/release/spotatui ~/.local/bin/
   cargo clean
   ```
+- first launch: log in to Spotify in the browser it opens. Since v0.46 spotatui talks to Spotify through its own
+  session, so there's no `client.yml` or app credentials to copy
+- updates: `git fetch upstream --tags`, `git rebase <new tag>`, build as above, then
+  `git push --force-with-lease origin local`
 - zsh completion: `_spotatui` comes with the dotfiles in `~/.local/share/zsh/site-functions`, which `.zshrc`
   adds to `fpath`
 
@@ -539,23 +580,33 @@ so treat it as per-game.
   `x-scheme-handler/discord=Vesktop.desktop` make it open `discord://` links (database refreshed in step 6)
 
 ### InputPlumber
-- build dependencies. `clang` alone isn't enough: bindgen looks for the unversioned `libclang.so`, which only
-  the matching `clang<N>-devel` package provides (it was `clang21-devel` on the laptop - check the number with
-  `xbps-query clang` / `xbps-query -Rs clang` first):
+- build dependencies. bindgen needs libclang, but not the whole clang toolchain: `libclang<N>` alone (~35 MB) is
+  enough, where N is the LLVM version Mesa already pulls in, so no second LLVM gets installed. It only ships
+  versioned files (`libclang.so.22.1`), so the dotfiles carry a `~/.local/lib/libclang/libclang.so` symlink, and
+  InputPlumber's `.cargo/config.toml` points bindgen at it (`LIBCLANG_PATH`) and at clang's built-in headers
+  (`BINDGEN_EXTRA_CLANG_ARGS`). libiio isn't needed since v0.82.0:
   ```sh
-  doas xbps-install -S rust cargo clang clang21-devel pkg-config eudev-libudev-devel libiio-devel
+  N=$(xbps-query -x mesa-libgallium | sed -n 's/^libllvm\([0-9]*\).*/\1/p')
+  # 22 in Oct 2026 - if it's changed, bump the 22s in the symlink and in .cargo/config.toml first (laptop too)
+  echo "$N"
+  doas xbps-install -S rust cargo pkg-config eudev-libudev-devel libclang$N
   ```
-- clone, build as your user, install as root (building with doas would make cargo run as root):
+- clone, add the build config and the symlink, build as your user, install as root (building with doas would
+  make cargo run as root):
   ```sh
   git clone https://github.com/ShadowBlip/InputPlumber.git ~/.local/src/InputPlumber
+  chezmoi apply ~/.local/src/InputPlumber/.cargo/config.toml ~/.local/lib/libclang/libclang.so
+  echo ".cargo/" >> ~/.local/src/InputPlumber/.git/info/exclude
   cd ~/.local/src/InputPlumber
   make build
   doas make install PREFIX=/usr
   # the install also drops systemd units, which do nothing on Void
   doas rm /usr/lib/systemd/system/inputplumber*.service
   ```
-  (if the build ever stops on `couldn't find any valid shared libraries matching: ['libclang.so'...]`, the
-  `clang<N>-devel` version doesn't match - `find /usr/lib -name 'libclang*.so*'` shows which one is installed)
+  (if the build stops on `couldn't find any valid shared libraries matching: ['libclang.so'...]`, the symlink
+  points at a libclang version that isn't installed - check with `ls -l ~/.local/lib/libclang/`; if it stops on
+  `'stddef.h' file not found`, the `-resource-dir` path in `.cargo/config.toml` doesn't match - the right folder
+  is the one above `include` in `xbps-query -f clang$N-headers | rg '/stddef\.h$'`)
 - its install adds udev rules, hwdb entries and a D-Bus system policy, which only take effect once reloaded:
   ```sh
   doas udevadm hwdb --update && doas udevadm control --reload && doas udevadm trigger
@@ -563,19 +614,6 @@ so treat it as per-game.
   doas sv reload dbus
   ```
 - its DualSense config and runit service come from the dotfiles - restored in step 7
-
-### Spotify (optional - not planned)
-spotatui is the Spotify client on the desktop, so neither the official app nor Spicetify is installed. If Premium
-offline downloads are ever needed (only the official app does them), build it from void-packages as on the laptop:
-```sh
-git clone https://github.com/void-linux/void-packages.git ~/.local/src/void-packages
-cd ~/.local/src/void-packages
-./xbps-src binary-bootstrap
-echo XBPS_ALLOW_RESTRICTED=yes >> etc/conf
-./xbps-src pkg spotify && doas xbps-install -R hostdir/binpkgs/nonfree spotify
-```
-(Spicetify and `spotify.desktop` are in `.chezmoiignore` for the desktop - drop the `spotify.desktop` line if
-installing it. `~/.spicetify` on `PATH` in `.zprofile` is harmless when it doesn't exist)
 
 ## 5. Manually installed apps (`~/.local/opt`)
 
@@ -725,15 +763,6 @@ Manual:
 - [ ] EasyEffects is for the mic only: Preferences → Audio → "Process all output streams" **off**,
   "Process all input streams" on (saved in `easyeffects/db/`, so this should already be set). Apps then play
   straight to the headset instead of through `easyeffects_sink`
-- [ ] Vesktop → Settings → Voice & Video: Output Device **Default** (not Easy Effects Sink), Input Device
-  Default or Easy Effects Source. When streaming, the picker's audio settings: Ignore Inputs, Ignore Virtual
-  and Ignore Devices on, Device Selection and Microphone Workaround off
-- [ ] stream audio needs `venmic-fix` (from the dotfiles) after starting each stream: venmic captures each app
-  through a loopback whose target WirePlumber ignores, so the loopback gets your mic instead of the app -
-  viewers hear you twice and none of the app. Start the stream with the app playing, then run `venmic-fix`;
-  check with `pw-link -l | rg -A3 'venmic-loopback-capture'` (the app feeds it, not `easyeffects_source`).
-  After a Vesktop update, test a stream without it first - if the mic is no longer in the loopback, upstream
-  fixed it and the script can go
 
 ## 9. Screen sharing (Vesktop, Firefox, OBS)
 
@@ -809,8 +838,8 @@ Copies live in `~/.config/system-configs` (applied by chezmoi in step 6).
 | `dualsense-no-audio.conf` | `/etc/modprobe.d/`       | `snd_usb_audio` refuses the DualSense's sound card - no audio-device hotplug, no game stutter on replug. Applies after a reboot |
 | `99-nofile.conf`     | `/etc/security/limits.d/`     | raised open-files limit; applies at next login |
 | `inputplumber/*.yaml`| `/etc/inputplumber/devices.d/`| DualSense device config - already restored in step 7 |
-| `60-limine`          | `/etc/kernel.d/post-install/` | `chmod +x`; already in place from step 1 (fetched from the repo) - only for a future reinstall |
-| `xbps.d/*.conf`      | `/etc/xbps.d/`                | mirrors restored in step 2. Don't restore the pins from here: `ignore.conf` is the laptop's (NVIDIA only) - the desktop's are written in step 1 |
+| `60-limine`          | `/etc/kernel.d/post-install/` | `chmod +x`, plus a symlink to it in `post-remove/`; already in place from step 1 (fetched from the repo) - only for a future reinstall |
+| `xbps.d/*.conf`      | `/etc/xbps.d/`                | mirrors restored in step 2. The pins (`ignore.conf`, `mainline.conf`) were already written in step 1, before anything was installed - nothing to restore |
 
 ```sh
 cd ~/.config/system-configs
@@ -956,7 +985,8 @@ doas xbps-install -S gsettings-desktop-schemas dconf
   gsettings set org.gnome.desktop.interface icon-theme 'Papirus-Dark'
   gsettings set org.gnome.desktop.interface cursor-theme 'Bibata-Modern-Classic'
   gsettings set org.gnome.desktop.interface cursor-size 32
-  gsettings set org.gnome.desktop.interface font-name 'DepartureMono Nerd Font Mono 16.5'
+  # the interface font (Pixelify Sans), taken from the GTK settings that came with the dotfiles
+  gsettings set org.gnome.desktop.interface font-name "$(sed -n 's/^gtk-font-name=//p' ~/.config/gtk-3.0/settings.ini)"
   gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
   ```
 - [ ] cursor size 32 also needs the dwl `cursorsize` patch (on the `desktop` branch after the merge in step 0) -

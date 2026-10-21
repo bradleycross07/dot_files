@@ -1,0 +1,55 @@
+#!/bin/sh
+# /etc/kernel.d/post-install/60-limine
+# (also symlinked as /etc/kernel.d/post-remove/60-limine)
+#
+# Rewrites /boot/limine.conf from the kernels actually in /boot: the newest
+# first, the one before it as a fallback. Running on removal too keeps the
+# menu from pointing at a kernel that vkpurge or xbps-remove just deleted.
+#
+# xbps runs kernel hooks from the root directory with $1 = package name and
+# $2 = kernel version. 20-dracut runs first, so the new initramfs exists here.
+#
+# Needs the ESP mounted at /boot: Limine only reads FAT, and boot():/ is the
+# partition Limine itself was started from.
+
+VERSION="$2"
+
+# On removal, leave out the kernel being removed even if its files linger.
+case "$0" in
+    */post-remove/*) SKIP="$VERSION" ;;
+    *) SKIP="" ;;
+esac
+
+ROOT_UUID=$(findmnt -no UUID -T .)
+CMDLINE="root=UUID=$ROOT_UUID ro loglevel=4 nowatchdog mitigations=off ipv6.disable=1"
+
+# Kernels that have both an image and an initramfs, newest first.
+KERNELS=$(for k in boot/vmlinuz-*; do
+              [ -e "$k" ] || continue
+              v=${k#boot/vmlinuz-}
+              [ "$v" = "$SKIP" ] && continue
+              [ -f "boot/initramfs-$v.img" ] && echo "$v"
+          done | sort -rV)
+NEWEST=$(printf '%s\n' "$KERNELS" | sed -n 1p)
+PREV=$(printf '%s\n' "$KERNELS" | sed -n 2p)
+
+# Never write an unbootable config: keep the old one if anything is missing.
+if [ -z "$ROOT_UUID" ] || [ -z "$NEWEST" ]; then
+    echo "60-limine: no root UUID or bootable kernel found - limine.conf not updated" >&2
+    exit 1
+fi
+
+# One boot menu entry: $1 = kernel version, $2 = title.
+entry() {
+    printf '\n/Void Linux (%s)\n' "$2"
+    printf '    protocol: linux\n'
+    printf '    path: boot():/vmlinuz-%s\n' "$1"
+    printf '    module_path: boot():/initramfs-%s.img\n' "$1"
+    printf '    cmdline: %s\n' "$CMDLINE"
+}
+
+{
+    printf 'timeout: 3\n'
+    entry "$NEWEST" "$NEWEST"
+    if [ -n "$PREV" ]; then entry "$PREV" "$PREV, previous"; fi
+} > boot/limine.conf.new && mv boot/limine.conf.new boot/limine.conf
