@@ -1,0 +1,18 @@
+{
+  "language": "auto",
+  "ribbonCollapsed": false,
+  "ribbonTab": "view",
+  "showThumbnails": true,
+  "showNotes": false,
+  "sidePaneWidth": 260,
+  "shapeListHeight": 180,
+  "shapeListCollapsed": false,
+  "inspectorCollapsed": false,
+  "fitMode": "page",
+  "embedMaxHeight": 420,
+  "embedControls": true,
+  "exportScale": 2,
+  "exportFolder": "",
+  "includeNotes": true,
+  "includeSourceLink": true
+}

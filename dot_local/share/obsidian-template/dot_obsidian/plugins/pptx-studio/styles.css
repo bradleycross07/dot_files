@@ -1,0 +1,1248 @@
+/* ---------------------------------------------------------------- layout */
+
+/*
+ * The deck view is a column: ribbon, viewer, and nothing else. The viewer takes
+ * whatever is left rather than a fixed height — a percentage here would add up
+ * to more than the pane once the ribbon is above it, and the whole view would
+ * scroll by exactly the ribbon's height.
+ */
+.pptx-view {
+	padding: 0;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+}
+
+.pptx-viewer {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	min-height: 0;
+	outline: none;
+	background: var(--background-secondary);
+}
+
+.pptx-view > .pptx-viewer {
+	flex: 1 1 auto;
+	height: auto;
+}
+
+.pptx-viewer.is-compact {
+	height: 100%;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-s);
+	overflow: hidden;
+}
+
+.pptx-body {
+	display: flex;
+	flex: 1 1 auto;
+	min-height: 0;
+}
+
+/* --------------------------------------------------------------- toolbar */
+
+.pptx-toolbar {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-3);
+	padding: var(--size-4-1) var(--size-4-2);
+	border-bottom: 1px solid var(--background-modifier-border);
+	background: var(--background-primary);
+	flex: 0 0 auto;
+}
+
+.pptx-toolbar-group {
+	display: flex;
+	align-items: center;
+	gap: var(--size-2-1);
+}
+
+.pptx-toolbar-right {
+	margin-left: auto;
+}
+
+.pptx-counter,
+.pptx-zoom-label {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-muted);
+	font-variant-numeric: tabular-nums;
+	min-width: 3.5em;
+	text-align: center;
+	user-select: none;
+}
+
+.pptx-zoom-label {
+	cursor: pointer;
+}
+
+.pptx-zoom-label:hover {
+	color: var(--text-normal);
+}
+
+/* An unsaved deck gets a dot on the save button, the way a dirty tab does. */
+.pptx-save.is-dirty {
+	position: relative;
+	color: var(--text-accent);
+}
+
+.pptx-save.is-dirty::after {
+	content: "";
+	position: absolute;
+	top: 3px;
+	right: 3px;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--text-accent);
+}
+
+/* ----------------------------------------------------------- thumbnails */
+
+.pptx-rail {
+	flex: 0 0 168px;
+	overflow-y: auto;
+	overflow-x: hidden;
+	padding: var(--size-4-2);
+	border-right: 1px solid var(--background-modifier-border);
+	background: var(--background-primary);
+	display: flex;
+	flex-direction: column;
+	gap: var(--size-4-2);
+}
+
+.pptx-thumb {
+	display: flex;
+	gap: var(--size-4-1);
+	align-items: flex-start;
+	cursor: pointer;
+	border-radius: var(--radius-s);
+	padding: 2px;
+}
+
+.pptx-thumb:hover {
+	background: var(--background-modifier-hover);
+}
+
+.pptx-thumb.is-active .pptx-thumb-frame {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: 1px;
+}
+
+.pptx-thumb-number {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-faint);
+	font-variant-numeric: tabular-nums;
+	min-width: 1.6em;
+	text-align: right;
+	padding-top: 2px;
+}
+
+.pptx-thumb-frame {
+	flex: 1 1 auto;
+	position: relative;
+	overflow: hidden;
+	border-radius: 2px;
+	background: var(--background-primary);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+}
+
+.pptx-thumb-frame > * {
+	transform-origin: top left;
+}
+
+/* --------------------------------------------------------------- stage */
+
+.pptx-stage {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: auto;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: var(--size-4-3);
+}
+
+.pptx-viewer.is-compact .pptx-stage {
+	padding: 0;
+}
+
+.pptx-canvas {
+	position: relative;
+	flex: 0 0 auto;
+	margin: auto;
+}
+
+.pptx-slide {
+	transform-origin: top left;
+	box-shadow: 0 2px 14px rgba(0, 0, 0, 0.22);
+	/* Slides carry their own colours; never let the Obsidian theme bleed in. */
+	color-scheme: light;
+}
+
+/* ---------------------------------------------------------------- notes */
+
+.pptx-notes {
+	flex: 0 0 auto;
+	max-height: 30%;
+	overflow-y: auto;
+	padding: var(--size-4-2) var(--size-4-3);
+	border-top: 1px solid var(--background-modifier-border);
+	background: var(--background-primary);
+}
+
+.pptx-notes.is-hidden {
+	display: none;
+}
+
+.pptx-notes-title {
+	font-size: var(--font-ui-smaller);
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--text-faint);
+	margin-bottom: var(--size-4-1);
+}
+
+.pptx-notes-body {
+	white-space: pre-wrap;
+	font-size: var(--font-ui-small);
+	color: var(--text-normal);
+}
+
+.pptx-notes.is-empty .pptx-notes-body {
+	color: var(--text-faint);
+	font-style: italic;
+}
+
+/* -------------------------------------------------------------- editing */
+
+/* Clicking selects a shape, so a stray drag must not start a text selection. */
+.pptx-view .pptx-slide {
+	user-select: none;
+}
+
+/* Embeds are read-only; there, selecting text to copy is the useful behaviour. */
+.pptx-viewer.is-compact .pptx-slide {
+	user-select: text;
+}
+
+.pptx-view .pptx-slide [data-selectable="1"] {
+	cursor: move;
+}
+
+.pptx-text[data-editable="1"] {
+	cursor: text;
+}
+
+.pptx-text.is-editing {
+	user-select: text;
+}
+
+.pptx-handle {
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.pptx-text.is-editing {
+	outline: 2px solid #2b7fff;
+	outline-offset: 2px;
+	background: rgba(43, 127, 255, 0.05);
+	z-index: 10;
+}
+
+/*
+ * The caret is drawn outside the slide, in screen pixels, because the slide's
+ * fit-to-pane transform would otherwise scale the browser's own caret down to a
+ * grey hairline. The halo keeps it legible over dark artwork as well as light.
+ */
+.pptx-caret {
+	position: fixed;
+	width: 2px;
+	margin-left: -1px;
+	z-index: 100;
+	pointer-events: none;
+	border-radius: 1px;
+	background: var(--interactive-accent, #2b7fff);
+	box-shadow:
+		0 0 0 1px rgba(255, 255, 255, 0.85),
+		0 0 3px rgba(0, 0, 0, 0.45);
+	animation: pptx-caret-blink 1.06s steps(1, end) infinite;
+}
+
+@keyframes pptx-caret-blink {
+	0%,
+	49% {
+		opacity: 1;
+	}
+	50%,
+	100% {
+		opacity: 0;
+	}
+}
+
+.pptx-bullet {
+	cursor: default;
+}
+
+/* ------------------------------------------------------------- messages */
+
+.pptx-message {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	gap: var(--size-4-2);
+	align-items: center;
+	justify-content: center;
+	min-height: 0;
+	padding: var(--size-4-6);
+	color: var(--text-muted);
+	text-align: center;
+}
+
+.pptx-error-title {
+	font-weight: var(--font-semibold);
+	color: var(--text-normal);
+}
+
+.pptx-error-detail {
+	font-size: var(--font-ui-small);
+	max-width: 42em;
+}
+
+/* --------------------------------------------------------------- embeds */
+
+.pptx-embed {
+	display: block;
+	margin: var(--size-4-3) 0;
+	resize: vertical;
+	overflow: hidden;
+	min-height: 120px;
+}
+
+/* --------------------------------------------------------------- ribbon */
+
+.pptx-ribbon {
+	flex: 0 0 auto;
+	background: var(--background-primary);
+	border-bottom: 1px solid var(--background-modifier-border);
+	user-select: none;
+}
+
+.pptx-ribbon-tabs {
+	display: flex;
+	gap: 2px;
+	padding: 4px 6px 0;
+	border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.pptx-ribbon-tab {
+	appearance: none;
+	background: transparent;
+	border: none;
+	border-bottom: 2px solid transparent;
+	border-radius: var(--radius-s) var(--radius-s) 0 0;
+	padding: 4px 12px;
+	font-size: var(--font-ui-small);
+	color: var(--text-muted);
+	cursor: pointer;
+	box-shadow: none;
+}
+
+.pptx-ribbon-tab:hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+}
+
+.pptx-ribbon-tab.is-active {
+	color: var(--text-normal);
+	border-bottom-color: var(--interactive-accent);
+	font-weight: var(--font-medium);
+}
+
+/*
+ * Every tab is one row of controls plus a group title, so the body's natural
+ * height is the same on all of them and switching tabs moves nothing. Keeping
+ * it automatic rather than pinning a number means a taller control, or a theme
+ * with a larger UI font, grows the ribbon instead of being clipped by it.
+ */
+.pptx-ribbon-body {
+	display: flex;
+	align-items: stretch;
+	gap: 0;
+	padding: 4px 6px;
+	box-sizing: border-box;
+	overflow-x: auto;
+	overflow-y: hidden;
+}
+
+.pptx-ribbon-group {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	padding: 0 8px;
+	min-width: 0;
+}
+
+/*
+ * Groups stay on one row. Wrapping was what made Home — the tab with the most
+ * controls — twice as tall as the others in a narrow pane, so the slide jumped
+ * down every time you switched to it. Sideways scrolling is the trade.
+ */
+.pptx-ribbon-row {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	flex-wrap: nowrap;
+	height: 28px;
+	flex: 0 0 auto;
+}
+
+.pptx-ribbon-group-title {
+	font-size: 10px;
+	color: var(--text-faint);
+	text-align: center;
+	padding-top: 2px;
+	white-space: nowrap;
+}
+
+.pptx-ribbon-divider {
+	width: 1px;
+	background: var(--background-modifier-border);
+	margin: 2px 0 14px;
+	flex: 0 0 auto;
+}
+
+.pptx-ribbon-btn {
+	appearance: none;
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	background: transparent;
+	border: none;
+	box-shadow: none;
+	border-radius: var(--radius-s);
+	padding: 4px 6px;
+	height: 26px;
+	color: var(--text-normal);
+	cursor: pointer;
+	font-size: var(--font-ui-smaller);
+	white-space: nowrap;
+}
+
+.pptx-ribbon-btn:hover {
+	background: var(--background-modifier-hover);
+}
+
+.pptx-ribbon-btn.is-active {
+	background: var(--background-modifier-active-hover, var(--background-modifier-hover));
+	color: var(--text-accent);
+}
+
+.pptx-ribbon-btn.is-disabled {
+	opacity: 0.4;
+	cursor: default;
+}
+
+.pptx-ribbon-btn.is-disabled:hover {
+	background: transparent;
+}
+
+.pptx-ribbon-icon {
+	display: inline-flex;
+	align-items: center;
+}
+
+.pptx-ribbon-icon .svg-icon {
+	width: 16px;
+	height: 16px;
+}
+
+.pptx-ribbon-caret .svg-icon {
+	width: 11px;
+	height: 11px;
+	opacity: 0.6;
+}
+
+.pptx-ribbon-sep {
+	width: 1px;
+	align-self: stretch;
+	background: var(--background-modifier-border);
+	margin: 2px 4px;
+}
+
+.pptx-ribbon-select {
+	height: 26px;
+	font-size: var(--font-ui-smaller);
+	padding: 0 4px;
+}
+
+/* The swatch under a colour button shows what clicking it would apply. */
+.pptx-ribbon-color {
+	flex-direction: column;
+	gap: 1px;
+	padding-bottom: 2px;
+}
+
+.pptx-ribbon-swatch {
+	width: 16px;
+	height: 3px;
+	border-radius: 1px;
+	border: 1px solid var(--background-modifier-border);
+}
+
+.pptx-ribbon-swatch.is-none {
+	background: repeating-linear-gradient(
+		45deg,
+		var(--background-primary) 0 2px,
+		var(--text-faint) 2px 3px
+	);
+}
+
+.pptx-color-popup {
+	background: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	box-shadow: var(--shadow-s);
+	padding: 8px;
+	z-index: var(--layer-menu);
+}
+
+.pptx-color-grid {
+	display: grid;
+	grid-template-columns: repeat(5, 20px);
+	gap: 4px;
+}
+
+.pptx-color-cell {
+	width: 20px;
+	height: 20px;
+	border-radius: 3px;
+	border: 1px solid var(--background-modifier-border);
+	cursor: pointer;
+}
+
+.pptx-color-cell:hover {
+	outline: 2px solid var(--interactive-accent);
+	outline-offset: 1px;
+}
+
+.pptx-color-option {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-top: 6px;
+	padding: 4px;
+	border-radius: var(--radius-s);
+	font-size: var(--font-ui-smaller);
+	cursor: pointer;
+}
+
+.pptx-color-option:hover {
+	background: var(--background-modifier-hover);
+}
+
+/* ----------------------------------------------------------- status bar */
+
+.pptx-statusbar {
+	display: flex;
+	align-items: center;
+	gap: var(--size-4-2);
+	padding: 2px var(--size-4-2);
+	border-top: 1px solid var(--background-modifier-border);
+	background: var(--background-primary);
+	flex: 0 0 auto;
+}
+
+.pptx-suggest-note {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-faint);
+}
+
+/* Find and replace results. */
+.pptx-find-results {
+	max-height: 18em;
+	overflow-y: auto;
+	margin-top: var(--size-4-2);
+}
+
+.pptx-find-count {
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+	padding: var(--size-4-1) 0;
+}
+
+.pptx-find-hit {
+	padding: var(--size-4-1) var(--size-4-2);
+	border-radius: var(--radius-s);
+	cursor: pointer;
+}
+
+.pptx-find-hit:hover {
+	background: var(--background-modifier-hover);
+}
+
+.pptx-find-where {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-faint);
+}
+
+.pptx-find-line {
+	font-size: var(--font-ui-small);
+	white-space: pre-wrap;
+	word-break: break-word;
+}
+
+/* Marquee and multi-selection outlines. */
+.pptx-marquee {
+	pointer-events: none;
+}
+
+/* A contextual tab disappears when it no longer applies to the selection. */
+.pptx-ribbon-tab.is-hidden {
+	display: none;
+}
+
+.pptx-ribbon-number {
+	display: inline-flex;
+	align-items: center;
+	gap: 3px;
+	padding: 0 2px;
+}
+
+.pptx-ribbon-number-label {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-faint);
+	min-width: 1em;
+	text-align: right;
+}
+
+.pptx-ribbon-number input {
+	height: 24px;
+	font-size: var(--font-ui-smaller);
+	padding: 0 4px;
+}
+
+/* Table cells picked out for row, column and merge commands. */
+.pptx-cell-selected {
+	outline: 2px solid var(--interactive-accent, #2f6fed);
+	outline-offset: -2px;
+	background-image: linear-gradient(rgba(47, 111, 237, 0.14), rgba(47, 111, 237, 0.14));
+}
+
+/* Dragging a thumbnail to reorder the deck. */
+.pptx-thumb.is-dragging {
+	opacity: 0.4;
+}
+
+.pptx-thumb.is-drop-before {
+	box-shadow: inset 0 2px 0 0 var(--interactive-accent);
+}
+
+.pptx-thumb.is-drop-after {
+	box-shadow: inset 0 -2px 0 0 var(--interactive-accent);
+}
+
+.pptx-rotate:active {
+	cursor: grabbing;
+}
+
+/* --------------------------------------------------------------- rulers */
+
+.pptx-canvas-area {
+	position: relative;
+	flex: 1 1 auto;
+	min-width: 0;
+	display: flex;
+}
+
+.pptx-ruler {
+	position: absolute;
+	background: var(--background-primary);
+	color: var(--text-faint);
+	font-size: 9px;
+	z-index: 5;
+	overflow: hidden;
+	user-select: none;
+	touch-action: none;
+}
+
+.pptx-ruler-h {
+	top: 0;
+	left: 18px;
+	right: 0;
+	height: 18px;
+	border-bottom: 1px solid var(--background-modifier-border);
+	cursor: row-resize;
+}
+
+.pptx-ruler-v {
+	top: 18px;
+	left: 0;
+	bottom: 0;
+	width: 18px;
+	border-right: 1px solid var(--background-modifier-border);
+	cursor: col-resize;
+}
+
+.pptx-ruler-tick {
+	position: absolute;
+}
+
+.pptx-ruler-h .pptx-ruler-tick {
+	top: 0;
+	bottom: 0;
+	border-left: 1px solid var(--background-modifier-border);
+	padding-left: 2px;
+}
+
+.pptx-ruler-v .pptx-ruler-tick {
+	left: 0;
+	right: 0;
+	border-top: 1px solid var(--background-modifier-border);
+	padding-left: 2px;
+}
+
+.pptx-ruler-label {
+	display: block;
+	line-height: 1.4;
+	font-variant-numeric: tabular-nums;
+}
+
+.pptx-stage.has-rulers {
+	padding-top: calc(18px + var(--size-4-3));
+	padding-left: calc(18px + var(--size-4-3));
+}
+
+/* Guides are drawn inside the slide so they scale with it. */
+.pptx-user-guides {
+	mix-blend-mode: normal;
+}
+
+/* ------------------------------------------------------- selection pane */
+
+/*
+ * The strip you drag to widen the side pane. The pane's own left border is the
+ * line that is seen; this sits beside it purely to be grabbed, and only tints
+ * itself once the pointer is on it.
+ */
+.pptx-side-resizer {
+	flex: 0 0 5px;
+	cursor: col-resize;
+	background: transparent;
+	transition: background 100ms ease-out;
+}
+
+.pptx-side-resizer:hover,
+.pptx-side-resizer.is-dragging {
+	background: var(--interactive-accent);
+}
+
+/* The shape list on top, the inspector below it; each scrolls on its own. */
+.pptx-side {
+	display: flex;
+	flex-direction: column;
+	flex: 0 0 260px;
+	/* The width is set on the element by the divider drag, so never grow past it. */
+	max-width: 100%;
+	border-left: 1px solid var(--background-modifier-border);
+	background: var(--background-primary);
+	overflow: hidden;
+	min-height: 0;
+}
+
+.pptx-selection-pane {
+	display: flex;
+	flex-direction: column;
+	/* Its height is whatever the divider between the two sections was left at. */
+	flex: 0 0 auto;
+	min-height: 0;
+}
+
+/* With the inspector folded away, the list takes everything that is left. */
+.pptx-selection-pane.is-flexible {
+	flex: 1 1 auto;
+}
+
+.pptx-selection-pane.is-collapsed,
+.pptx-inspector-pane.is-collapsed {
+	flex: 0 0 auto;
+}
+
+.pptx-selection-pane.is-collapsed .pptx-pane-list,
+.pptx-inspector-pane.is-collapsed .pptx-inspector-body {
+	display: none;
+}
+
+/* The line between the two sections; the inspector's own border is what shows. */
+.pptx-pane-splitter {
+	flex: 0 0 5px;
+	cursor: row-resize;
+	background: transparent;
+	transition: background 100ms ease-out;
+}
+
+.pptx-pane-splitter:hover,
+.pptx-pane-splitter.is-dragging {
+	background: var(--interactive-accent);
+}
+
+.pptx-pane-splitter.is-hidden {
+	display: none;
+}
+
+.pptx-inspector-pane {
+	display: flex;
+	flex-direction: column;
+	flex: 1 1 auto;
+	min-height: 0;
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+.pptx-pane-copy {
+	padding: 2px;
+}
+
+.pptx-pane-copy .svg-icon {
+	width: 14px;
+	height: 14px;
+}
+
+/* Values are here to be read off and pasted into a script, so let them select. */
+.pptx-inspector-body {
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow-y: auto;
+	padding: 0 var(--size-4-2) var(--size-4-2);
+	user-select: text;
+}
+
+.pptx-props {
+	display: flex;
+	flex-direction: column;
+}
+
+.pptx-prop {
+	display: flex;
+	gap: 6px;
+	font-size: var(--font-ui-smaller);
+	line-height: 1.55;
+}
+
+.pptx-prop-key {
+	flex: 0 0 36%;
+	color: var(--text-faint);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.pptx-prop-value {
+	flex: 1 1 auto;
+	min-width: 0;
+	font-family: var(--font-monospace);
+	word-break: break-word;
+}
+
+.pptx-prop-value.is-editable {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: baseline;
+	gap: 1px 4px;
+}
+
+/* A field that reads as text until you click it, so the pane stays a readout. */
+.pptx-prop-input {
+	/* The EMU note drops to its own line rather than squeezing the field. */
+	flex: 1 1 70px;
+	min-width: 0;
+	height: 20px;
+	padding: 0 3px;
+	background: transparent;
+	border: 1px solid transparent;
+	border-radius: var(--radius-s);
+	font-family: var(--font-monospace);
+	font-size: var(--font-ui-smaller);
+	color: var(--text-normal);
+}
+
+.pptx-prop-input:hover {
+	border-color: var(--background-modifier-border);
+}
+
+.pptx-prop-input:focus {
+	border-color: var(--interactive-accent);
+	background: var(--background-primary);
+	outline: none;
+}
+
+.pptx-prop-note {
+	flex: 0 0 auto;
+	color: var(--text-faint);
+	font-size: 10px;
+	white-space: nowrap;
+}
+
+.pptx-pane-note {
+	margin-top: var(--size-4-1);
+	font-size: var(--font-ui-smaller);
+	color: var(--text-faint);
+}
+
+.pptx-xml {
+	margin: var(--size-4-2) 0 0;
+	padding: var(--size-4-1);
+	background: var(--background-secondary);
+	border-radius: var(--radius-s);
+	font-size: 11px;
+	line-height: 1.4;
+	white-space: pre;
+	overflow: auto;
+	max-height: 46vh;
+	tab-size: 2;
+}
+
+/* The whole bar folds the section, so it reads and behaves as one control. */
+.pptx-pane-title {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: var(--font-ui-smaller);
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--text-faint);
+	padding: var(--size-4-2) var(--size-4-2) var(--size-4-1);
+	cursor: pointer;
+	user-select: none;
+}
+
+.pptx-pane-title:hover {
+	color: var(--text-muted);
+}
+
+.pptx-pane-heading {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.pptx-pane-chevron {
+	display: inline-flex;
+	align-items: center;
+}
+
+.pptx-pane-chevron .svg-icon {
+	width: 12px;
+	height: 12px;
+}
+
+.pptx-pane-list {
+	flex: 1 1 auto;
+	overflow-y: auto;
+	padding: 0 var(--size-4-1) var(--size-4-2);
+}
+
+.pptx-pane-row {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	padding: 2px 4px;
+	border-radius: var(--radius-s);
+	cursor: pointer;
+	font-size: var(--font-ui-smaller);
+}
+
+.pptx-pane-row:hover {
+	background: var(--background-modifier-hover);
+}
+
+.pptx-pane-row.is-selected {
+	background: var(--background-modifier-active-hover, var(--background-modifier-hover));
+	color: var(--text-accent);
+}
+
+.pptx-pane-row.is-hidden .pptx-pane-name {
+	opacity: 0.45;
+	font-style: italic;
+}
+
+.pptx-pane-name {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.pptx-pane-eye .svg-icon,
+.pptx-pane-move .svg-icon {
+	width: 14px;
+	height: 14px;
+}
+
+.pptx-pane-move,
+.pptx-pane-eye {
+	opacity: 0.55;
+	flex: 0 0 auto;
+	padding: 1px;
+}
+
+.pptx-pane-row:hover .pptx-pane-move,
+.pptx-pane-row:hover .pptx-pane-eye {
+	opacity: 1;
+}
+
+.pptx-pane-rename {
+	flex: 1 1 auto;
+	min-width: 0;
+	font-size: var(--font-ui-smaller);
+	height: 20px;
+	padding: 0 4px;
+}
+
+.pptx-pane-empty {
+	padding: var(--size-4-2);
+	color: var(--text-faint);
+	font-size: var(--font-ui-smaller);
+}
+
+/* ---------------------------------------------- ribbon: collapse & compact */
+
+.pptx-ribbon-tabs {
+	position: relative;
+}
+
+.pptx-ribbon-collapse {
+	margin-left: auto;
+	align-self: center;
+	padding: 2px 4px;
+}
+
+.pptx-ribbon-collapse .svg-icon {
+	width: 14px;
+	height: 14px;
+}
+
+/* A contextual tab is tinted so its arrival is noticed. */
+.pptx-ribbon-tab.is-contextual.is-active {
+	border-bottom-color: var(--text-accent);
+	color: var(--text-accent);
+}
+
+/* Narrow panes drop the labels rather than scrolling sideways. */
+.pptx-ribbon.is-compact .pptx-ribbon-label,
+.pptx-ribbon.is-compact .pptx-ribbon-group-title {
+	display: none;
+}
+
+.pptx-ribbon.is-compact .pptx-ribbon-group {
+	padding: 0 4px;
+}
+
+.pptx-ribbon.is-compact .pptx-ribbon-body {
+	padding-bottom: 4px;
+}
+
+/* ----------------------------------------------- floating selection toolbar */
+
+.pptx-context-toolbar {
+	position: fixed;
+	display: flex;
+	align-items: center;
+	gap: 1px;
+	padding: 3px;
+	background: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: var(--radius-m);
+	box-shadow: var(--shadow-s);
+	z-index: var(--layer-popover, 30);
+}
+
+.pptx-ctx-btn {
+	appearance: none;
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 26px;
+	height: 26px;
+	padding: 0;
+	background: transparent;
+	border: none;
+	box-shadow: none;
+	border-radius: var(--radius-s);
+	color: var(--text-normal);
+	cursor: pointer;
+}
+
+.pptx-ctx-btn:hover {
+	background: var(--background-modifier-hover);
+}
+
+.pptx-ctx-btn.is-active {
+	background: var(--background-modifier-active-hover, var(--background-modifier-hover));
+	color: var(--text-accent);
+}
+
+.pptx-ctx-btn .svg-icon {
+	width: 16px;
+	height: 16px;
+}
+
+.pptx-ctx-btn.has-menu::after {
+	content: "";
+	position: absolute;
+	right: 2px;
+	bottom: 2px;
+	border-left: 3px solid transparent;
+	border-top: 3px solid currentColor;
+	opacity: 0.5;
+}
+
+.pptx-ctx-swatch {
+	position: absolute;
+	left: 5px;
+	right: 5px;
+	bottom: 3px;
+	height: 3px;
+	border-radius: 1px;
+	border: 1px solid var(--background-modifier-border);
+}
+
+.pptx-ctx-swatch.is-none {
+	background: repeating-linear-gradient(
+		45deg,
+		var(--background-primary) 0 2px,
+		var(--text-faint) 2px 3px
+	);
+}
+
+.pptx-ctx-sep {
+	width: 1px;
+	align-self: stretch;
+	margin: 2px 3px;
+	background: var(--background-modifier-border);
+}
+
+/* ------------------------------------------------------- canvas feedback */
+
+/* A faint outline on hover says "this is a thing you can pick up". */
+.pptx-view .pptx-slide [data-selectable="1"]:hover {
+	outline: 1px solid rgba(47, 111, 237, 0.45);
+	outline-offset: 0;
+}
+
+.pptx-status {
+	font-size: var(--font-ui-smaller);
+	color: var(--text-faint);
+	margin-left: var(--size-4-2);
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 40%;
+}
+
+/* ---------------------------------------------------------------- motion */
+
+/*
+ * Motion is only used to explain a change: which way the deck moved, that a
+ * slide was added, that a toolbar belongs to the thing under it. Anything that
+ * fires while typing or dragging is deliberately left alone.
+ */
+.pptx-canvas.is-enter-forward {
+	animation: pptx-slide-in-forward 140ms ease-out;
+}
+
+.pptx-canvas.is-enter-back {
+	animation: pptx-slide-in-back 140ms ease-out;
+}
+
+@keyframes pptx-slide-in-forward {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+}
+
+@keyframes pptx-slide-in-back {
+	from {
+		opacity: 0;
+		transform: translateY(-10px);
+	}
+}
+
+.pptx-thumb.is-new .pptx-thumb-frame {
+	animation: pptx-thumb-in 420ms ease-out;
+}
+
+@keyframes pptx-thumb-in {
+	from {
+		opacity: 0;
+		transform: scale(0.9);
+	}
+	60% {
+		outline: 2px solid var(--interactive-accent);
+		outline-offset: 1px;
+	}
+}
+
+.pptx-thumb {
+	transition: background 120ms ease-out;
+}
+
+.pptx-context-toolbar {
+	transition:
+		opacity 110ms ease-out,
+		transform 110ms ease-out;
+}
+
+.pptx-context-toolbar.is-hidden {
+	opacity: 0;
+	transform: translateY(4px);
+	pointer-events: none;
+}
+
+/* Collapsing animates a max-height, since the open height is left automatic. */
+.pptx-ribbon-body {
+	transition:
+		max-height 140ms ease-out,
+		padding 140ms ease-out;
+	max-height: 200px;
+}
+
+.pptx-ribbon.is-collapsed .pptx-ribbon-body {
+	display: flex;
+	max-height: 0;
+	padding-top: 0;
+	padding-bottom: 0;
+	border: none;
+}
+
+.pptx-ribbon-btn,
+.pptx-ctx-btn,
+.pptx-ribbon-tab {
+	transition:
+		background 100ms ease-out,
+		color 100ms ease-out;
+}
+
+/* Someone who has asked for less motion gets none of it. */
+@media (prefers-reduced-motion: reduce) {
+	.pptx-canvas.is-enter-forward,
+	.pptx-canvas.is-enter-back,
+	.pptx-thumb.is-new .pptx-thumb-frame,
+	/* A caret that does not blink is still a caret; it just sits there. */
+	.pptx-caret {
+		animation: none;
+	}
+
+	.pptx-context-toolbar,
+	.pptx-ribbon-body,
+	.pptx-thumb,
+	.pptx-ribbon-btn,
+	.pptx-ctx-btn,
+	.pptx-ribbon-tab {
+		transition: none;
+	}
+}

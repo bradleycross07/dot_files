@@ -1,0 +1,7 @@
+[profile.release]
+lto = "thin"
+codegen-units = 16
+
+[env]
+LIBCLANG_PATH = "/home/bradley/.local/lib/libclang"
+BINDGEN_EXTRA_CLANG_ARGS = "-resource-dir=/usr/lib/llvm/22/lib/clang/22"

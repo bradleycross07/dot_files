@@ -6,5 +6,5 @@
  "export-gtk4-symlinks": true,
  "flatpak-export-gtk-theme-override": false,
  "flatpak-export-icon-theme-override": false,
- "flatpak-install-current-gtk-theme": false
+ "flatpak-install-current-gtk-theme": true
 }

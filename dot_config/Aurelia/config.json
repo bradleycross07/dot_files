@@ -1,0 +1,65 @@
+{
+  "steam_library_path": "/home/bradley/.local/share/Steam",
+  "proton_version": "Proton - Experimental",
+  "chat_presence": "offline",
+  "steam_runtime_runner": "",
+  "steam_prefix_mode": "Shared",
+  "enable_cloud_sync": true,
+  "use_shared_compat_data": false,
+  "windows_steam_discovery_enabled": true,
+  "preferred_launch_options": {},
+  "game_configs": {
+    "339800": {
+      "forced_proton_version": null,
+      "platform_preference": null,
+      "runner": "auto",
+      "pinned_manifests": {
+        "339806": 5887747492570731416
+      },
+      "pinned": true
+    },
+    "504230": {
+      "forced_proton_version": null,
+      "platform_preference": "linux",
+      "runner": "auto",
+      "pinned_manifests": {
+        "504233": 5880027853585448535
+      },
+      "pinned": true
+    },
+    "367520": {
+      "forced_proton_version": null,
+      "platform_preference": null,
+      "runner": "auto",
+      "pinned_manifests": {
+        "367523": 5829533265112705522
+      },
+      "pinned": true
+    },
+    "1030300": {
+      "forced_proton_version": null,
+      "platform_preference": null,
+      "runner": "auto",
+      "pinned_manifests": {
+        "1030303": 7921642076658611197
+      },
+      "pinned": true
+    },
+    "930210": {
+      "forced_proton_version": "Proton 11.0",
+      "platform_preference": null,
+      "runner": "auto",
+      "pinned": false
+    }
+  },
+  "luxtorpeda_enabled": false,
+  "luxtorpeda_path": null,
+  "umu_enabled": false,
+  "umu_path": null,
+  "language": null,
+  "country": null,
+  "proxy": {},
+  "steam_runtime_policy": "Auto",
+  "experimental": false,
+  "encrypt_session": true
+}

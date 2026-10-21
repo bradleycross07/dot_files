@@ -71,17 +71,17 @@ behavior:
   startup_behavior: continue
   disable_auto_update: true
   auto_update_delay: '0'
-  draw_cover_art: false
+  draw_cover_art: true
   draw_cover_art_forced: false
-  playbar_cover_art_size_percent: 100
+  playbar_cover_art_size_percent: 200
   cover_art_theme: false
   cover_art_dither: false
-  cover_art_dither_algorithm: stucki
+  cover_art_dither_algorithm: atkinson
   cover_art_dither_pixel_scale: 1
   keepawake_enabled: true
   enable_media_keys: false
   enable_streaming: true
-  streaming_device_name: spotatui
+  streaming_device_name: void spotatui
   streaming_bitrate: 320
   streaming_audio_cache: true
   streaming_autoplay: false
@@ -102,8 +102,8 @@ behavior:
   playbar_control_labels: null
   status_message_ttl_percent: 100
   playback_poll_seconds: 10
-  table_scroll_padding: 3
-  like_animation_frames: 4
+  table_scroll_padding: 5
+  like_animation_frames: 5
   startup_route: home
   default_sort_playlist_tracks: default
   default_sort_saved_albums: name

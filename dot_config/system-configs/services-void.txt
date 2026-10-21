@@ -1,18 +1,22 @@
-agetty-tty1 -> /etc/sv/agetty-tty1
-agetty-tty2 -> /etc/sv/agetty-tty2
-chronyd -> /etc/sv/chronyd
-cronie -> /etc/sv/cronie
-dbus -> /etc/sv/dbus
-dhcpcd -> /etc/sv/dhcpcd
-earlyoom -> /etc/sv/earlyoom
-elogind -> /etc/sv/elogind
-inputplumber -> /etc/sv/inputplumber
-iwd -> /etc/sv/iwd
-nanoklogd -> /etc/sv/nanoklogd
-nftables -> /etc/sv/nftables
-rtkit -> /etc/sv/rtkit
-socklog-unix -> /etc/sv/socklog-unix
-tlp -> /etc/sv/tlp
-udevd -> /etc/sv/udevd
-unbound -> /etc/sv/unbound
-zramen -> /etc/sv/zramen
+Permissions Size User Date Modified Name
+lrwxrwxrwx     - root 19 Oct 15:56  agetty-tty1 -> /etc/sv/agetty-tty1
+lrwxrwxrwx     - root 19 Oct 15:56  agetty-tty2 -> /etc/sv/agetty-tty2
+lrwxrwxrwx     - root 19 Oct 15:56  agetty-tty3 -> /etc/sv/agetty-tty3
+lrwxrwxrwx     - root 19 Oct 15:56  agetty-tty4 -> /etc/sv/agetty-tty4
+lrwxrwxrwx     - root 19 Oct 15:56  agetty-tty5 -> /etc/sv/agetty-tty5
+lrwxrwxrwx     - root 19 Oct 15:56  agetty-tty6 -> /etc/sv/agetty-tty6
+lrwxrwxrwx     - root  6 Sep 21:04  chronyd -> /etc/sv/chronyd
+lrwxrwxrwx     - root  7 Sep 15:44  cronie -> /etc/sv/cronie
+lrwxrwxrwx     - root  6 Sep 21:10  dbus -> /etc/sv/dbus
+lrwxrwxrwx     - root 30 Sep 11:07  dhcpcd -> /etc/sv/dhcpcd
+lrwxrwxrwx     - root  6 Sep 21:10  elogind -> /etc/sv/elogind
+lrwxrwxrwx     - root 17 Oct 20:43  inputplumber -> /etc/sv/inputplumber
+lrwxrwxrwx     - root  9 Sep 16:15  iwd -> /etc/sv/iwd
+lrwxrwxrwx     - root  9 Sep 16:03  nanoklogd -> /etc/sv/nanoklogd
+lrwxrwxrwx     - root  7 Sep 15:39  nftables -> /etc/sv/nftables
+lrwxrwxrwx     - root  7 Sep 16:20  rtkit -> /etc/sv/rtkit
+lrwxrwxrwx     - root  9 Sep 16:03  socklog-unix -> /etc/sv/socklog-unix
+lrwxrwxrwx     - root  6 Sep 21:07  tlp -> /etc/sv/tlp
+lrwxrwxrwx     - root 19 Oct 15:56  udevd -> /etc/sv/udevd
+lrwxrwxrwx     - root 14 Sep 16:26  unbound -> /etc/sv/unbound
+lrwxrwxrwx     - root  7 Sep 16:20  zramen -> /etc/sv/zramen

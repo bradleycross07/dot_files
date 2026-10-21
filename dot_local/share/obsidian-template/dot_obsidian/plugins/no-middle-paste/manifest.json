@@ -1,0 +1,9 @@
+{
+  "id": "no-middle-paste",
+  "name": "No Middle-Click Paste",
+  "version": "1.0.0",
+  "minAppVersion": "1.0.0",
+  "description": "Stops middle-click from pasting the primary selection.",
+  "author": "Bradley",
+  "isDesktopOnly": true
+}
