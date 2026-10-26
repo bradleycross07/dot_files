@@ -1,0 +1,311 @@
+/* Departure Mono at 11px or 22px everywhere, whole-pixel line heights.
+   Sizes are set on the element that owns them and inherited by everything inside,
+   which keeps Discord fast (rules ending in " *" made every element search all
+   of its parents). */
+
+:root {
+  --font-primary: "DepartureMono Nerd Font Mono" !important;
+  --font-display: "DepartureMono Nerd Font Mono" !important;
+  --font-headline: "DepartureMono Nerd Font Mono" !important;
+  --font-code: "DepartureMono Nerd Font Mono" !important;
+}
+
+* {
+  font-family: "DepartureMono Nerd Font Mono" !important;
+  font-synthesis: none !important;
+}
+
+html {
+  font-size: 22px !important;
+}
+
+/* Sizes: every element inherits its parent's size (22px from html), except
+   Discord's text components and secondary text, which set their own */
+:where(:not(.monaco-editor, .monaco-editor *)) {
+  font-size: inherit !important;
+}
+
+:where([class*="text-md/"], [class*="text-lg/"], [class*="body-md/"], [class*="body-lg/"],
+       [class*="heading-md/"], [class*="heading-lg/"], [class*="heading-xl/"],
+       [class*="heading-xxl/"], [class*="display-sm/"], [class*="display-md/"],
+       [class*="display-lg/"])[class] {
+  font-size: 22px !important;
+  line-height: round(1.36em, 1px) !important;
+}
+
+:where([class*="text-xxs/"], [class*="text-xs/"], [class*="text-sm/"],
+       [class*="heading-xxs/"], [class*="heading-xs/"], [class*="heading-sm/"],
+       [class*="eyebrow"], [class*="subText"], [class*="subtext"], [class*="statusDiv"],
+       [class*="privateChannelsHeader"], [class*="membersGroup"], [class*="panelSubtext"],
+       [class*="perksDemoText"], [class*="timestampVisibleOnHover"], [class*="edited"],
+       [class*="newMessagesBar"], [class*="divider"] > span[class*="content"],
+       [class*="embedDescription"], [class*="embedFooter"], [class*="discriminator"],
+       [class*="chiplet"], [class*="botTag"], [class*="numberBadge"], [class*="textBadge"],
+       [class*="subtitleContainer"] [class*="searchBar"], [class*="peopleList"] h2,
+       [class*="active-now"] [class*="textContent"])[class] {
+  font-size: 11px !important;
+  line-height: round(1.36em, 1px) !important;
+}
+
+/* Embeds */
+[class*="embedFull"] {
+  line-height: 28px !important;
+}
+
+/* Channel sidebar */
+[class*="sidebarList"] [class*="name_"] {
+  font-size: 22px !important;
+}
+
+[class*="sidebarList"] :is([class*="name_"], [class*="channelInfo"]) {
+  line-height: 32px !important;
+}
+
+/* Voice users */
+[class*="listDefault"] :is([class*="draggable"], [class*="voiceUser"]) {
+  height: 44px !important;
+}
+
+[class*="voiceUser"] [class*="content__"] > div[class*="container_"] {
+  display: flex !important;
+  align-items: center !important;
+}
+
+[class*="voiceUser"] [class*="usernameContainer"] {
+  flex: 0 1 auto !important;
+  margin-top: 0 !important;
+}
+
+[class*="voiceUser"] [class*="chipletParent"] {
+  flex: 0 0 auto !important;
+  margin-left: 6px !important;
+}
+
+[class*="voiceUser"] [class*="chipletContainerInner"] {
+  margin-top: 0 !important;
+}
+
+[class*="voiceUser"] [class*="chiplet"] {
+  max-width: none !important;
+  overflow: visible !important;
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
+}
+
+/* DM list */
+nav[class*="privateChannels"] [class*="name_"] {
+  line-height: 22px !important;
+}
+
+nav[class*="privateChannels"] [class*="subText"] {
+  margin-top: 1px !important;
+}
+
+/* User panel */
+section[class*="panels_"] [class*="panelTitleContainer"] {
+  line-height: 22px !important;
+}
+
+section[class*="panels_"] [class*="panelSubtextContainer"] {
+  line-height: 13px !important;
+}
+
+/* Member list */
+[class*="membersWrap"],
+[class*="members_"] {
+  width: 320px !important;
+  min-width: 320px !important;
+}
+
+[class*="members_"] [class*="member_"] {
+  max-width: none !important;
+}
+
+[class*="members_"] [class*="nameAndDecorators"] {
+  line-height: 28px !important;
+}
+
+/* Chat */
+li[class*="messageListItem"] :is([class*="header_"], [class*="messageContent"]) {
+  line-height: 28px !important;
+}
+
+li[class*="messageListItem"] [class*="messageContent"] {
+  word-spacing: -3px !important;
+}
+
+li[class*="messageListItem"] > [class*="cozyMessage"] {
+  padding-top: 1px !important;
+  padding-bottom: 1px !important;
+}
+
+li[class*="messageListItem"] > [class*="groupStart"] {
+  margin-top: 24px !important;
+}
+
+[class*="slateTextArea"] {
+  line-height: 30px !important;
+  padding-top: 13px !important;
+  padding-bottom: 13px !important;
+}
+
+/* Header bar */
+[class*="upperContainer"] :is([class*="titleWrapper"], h1) {
+  line-height: 28px !important;
+}
+
+[class*="upperContainer"] [class*="tabBar"] [class*="item_"] {
+  line-height: 24px !important;
+}
+
+/* Settings pages */
+[class*="contentBody_"] {
+  font-size: 11px !important;
+}
+
+[class*="contentBody_"] :is(h1, h2, [class*="heading-xl/"], [class*="heading-lg/"],
+                            [class*="heading-md/"], [class*="text-lg/"], [class*="text-md/"],
+                            .vc-text-md, .vc-text-lg, .vc-h1, .vc-h2, .vc-h3,
+                            .vc-addon-name, .vc-addon-title) {
+  font-size: 22px !important;
+  line-height: 28px !important;
+}
+
+/* Friends list */
+[class*="peopleList"] [class*="discordTag"] {
+  line-height: 22px !important;
+}
+
+/* Half-pixel offsets */
+[class*="contentBody_"] [class*="panel__"] {
+  margin-left: 64px !important;
+  margin-right: auto !important;
+}
+
+[class*="embedFull"] [class*="grid_"] {
+  padding-top: 3px !important;
+  padding-left: 16px !important;
+  padding-right: 16px !important;
+}
+
+[id^="message-accessories"] {
+  padding-top: 3px !important;
+  padding-bottom: 3px !important;
+}
+
+/* Vencord cards and buttons */
+:is(.vc-addon-name-author, .vc-addon-name, .vc-addon-title-container) {
+  height: 28px !important;
+}
+
+.vc-addon-note {
+  height: 30px !important;
+}
+
+.vc-btn-base {
+  font-size: 11px !important;
+  line-height: 24px !important;
+}
+
+/* Hidden copy-only text (server tags after names) */
+[class*="copyOnlyText"][class] {
+  font-size: 0 !important;
+}
+
+/* Voice/Video Connected */
+[class*="rtcConnectionStatus"] {
+  line-height: 24px !important;
+  height: auto !important;
+  overflow: visible !important;
+}
+
+/* Stream Info overlay */
+[class*="streamInfo"] {
+  line-height: 26px !important;
+}
+
+/* Settings sidebar */
+[class*="modal_"] aside[class*="sidebar__"],
+[class*="modal_"] aside[class*="sidebar__"] :is([class*="text-md/"], [class*="text-lg/"],
+  [class*="body-md/"], [class*="body-lg/"], [class*="heading-md/"], [class*="heading-lg/"],
+  [class*="heading-xl/"]) {
+  font-size: 11px !important;
+}
+
+[class*="modal_"] aside[class*="sidebar__"] [class*="item_"] [class*="text-"] {
+  line-height: 20px !important;
+}
+
+[class*="modal_"] aside[class*="sidebar__"] h3 {
+  line-height: 17px !important;
+  margin-top: 9px !important;
+}
+
+[class*="modal_"] aside[class*="sidebar__"] [class*="compactInfo"] span {
+  line-height: 13px !important;
+}
+
+/* Message box in profiles and popouts */
+:is([class*="rofile"], [class*="opout"]) :is([class*="slateTextArea"], [class*="placeholder"]) {
+  font-size: 11px !important;
+  line-height: 18px !important;
+}
+
+/* Typing indicator */
+[class*="typing_"] {
+  font-size: 11px !important;
+  line-height: 24px !important;
+}
+
+/* Tags, badges and LIVE pill. Keep these after everything above. */
+:is([class*="chiplet"], [class*="botTag"], [class*="numberBadge"], [class*="textBadge"])[class] {
+  font-size: 11px !important;
+  line-height: 15px !important;
+}
+
+[class*="body-xs/"][class] {
+  font-size: 11px !important;
+}
+
+[class*="badge_"][class*="notification_"] {
+  line-height: 20px !important;
+}
+
+/* Vesktop screen share picker */
+[class*="vcd-screen-picker"] {
+  font-size: 11px !important;
+  line-height: 15px !important;
+}
+
+[class*="vcd-screen-picker"] :is(h1, h2, h3, h4, h5) {
+  font-size: 22px !important;
+  line-height: 28px !important;
+}
+
+/* Spotify card: elapsed and total time at 11px */
+[class*="timeBar"],
+[class*="timeBar"] > [class*="text"] {
+  font-size: 11px !important;
+  line-height: 15px !important;
+}
+
+/* Spotify card: artist name at 11px */
+[class*="bodyLinkMuted"] {
+  font-size: 11px !important;
+  line-height: 15px !important;
+}
+
+/* Instant transitions and animations */
+*, *::before, *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* No fade on full-screen layers (settings): stay fully visible, no movement.
+   Tooltips and popouts live elsewhere, so they keep their positioning. */
+[class*="layers_"] > [class*="layer_"] {
+  opacity: 1 !important;
+  transform: none !important;
+}
