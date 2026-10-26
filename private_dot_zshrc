@@ -1,76 +1,61 @@
-# ~/.zshrc configuration
+# ~/.zshrc
 
-# for spotatui
-fpath=(~/.local/share/zsh/site-functions $fpath)
-
-# zinit: plugin manager
+# --- plugins and completion ---
+fpath=(~/.local/share/zsh/site-functions $fpath)   # spotatui completions
 source ~/.local/share/zinit/zinit.git/zinit.zsh
 
-# starship theming
-eval "$(starship init zsh)"
-
-# completion
 autoload -Uz compinit
 zcompdump="${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump-$ZSH_VERSION"
 [[ -d ${zcompdump:h} ]] || mkdir -p ${zcompdump:h}
 compinit -d "$zcompdump"
 unset zcompdump
 
-# autocomplete suggestions
 zinit light zsh-users/zsh-autosuggestions
 
-# shell integration
-source <(fzf --zsh)
-
-# history settings
+# --- history ---
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
-
 setopt SHARE_HISTORY
 setopt HIST_IGNORE_DUPS
 setopt HIST_REDUCE_BLANKS
-setopt HIST_IGNORE_SPACE   # prefix a command with a space to exclude it from history
-setopt AUTO_CD             # type a directory name to cd into it
+setopt HIST_IGNORE_SPACE # prefix a command with a space to keep it out of history
 
-# needed shell aliases
+# --- options ---
+setopt AUTO_CD # type a directory name to cd into it
+
+# --- aliases ---
 alias ff="fastfetch"
 alias ls="eza -lah --git --color=auto"
 alias lt="eza --tree -a --color=auto"
 alias df="duf"
+alias clear="command clear && printf '\e[3J' && fastfetch"
 
-# VPN aliases (windscribe isn't on void manually installed it with config)
+# WireGuard config for Windscribe
 alias vpnup='doas wg-quick up windscribe'
 alias vpndown='doas wg-quick down windscribe'
 
-# start dwl with its own D-Bus session, logging to ~/.local/share/dwl.log
+# --- functions ---
+# start dwl in its own D-Bus session; only errors go to ~/.local/share/dwl.log
 dwl() {
   if [ -n "$WAYLAND_DISPLAY" ]; then
     echo "dwl is already running" >&2
     return 1
   fi
-  dbus-run-session dwl > "$HOME/.local/share/dwl.log" 2>&1
+  dbus-run-session dwl > /dev/null 2> "$HOME/.local/share/dwl.log"
 
-  # stop audio left running after quitting out of dwl
-  pkill -u "$USER" -x 'pipewire|wireplumber'
-  # stop Aurelia daemon too
+  # stop audio and the Aurelia daemon left running after quitting dwl
+  pkill -u "$USER" -x 'pipewire|pipewire-pulse|wireplumber'
   aurelia daemon stop >/dev/null 2>&1
 }
 
-# open ff automatically
-fastfetch
-alias clear="command clear && printf '\e[3J' && fastfetch" # clear everything
-
-# zoxide
+# --- integrations ---
+eval "$(starship init zsh)"
+source <(fzf --zsh)
 eval "$(zoxide init zsh)"
 
-# syntax highlighting 
-zinit light zsh-users/zsh-syntax-highlighting
+# --- startup ---
+fastfetch
 
-# pnpm
-export PNPM_HOME='/home/bradley/.local/share/pnpm'
-case ":$PATH:" in
-  ":$PNPM_HOME/bin:"*) ;;
-  *) export PATH="$PNPM_HOME/bin:$PATH" ;;
-esac
-# pnpm end
+# must be last: wraps every widget defined above
+zinit light zsh-users/zsh-syntax-highlighting

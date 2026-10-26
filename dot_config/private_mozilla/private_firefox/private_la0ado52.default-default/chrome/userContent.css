@@ -31,23 +31,31 @@
 /* YouTube */
 @-moz-document regexp("^https://([^/]*\\.)?youtube\\.com/(?!embed/).*") {
 
-  /* font: everything except video players. line-height is set here on every
-     element because YouTube's rem-based line heights grow with the 22px root */
+  /* keep YouTube's own 10px root so rem-based sizes (buttons, icons,
+     spacing, line heights) stay as designed; beats the * rule below */
+  html:root {
+    font-size: 10px !important;
+  }
+
+  /* font: everything except video players */
   *:not(.html5-video-player, .html5-video-player *,
         yt-inline-player-controls, yt-inline-player-controls *) {
     font-family: monospace !important;
     font-size: 22px !important;
-    line-height: 30px !important;
     word-spacing: normal !important;
+  }
+
+  /* scale YouTube's rem-based layout 1.5x to suit 22px text:
+     line heights, title clamping, buttons and spacing grow together */
+  html:root {
+    font-size: 15px !important;
   }
 
   yt-inline-player-controls {
     font-family: Roboto, Arial, sans-serif !important;
     font-size: 10px !important;
     line-height: normal !important;
-  }
-
-  /* 5 videos per row */
+  }  /* 5 videos per row */
   ytd-two-column-browse-results-renderer.grid {
     max-width: 100% !important;
     width: 100% !important;

@@ -1,10 +1,11 @@
 #!/bin/sh
 
+# let D-Bus activated services (portals etc.) inherit the full session
+# environment: Wayland/X display, cursor theme and size, Qt/GTK settings
+dbus-update-activation-environment --all
+
 # razer
 openrazer-daemon &
-
-# let D-Bus activated services (portals etc.) find the Wayland session
-dbus-update-activation-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
 
 # gnome keyring
 gnome-keyring-daemon --start --components=secrets &
@@ -15,15 +16,19 @@ gnome-keyring-daemon --start --components=secrets &
 # audio (pipewire starts wireplumber and pipewire-pulse via ~/.config/pipewire/pipewire.conf.d)
 pipewire &
 
-# audio processing
-( while ! wpctl status >/dev/null 2>&1; do sleep 0.2; done
-  sway-audio-idle-inhibit &
-  easyeffects --gapplication-service ) &
+# audio processing, once PipeWire is up (give up after ~30s)
+( n=0
+  until wpctl status >/dev/null 2>&1; do
+    n=$((n + 1)); [ "$n" -ge 150 ] && exit 1
+    sleep 0.2
+  done
+    sway-audio-idle-inhibit >/dev/null 2>&1 &
+    easyeffects --gapplication-service ) &
 
 # monitors
 kanshi &
 
-# x11 stuff
+# XSettings for X11/XWayland apps
 xsettingsd &
 
 # night light
@@ -33,7 +38,7 @@ gammastep &
 wl-paste --type text --watch cliphist store &
 wl-paste --type image --watch cliphist store &
 
-# idling
+# idling: lock at 10 min, screen off at 15, power off after 3 h
 swayidle -w \
   timeout 600   'waylock -fork-on-lock' \
   timeout 900   'wlopm --off "*"' \

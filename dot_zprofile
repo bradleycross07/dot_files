@@ -1,25 +1,41 @@
-# ~/.zprofile configuration
+# ~/.zprofile configuration - read once at login
 
+# --- PATH (typeset -U drops duplicates) ---
 typeset -U path
-path=(~/.local/bin ~/.cargo/bin $path)
+export PNPM_HOME="$HOME/.local/share/pnpm"
+path=(
+  ~/.local/bin
+  ~/.cargo/bin
+  $PNPM_HOME/bin
+  ~/.local/opt/arm-gnu-toolchain/bin
+  $path
+)
 
-export NO_AT_BRIDGE=1
-export GTK_A11Y=none
+# --- for STM32CubeMX ---
+export STM32CubeMX_PATH="$HOME/.local/opt/STM32CubeMX"
 
+# --- session ---
 export XDG_CURRENT_DESKTOP=wlroots
+export XDG_SESSION_TYPE=wayland
 
+# --- toolkits; prefer Wayland, fall back to X11 ---
 export QT_QPA_PLATFORM="wayland;xcb"
 export SDL_VIDEODRIVER=wayland,x11
-export XDG_SESSION_TYPE=wayland
 export ELECTRON_OZONE_PLATFORM_HINT=auto
 
+# --- theming ---
+export QT_QPA_PLATFORMTHEME=qt6ct
+export QT_QUICK_CONTROLS_STYLE=org.kde.desktop
 export XCURSOR_THEME=Bibata-Modern-Classic
 export XCURSOR_SIZE=32
 
+# --- accessibility bus off (no screen reader) ---
+export NO_AT_BRIDGE=1
+export GTK_A11Y=none
+
+# --- graphics ---
 export MESA_SHADER_CACHE_MAX_SIZE=15G
 
-export QT_QPA_PLATFORMTHEME=qt6ct
-export QT_QUICK_CONTROLS_STYLE=org.kde.desktop
-
+# --- default apps ---
 export BROWSER=firefox
 export EDITOR=nvim
