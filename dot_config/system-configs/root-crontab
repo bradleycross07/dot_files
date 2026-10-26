@@ -1,0 +1,1 @@
+@weekly /usr/bin/fstrim -a
