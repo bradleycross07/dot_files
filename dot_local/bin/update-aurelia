@@ -1,14 +1,23 @@
 #!/bin/sh
-set -e
+set -eu
+
 cd ~/.local/src/Aurelia
-git checkout local
-git fetch
+git switch -q local
+git fetch -q --prune
+
 if [ "$(git merge-base HEAD origin/main)" = "$(git rev-parse origin/main)" ]; then
     echo "Aurelia already up to date"
     exit 0
 fi
-git rebase origin/main
+
+if ! git rebase -q origin/main; then
+    git rebase --abort
+    echo "Rebase onto origin/main hit conflicts; 'local' left as it was" >&2
+    exit 1
+fi
+
 cargo build --release
 cp target/release/aurelia ~/.local/bin/aurelia.new
 mv ~/.local/bin/aurelia.new ~/.local/bin/aurelia
 cargo clean
+echo "Installed $(~/.local/bin/aurelia --version)"

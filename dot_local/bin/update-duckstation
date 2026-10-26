@@ -1,0 +1,34 @@
+#!/bin/sh
+set -eu
+
+dest="$HOME/.local/opt/DuckStation"
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+# Rolling builds are always re-uploaded under the same "latest" tag, so the
+# asset's upload time is what identifies a build.
+asset=$(curl -fsSL "https://api.github.com/repos/stenzek/duckstation/releases/tags/latest" \
+        | jq -c '.assets[] | select(.name == "DuckStation-x64.AppImage")
+                 | {ver: .updated_at, url: .browser_download_url}')
+
+[ -n "$asset" ] || { echo "Couldn't find the DuckStation AppImage" >&2; exit 1; }
+
+ver=$(printf '%s' "$asset" | jq -r .ver)
+url=$(printf '%s' "$asset" | jq -r .url)
+
+if [ -f "$dest/.version" ] && [ "$(cat "$dest/.version")" = "$ver" ]; then
+    echo "DuckStation build from ${ver%%T*} already installed"
+    exit 0
+fi
+
+echo "Installing DuckStation build from ${ver%%T*}"
+cd "$tmp"
+curl -fL -o duckstation.AppImage "$url"
+chmod +x duckstation.AppImage
+./duckstation.AppImage --appimage-extract >/dev/null
+echo "$ver" > squashfs-root/.version
+
+rm -rf "$dest.old"
+[ -d "$dest" ] && mv "$dest" "$dest.old"
+mv squashfs-root "$dest"
+echo "Done. Old version kept at $dest.old"

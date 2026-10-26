@@ -1,4 +1,5 @@
 [EffectsPipelines]
+processAllInputs=false
 processAllOutputs=false
 
 [StreamInputs]
@@ -14,8 +15,8 @@ visiblePage=pluginsPage
 
 [Window]
 autostartOnLogin=true
-height=1046
+height=1406
 reducePluginsListControls=true
 showTrayIcon=false
 visiblePage=inputPage
-width=1030
+width=1382

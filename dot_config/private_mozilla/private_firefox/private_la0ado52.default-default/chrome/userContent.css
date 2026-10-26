@@ -1,50 +1,50 @@
-/* ==========================================================================
-   userContent.css
-   Monospace font is set via the generic "monospace" keyword so Firefox uses
-   font.size.monospace.x-western (22). fontconfig maps monospace ->
-   DepartureMono Nerd Font Mono.
-   ========================================================================== */
+/* userContent.css - DepartureMono Nerd Font Mono / Pixelify Sans
+   Global rules first, site-specific rules after (later rules win ties). */
 
-/* --------------------------------------------------------------------------
-   All sites except YouTube: slightly roomier lines.
-   Only text elements are targeted (not *), so buttons, badges and icon fonts
-   keep the site's own line-height and stay centred. Code blocks are left
-   alone so ASCII art has no gaps.
-   -------------------------------------------------------------------------- */
+/* never fake bold: Departure Mono has no bold weight */
+* { font-synthesis-weight: none !important; }
+
+/* Pixelify Sans has a narrow space (0.2em = 4px at 20px); widen word gaps.
+   Inherited by all text, then reset for code and Departure Mono sites below. */
+:where(body) {
+  word-spacing: 3px !important;
+}
+
+/* Code everywhere: Departure Mono at 11px on its pixel grid.
+   :where() has zero specificity, so the site rules further down still win. */
+:where(code, kbd, samp, pre, pre *) {
+  font-family: monospace !important;
+  font-size: 11px !important;
+  word-spacing: normal !important;
+}
+:where(pre, pre *) {
+  line-height: 17px !important;
+}
+
+/* Everywhere except YouTube: roomier paragraphs */
 @-moz-document regexp("^https?://(?!([^/]*\\.)?youtube\\.com/).*") {
   :where(p, li, dd, dt, blockquote, figcaption, td, th) {
     line-height: 1.5 !important;
   }
 }
 
-/* --------------------------------------------------------------------------
-   YouTube (not embedded players on other sites: /embed/ is excluded)
-   -------------------------------------------------------------------------- */
+/* YouTube */
 @-moz-document regexp("^https://([^/]*\\.)?youtube\\.com/(?!embed/).*") {
 
-  /* font: everything except video players (main player and the hover
-     preview player) and the hover preview's mute/CC buttons, so player
-     controls and captions keep YouTube's own sizing */
+  /* font: everything except video players. line-height is set here on every
+     element because YouTube's rem-based line heights grow with the 22px root */
   *:not(.html5-video-player, .html5-video-player *,
         yt-inline-player-controls, yt-inline-player-controls *) {
     font-family: monospace !important;
     font-size: 22px !important;
+    line-height: 30px !important;
+    word-spacing: normal !important;
   }
 
-  /* the hover preview's mute/CC buttons set no font size of their own, so
-     excluding them above isn't enough: they'd still inherit 22px from the
-     page, which makes the line around each 24px icon taller than the icon
-     and pushes it off-centre. Give them YouTube's base size instead. */
   yt-inline-player-controls {
     font-family: Roboto, Arial, sans-serif !important;
     font-size: 10px !important;
     line-height: normal !important;
-  }
-
-  /* roomier lines for text only: YouTube's text lives in these elements,
-     so icons and buttons keep YouTube's own line-height and stay centred */
-  :where(yt-formatted-string, .yt-core-attributed-string, #video-title, #content-text, p) {
-    line-height: 1.5 !important;
   }
 
   /* 5 videos per row */
@@ -98,43 +98,12 @@
   }
 }
 
-
-/* --------------------------------------------------------------------------
-   Claude
-   -------------------------------------------------------------------------- */
-@-moz-document domain("claude.ai") {
-  /* math (KaTeX) and SVG drawings are left alone: forcing one font and size
-     on them breaks fractions, superscripts and diagram labels */
-  *:not(.katex, .katex *, svg, svg *) {
-    font-family: monospace !important;
-    font-size: 22px !important;
-  }
-
-  /* slightly roomier lines (inputs excluded so text boxes stay centred) */
-  *:not(input, textarea, .katex, .katex *) {
-    line-height: 30px !important;
-  }
-
-  /* roomier sidebar rows: claude.ai sizes them with --df-row-h */
-  [data-testid="sidebar"] {
-    --df-row-h: 40px !important;
-  }
-
-  /* keep Claude's icon font */
-  [data-cds="Icon"] {
-    font-family: var(--font-anthropicons, Anthropicons-Variable) !important;
-  }
-}
-
-
-
-/* --------------------------------------------------------------------------
-   GitHub, Stack Overflow, Reddit: Departure Mono at 11px
-   -------------------------------------------------------------------------- */
+/* GitHub, Stack Overflow, Reddit: Departure Mono at 11px */
 @-moz-document domain("github.com"), domain("stackoverflow.com"), domain("reddit.com") {
   * {
     font-family: monospace !important;
     font-size: 11px !important;
+    word-spacing: normal !important;
   }
 }
 
@@ -151,25 +120,23 @@
     line-height: 20px !important;
   }
 
-  /* tighter lines in code blocks so ASCII art has no gaps.*/
+  /* tighter lines in code blocks so ASCII art has no gaps */
   pre, pre * {
     line-height: 11px !important;
   }
 }
 
-/* --------------------------------------------------------------------------
-   DuckDuckGo: Departure Mono at 22px
-   -------------------------------------------------------------------------- */
+/* DuckDuckGo: Departure Mono at 22px */
 @-moz-document domain("duckduckgo.com") {
-  /* :not(.ddgsi) leaves DuckDuckGo's icon font alone */
+
   *:not(.ddgsi) {
     font-family: monospace !important;
+    word-spacing: normal !important;
   }
   * {
     font-size: 22px !important;
   }
 
-  /* slightly roomier lines (inputs and icons excluded so they stay centred) */
   *:not(input):not(textarea):not(.ddgsi) {
     line-height: 30px !important;
   }

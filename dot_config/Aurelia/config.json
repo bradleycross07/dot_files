@@ -9,24 +9,6 @@
   "windows_steam_discovery_enabled": true,
   "preferred_launch_options": {},
   "game_configs": {
-    "339800": {
-      "forced_proton_version": null,
-      "platform_preference": null,
-      "runner": "auto",
-      "pinned_manifests": {
-        "339806": 5887747492570731416
-      },
-      "pinned": true
-    },
-    "504230": {
-      "forced_proton_version": null,
-      "platform_preference": "linux",
-      "runner": "auto",
-      "pinned_manifests": {
-        "504233": 5880027853585448535
-      },
-      "pinned": true
-    },
     "367520": {
       "forced_proton_version": null,
       "platform_preference": null,
@@ -40,10 +22,19 @@
       "forced_proton_version": null,
       "platform_preference": null,
       "runner": "auto",
-      "pinned_manifests": {
-        "1030303": 7921642076658611197
-      },
-      "pinned": true
+      "pinned": false
+    },
+    "504230": {
+      "forced_proton_version": null,
+      "platform_preference": "linux",
+      "runner": "auto",
+      "pinned": false
+    },
+    "339800": {
+      "forced_proton_version": null,
+      "platform_preference": null,
+      "runner": "auto",
+      "pinned": false
     },
     "930210": {
       "forced_proton_version": "Proton 11.0",
