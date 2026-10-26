@@ -18,13 +18,13 @@ Repos:
 
 Do these first, then keep this checklist open on the laptop while installing on the PC.
 
-Last updated: 21 Oct 2026.
+Last updated: 26 Oct 2026.
 
 ### Right before the install
 - [ ] refresh the lists, pull in any config changes made since, and push:
   ```sh
   xbps-query -m > ~/.config/system-configs/packages-void.txt
-  ls /var/service > ~/.config/system-configs/services-void.txt
+  command ls /var/service > ~/.config/system-configs/services-void.txt   # 'command' skips the eza alias
   chezmoi re-add
   chezmoi git -- add -A
   chezmoi git -- status
@@ -51,7 +51,8 @@ Last updated: 21 Oct 2026.
 - [ ] export the settings that aren't in the dotfiles or Firefox Sync onto the Ventoy USB (next to the SSH key
   and saves - step 4):
   - uBlock Origin: Settings → **Back up to file** (filter lists, `no-cosmetic-filtering` rules, settings)
-  - Vencord: Vesktop → Settings → **Backup & Restore** → export
+  - Vencord (fallback only): Vesktop → Settings → **Backup & Restore** → export. Its `settings.json` and
+    `quickCss.css` already come with the dotfiles; the export also covers plugin data stored inside Vesktop
   - put both files in a `backups/` folder on the USB
 
 ### Backing up the old Windows drives (from the live environment, to avoid Windows altogether)
@@ -331,7 +332,7 @@ Install packages by hand, one group at a time - the laptop's list (`packages-voi
 reference to pick from, not something to install wholesale. Build dependencies are installed with each build in step 4.
 
 Don't install on the desktop:
-- laptop power/memory/network: `tlp`, `zramen`, `earlyoom`, `iwd`, `wifi-firmware`, `unbound`, `wireguard-tools`
+- laptop power/memory/network: `tlp`, `zramen`, `iwd`, `wifi-firmware`, `unbound`, `wireguard-tools`
 - `grub-x86_64-efi` (Limine instead), `elogind` (seatd + turnstile instead), `cronie`, `socklog-void`, `yarn`
 - laptop session extras (autostart.sh doesn't run them on the desktop): `kanshi`, `wlr-randr`, `gammastep`,
   `xsettingsd`, `polkit-gnome`, `gnome-keyring`, `cliphist`, `sway-audio-idle-inhibit`
@@ -741,8 +742,9 @@ doas tail /var/log/inputplumber/current
   - check in `about:config`: `browser.contentblocking.category` = `standard`, `media.av1.enabled` = `true`
   - `userChrome.css` hides the tab bar, so install Sidebery (via Sync) before relying on it
 - [ ] uBlock Origin: Settings → **Restore from file** → the backup in `~/backups` (the settings aren't in Sync)
-- [ ] Vesktop: log in to Discord. Neither the session nor the Vencord settings are in the dotfiles - import them
-  from `~/backups` (Settings → Backup & Restore, exported on the laptop in step 0)
+- [ ] Vesktop: log in to Discord (the session isn't in the dotfiles). Vencord's settings and QuickCSS come with
+  the dotfiles (`~/.config/vesktop/settings/`); only if plugin data is missing, import the export from
+  `~/backups` (Settings → Backup & Restore, exported on the laptop in step 0)
 
 ## 8. Audio
 

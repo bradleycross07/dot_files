@@ -21,7 +21,7 @@ brightnessctl-0.5.1_1
 btop-1.4.7_1
 cargo-1.99.0_1
 chezmoi-2.73.1_1
-chrony-4.8_1
+chrony-4.9_1
 cliphist-0.7.0_2
 cmake-4.2.2_3
 cronie-1.7.2_2
@@ -43,7 +43,7 @@ eza-0.23.5_1
 fastfetch-2.69.0_1
 fd-10.5.0_1
 file-5.46_2
-firefox-158.0_1
+firefox-158.0.1_1
 flatpak-1.18.4_1
 foot-1.28.0_1
 fuzzel-1.15.0_1
@@ -53,7 +53,7 @@ gamemode-1.8.2_1
 gamescope-3.16.30_1
 gammastep-2.0.11_1
 git-2.55.0_1
-github-cli-2.102.0_1
+github-cli-2.103.2_1
 glfw-3.4_1
 glu-9.0.3_1
 gnome-keyring-48.0_1
@@ -88,7 +88,7 @@ libsysfs-2.1.0_7
 libva-utils-2.24.0_1
 linux-mainline-7.2_1
 linux-mainline-headers-7.2_1
-linux7.2-headers-7.2.11_1
+linux7.2-headers-7.2.12_1
 lm_sensors-3.6.0_2
 lsp-plugins-lv2-1.2.29_1
 mesa-dri-26.2.5_2
@@ -102,7 +102,7 @@ ncurses-6.6_1
 ncurses-libtinfo-libs-6.6_1
 neovim-0.12.6_1
 nftables-1.1.5_2
-nodejs-24.18.0_1
+nodejs-24.22.1_1
 noto-fonts-cjk-1_1
 noto-fonts-emoji-2.051_2
 noto-fonts-ttf-2026.10.01_1
@@ -121,7 +121,7 @@ pkg-config-0.29.2_3
 polkit-127_1
 polkit-gnome-0.105_8
 procs-0.14.10_1
-qbittorrent-5.2.3_1
+qbittorrent-5.3.0_1
 qt6ct-0.11_4
 razergenie-1.1.0_1
 ripgrep-15.2.0_1
@@ -133,9 +133,9 @@ scx-loader-1.1.3_1
 shellcheck-0.11.0_1
 shfmt-3.14.1_1
 slurp-1.5.0_2
+smartmontools-7.5_1
 socklog-void-20200115_2
 starship-1.26.0_1
-steam-1.0.0.87_1
 stlink-1.8.0_1
 strace-7.1_1
 streamlink-8.6.2_1
@@ -147,7 +147,7 @@ tlp-1.10.2_1
 tokei-15.0.0_1
 tumbler-4.20.1_1
 udisks2-2.10.1_1
-unbound-1.26.1_1
+unbound-1.26.2_1
 unrar-7.2.6_1
 upower-1.91.3_2
 usbutils-019_1

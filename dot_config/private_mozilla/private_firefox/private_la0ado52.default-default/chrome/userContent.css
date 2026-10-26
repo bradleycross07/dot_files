@@ -1,27 +1,25 @@
-/* userContent.css - DepartureMono Nerd Font Mono / Pixelify Sans
-   Global rules first, site-specific rules after (later rules win ties). */
+/* Departure Mono and Pixelify Sans: global rules first, then sites */
 
-/* never fake bold: Departure Mono has no bold weight */
+/* No fake bold */
 * { font-synthesis-weight: none !important; }
 
-/* Pixelify Sans has a narrow space (0.2em = 4px at 20px); widen word gaps.
-   Inherited by all text, then reset for code and Departure Mono sites below. */
+/* Wider word gaps for Pixelify Sans */
 :where(body) {
   word-spacing: 3px !important;
 }
 
-/* Code everywhere: Departure Mono at 11px on its pixel grid.
-   :where() has zero specificity, so the site rules further down still win. */
+/* Code: Departure Mono at 11px */
 :where(code, kbd, samp, pre, pre *) {
   font-family: monospace !important;
   font-size: 11px !important;
   word-spacing: normal !important;
 }
+
 :where(pre, pre *) {
   line-height: 17px !important;
 }
 
-/* Everywhere except YouTube: roomier paragraphs */
+/* Roomier paragraphs everywhere except YouTube */
 @-moz-document regexp("^https?://(?!([^/]*\\.)?youtube\\.com/).*") {
   :where(p, li, dd, dt, blockquote, figcaption, td, th) {
     line-height: 1.5 !important;
@@ -30,14 +28,11 @@
 
 /* YouTube */
 @-moz-document regexp("^https://([^/]*\\.)?youtube\\.com/(?!embed/).*") {
-
-  /* keep YouTube's own 10px root so rem-based sizes (buttons, icons,
-     spacing, line heights) stay as designed; beats the * rule below */
+  /* Scale the rem-based layout 1.5x to suit 22px text */
   html:root {
-    font-size: 10px !important;
+    font-size: 15px !important;
   }
 
-  /* font: everything except video players */
   *:not(.html5-video-player, .html5-video-player *,
         yt-inline-player-controls, yt-inline-player-controls *) {
     font-family: monospace !important;
@@ -45,17 +40,13 @@
     word-spacing: normal !important;
   }
 
-  /* scale YouTube's rem-based layout 1.5x to suit 22px text:
-     line heights, title clamping, buttons and spacing grow together */
-  html:root {
-    font-size: 15px !important;
-  }
-
   yt-inline-player-controls {
     font-family: Roboto, Arial, sans-serif !important;
     font-size: 10px !important;
     line-height: normal !important;
-  }  /* 5 videos per row */
+  }
+
+  /* 5 videos per row */
   ytd-two-column-browse-results-renderer.grid {
     max-width: 100% !important;
     width: 100% !important;
@@ -66,7 +57,7 @@
     --ytd-rich-grid-posts-per-row: 5 !important;
   }
 
-  /* channel header: remove centred/max-width layout */
+  /* Full-width channel header and banner */
   ytd-tabbed-page-header,
   ytd-tabbed-page-header #page-header {
     width: 100% !important;
@@ -77,7 +68,6 @@
     padding-right: 0 !important;
   }
 
-  /* banner */
   ytd-tabbed-page-header #page-header-banner-sizer,
   ytd-tabbed-page-header #page-header-banner {
     width: 100% !important;
@@ -86,61 +76,30 @@
     margin-right: 0 !important;
   }
 
-  /* remove the inset padding from the banner */
   ytd-tabbed-page-header[has-inset-banner] #page-header-banner {
     padding-left: 0 !important;
     padding-right: 0 !important;
   }
 
-  /* channel-info container */
   ytd-tabbed-page-header .ytImageBannerViewModelHost,
   ytd-tabbed-page-header .ytImageBannerViewModelInset,
   ytd-tabbed-page-header .ytImageBannerViewModelPositionAbsolute {
     max-width: none !important;
   }
 
-  /* align tabs with channel information */
   tp-yt-paper-tabs#tabs {
     margin-left: 0 !important;
     margin-right: 0 !important;
   }
 }
 
-/* GitHub, Stack Overflow, Reddit: Departure Mono at 11px */
-@-moz-document domain("github.com"), domain("stackoverflow.com"), domain("reddit.com") {
-  * {
-    font-family: monospace !important;
-    font-size: 11px !important;
-    word-spacing: normal !important;
-  }
-}
-
-/* Stack Overflow, Reddit: slightly roomier lines */
-@-moz-document domain("stackoverflow.com"), domain("reddit.com") {
-  *:not(input):not(textarea) {
-    line-height: 17px !important;
-  }
-}
-
-/* whole-pixel line height so text doesn't land on half pixels */
-@-moz-document domain("github.com") {
-  * {
-    line-height: 20px !important;
-  }
-
-  /* tighter lines in code blocks so ASCII art has no gaps */
-  pre, pre * {
-    line-height: 11px !important;
-  }
-}
-
 /* DuckDuckGo: Departure Mono at 22px */
 @-moz-document domain("duckduckgo.com") {
-
   *:not(.ddgsi) {
     font-family: monospace !important;
     word-spacing: normal !important;
   }
+
   * {
     font-size: 22px !important;
   }
@@ -149,19 +108,19 @@
     line-height: 30px !important;
   }
 
-  /* homepage search box only: room for descenders (g, y, p) */
+  /* Homepage search box: room for descenders */
   #searchbox_homepage textarea[name="q"] {
     height: auto !important;
     line-height: 28px !important;
   }
 
-  /* clear "X" in settings text fields: centre it in the field */
+  /* Clear button in settings fields */
   .frm__input__clear {
     font-size: 18px !important;
     line-height: 44px !important;
   }
 
-  /* homepage suggestions: give every row identical spacing */
+  /* Even spacing for homepage suggestions */
   #searchbox-suggestions > li {
     margin: 0 !important;
     padding: 0 !important;
