@@ -291,14 +291,14 @@ reboot
 Log in as `bradley` on tty1 (dhcpcd from step 1 should already have you online - check with `ping -c 3 voidlinux.org`).
 zsh shows its first-run menu because there's no `~/.zshrc` yet - press `q` to skip it.
 
-The dotfiles are cloned now but applied in step 6: the package lists, mirrors and patches are read straight from
+The dotfiles are cloned now but applied in step 6: the package lists and mirrors are read straight from
 the clone, and the repo is public, so no SSH key is needed for this:
 
 ```sh
 # delta is .gitconfig's pager
 doas xbps-install -S void-repo-nonfree git chezmoi delta
 chezmoi init --branch void-linux https://github.com/bradleycross07/dot_files.git
-# git identity + commit signing, used by the patches in step 4;
+# git identity + commit signing;
 # cargo config: every Rust build links with mold and tunes for this CPU
 chezmoi apply ~/.gitconfig ~/.cargo/config.toml
 # the laptop's mirrors, for main and nonfree (written by xmirror on the laptop)
@@ -329,6 +329,8 @@ doas xbps-install -S pipewire wireplumber alsa-pipewire easyeffects pavucontrol 
 doas xbps-install -S mesa-dri mesa-vulkan-radeon vulkan-loader
 doas xbps-install -S mesa-vaapi libva-utils
 doas xbps-install -S gamemode gamescope mangohud
+# mouse DPI/polling rate (bradley is already in plugdev from step 1)
+doas xbps-install -S openrazer-meta razergenie
 doas xbps-install -S $(cat fonts-void.txt)
 [ -s fonts-confd.txt ] && while read -r c; do
     doas ln -sf "/usr/share/fontconfig/conf.avail/$c" /etc/fonts/conf.d/
@@ -353,7 +355,7 @@ cargo install tree-sitter-cli
 
 ### From the Ventoy USB: SSH key, game saves
 
-The SSH key comes first: dwl is a private repo, and the patches below are signed commits.
+The SSH key comes first: dwl, spotatui and the Aurelia/Vesktop backups are private repos.
 
 ```sh
 doas mount -o uid=1000,gid=1000 /dev/sdX1 /mnt
@@ -375,14 +377,6 @@ doas umount /mnt
 ```
 
 ### Rust builds
-
-Rust builds use mold and native CPU tuning from `~/.cargo/config.toml` (applied in step 2), so a plain
-`cargo build --release` is enough - no `RUSTFLAGS`, which would replace those settings rather than add to them.
-
-Aurelia, spotatui and InputPlumber each also have a `.cargo/config.toml` inside their repo folder (in the
-dotfiles, kept out of the projects' own git): release builds use thin LTO and 16 codegen units instead of the
-slow single-core link at the end. Apply each one **right after** cloning - if chezmoi created the folder first,
-`git clone` would refuse to clone into it - and hide it from that repo's git:
 
 ```sh
 # after `git clone ... ~/.local/src/<name>`:
@@ -408,9 +402,6 @@ git remote add upstream https://codeberg.org/dwl/dwl.git
 git checkout desktop
 make && doas make install
 ```
-(`base-devel` is gcc + make; `xcb-util-wm-devel` provides `xcb-icccm` for the XWayland build;
-`xorg-server-xwayland` runs X11 apps and the few games that still need it - if `make` reports another missing
-pkg-config module, install its `-devel` package)
 - the `desktop` branch: monitor rule, no brightness keys, no Mod+v clipboard picker
 - dwl runs `~/.local/bin/autostart.sh` at startup (a template): PipeWire, EasyEffects (mic for Vesktop) and swayidle
   (lock after 10 min, screen off after 15 - protects the OLED)
@@ -431,25 +422,11 @@ export SDL_VIDEODRIVER=wayland,x11
 export ELECTRON_OZONE_PLATFORM_HINT=auto
 ```
 
-- `SDL_VIDEODRIVER`: SDL2 still prefers X11 by default, so this is what keeps SDL2 apps native. The fallback list
-  only works in SDL 2.0.22+ - a game bundling an older SDL2 can fail to open a window. If that happens, override it
-  for that game only (e.g. `SDL_VIDEODRIVER=x11` in its Aurelia launch script)
-- `ELECTRON_OZONE_PLATFORM_HINT`: newer Electron versions pick Wayland on their own and ignore it, so it's harmless
-
-Check what's still on XWayland with `xlsclients` (from the `xlsclients` package) while things are running -
-anything it lists is an X11 client.
-
-Hollow Knight and Silksong (native Linux builds via Aurelia) already run on Wayland. Keep XWayland built into dwl
-anyway for the few Wine/Proton games that still need X11 - it costs nothing when nothing's using it. For those,
-Wine's Wayland driver is the way to try native Wayland first: `PROTON_ENABLE_WAYLAND=1` on GE-Proton, or for
-plain Wine, unset `DISPLAY` for that game so Wine picks its Wayland driver. Not every game works with it yet,
-so treat it as per-game.
+Proton games still on X11: try `PROTON_ENABLE_WAYLAND=1`.
 
 ### Aurelia
 - needs `rust cargo mold` (and possibly `openssl-devel` - it's on the laptop's list)
-- the launch scripts run each game inside `bwrap --unshare-net` (its own network namespace, so the game never
-  hears about USB hotplugs - stops the Unity freeze when a controller/mouse is plugged in). Flatpak pulls
-  bubblewrap in too, but install it explicitly so the scripts don't depend on Flatpak:
+- bubblewrap, for the launch scripts:
   ```sh
   doas xbps-install -S bubblewrap
   ```
@@ -458,48 +435,23 @@ so treat it as per-game.
   doas xbps-install -S void-repo-multilib
   doas xbps-install -S mesa-dri-32bit vulkan-loader-32bit mesa-vulkan-radeon-32bit
   ```
-- clone it, then restore the local tweaks from the dotfiles repo onto a `local` branch
-  (if `git am` stops on a conflict because upstream changed, fix the file, `git add` it, then `git am --continue`):
+- clone upstream as `origin` (`update-aurelia` rebases onto `origin/main`), then the `local` branch with the
+  tweaks from the private backup:
   ```sh
   git clone https://github.com/Drackrath/Aurelia.git ~/.local/src/Aurelia
   chezmoi apply ~/.local/src/Aurelia/.cargo/config.toml
   echo ".cargo/" >> ~/.local/src/Aurelia/.git/info/exclude
   cd ~/.local/src/Aurelia
-  git checkout -b local
-  git am "$(chezmoi source-path)"/patches/aurelia/*.patch
+  git remote add backup git@github.com:bradleycross07/aurelia-local.git
+  git fetch backup
+  git switch -c local --track backup/local
   ```
-- build (tuned for this CPU and linked with mold, via `~/.cargo/config.toml`), install, then clean:
+- build, install, then clean:
   ```sh
   cargo build --release
   cp target/release/aurelia ~/.local/bin/
   cargo clean
   ```
-  (release builds already use full optimisation; `target-cpu=native` tunes for the machine it's built on, so
-  the desktop builds its own binary). `update-aurelia` from the dotfiles handles later updates.
-- game library: `~/Games/Aurelia` - don't install games until the SATA SSD is formatted and mounted on `~/Games`
-  (end of section 11); anything installed there before would end up on the NVMe, hidden under the mount.
-  Aurelia's `config.json` is in the dotfiles but skipped on the desktop (`.chezmoiignore`, step 0) - it has the
-  laptop's library path - so set the library path to `~/Games/Aurelia` on first run
-- launch scripts (`~/.config/Aurelia/scripts/<appid>.sh`) come with the dotfiles; adjust them for this
-  monitor in section 11. Any script with a hard-coded game path needs pointing at `~/Games/Aurelia` instead:
-  ```sh
-  rg -n 'local/share/Steam' ~/.config/Aurelia/scripts/
-  ```
-- the Hollow Knight script (`367520.sh`) starts InputPlumber before the game and stops it on exit
-  (`doas sv up/down inputplumber` + an `EXIT` trap), so it relies on the two passwordless `sv` lines in
-  `doas.conf` (section 10)
-
-### OpenRazer (mouse DPI and polling rate)
-- install the driver, daemon and GUI, and join the `plugdev` group (log out and back in afterwards):
-  ```sh
-  doas xbps-install -S openrazer-meta razergenie
-  doas usermod -aG plugdev bradley
-  ```
-- the driver is a DKMS module, so the headers for the running kernel must be installed or it won't build
-- the DeathAdder V3 keeps DPI and polling rate in its onboard memory, so the daemon is only needed while
-  changing them - it's no longer autostarted (commented out in the laptop's `autostart.sh`). When needed, run it
-  as your user (not a runit service): `openrazer-daemon &`, then set DPI and polling rate in RazerGenie
-- if the mouse already has the right settings from the laptop, this whole section can be skipped
 
 ### spotatui
 - build dependencies:
@@ -523,12 +475,6 @@ so treat it as per-game.
   cp target/release/spotatui ~/.local/bin/
   cargo clean
   ```
-- first launch: log in to Spotify in the browser it opens. Since v0.46 spotatui talks to Spotify through its own
-  session, so there's no `client.yml` or app credentials to copy
-- updates: `git fetch upstream --tags`, `git rebase <new tag>`, build as above, then
-  `git push --force-with-lease origin local`
-- zsh completion: `_spotatui` comes with the dotfiles in `~/.local/share/zsh/site-functions`, which `.zshrc`
-  adds to `fpath`
 
 ### Vesktop
 - needs pnpm (standalone installer) and Node.js, which on the laptop is managed by pnpm itself
@@ -545,12 +491,13 @@ so treat it as per-game.
   pnpm env use --global 26
   node --version
   ```
-- clone, restore the raised-bitrate patch, build, install into `~/.local/opt/Vesktop`:
+- clone, get the raised-bitrate `local` branch from the private backup, build, install into `~/.local/opt/Vesktop`:
   ```sh
   git clone https://github.com/Vencord/Vesktop.git ~/.local/src/Vesktop
   cd ~/.local/src/Vesktop
-  git checkout -b local
-  git am "$(chezmoi source-path)"/patches/vesktop/*.patch
+  git remote add backup git@github.com:bradleycross07/vesktop-local.git
+  git fetch backup
+  git switch -c local --track backup/local
   pnpm install --frozen-lockfile
   # unpacked build in dist/linux-unpacked
   pnpm package:dir
@@ -558,38 +505,31 @@ so treat it as per-game.
   mkdir -p ~/.local/opt
   cp -r dist/linux-unpacked ~/.local/opt/Vesktop
   ```
-- `~/.local/bin/vesktop` (wrapper) and `~/.local/share/applications/Vesktop.desktop` come with the dotfiles;
-  the desktop entry's `MimeType=x-scheme-handler/discord;` plus `mimeapps.list`'s
-  `x-scheme-handler/discord=Vesktop.desktop` make it open `discord://` links (database refreshed in step 6)
 
 ### InputPlumber
-- build dependencies. bindgen needs libclang, but not the whole clang toolchain: `libclang<N>` alone (~35 MB) is
-  enough, where N is the LLVM version Mesa already pulls in, so no second LLVM gets installed. It only ships
-  versioned files (`libclang.so.22.1`), so the dotfiles carry a `~/.local/lib/libclang/libclang.so` symlink, and
-  InputPlumber's `.cargo/config.toml` points bindgen at it (`LIBCLANG_PATH`) and at clang's built-in headers
-  (`BINDGEN_EXTRA_CLANG_ARGS`). libiio isn't needed since v0.82.0:
+- build dependencies (`libclang<N>` matches the LLVM version Mesa already uses):
   ```sh
   N=$(xbps-query -x mesa-libgallium | sed -n 's/^libllvm\([0-9]*\).*/\1/p')
-  # 22 in Oct 2026 - if it's changed, bump the 22s in the symlink and in .cargo/config.toml first (laptop too)
+  # 22 in Oct 2026 - if it's changed, bump the 22s in .cargo/config.toml first (laptop too)
   echo "$N"
   doas xbps-install -S rust cargo pkg-config eudev-libudev-devel libclang$N
   ```
-- clone, add the build config and the symlink, build as your user, install as root (building with doas would
-  make cargo run as root):
+- clone, add the build config, link libclang where `.cargo/config.toml` expects it, build as your user,
+  install as root:
   ```sh
   git clone https://github.com/ShadowBlip/InputPlumber.git ~/.local/src/InputPlumber
-  chezmoi apply ~/.local/src/InputPlumber/.cargo/config.toml ~/.local/lib/libclang/libclang.so
+  chezmoi apply ~/.local/src/InputPlumber/.cargo/config.toml
   echo ".cargo/" >> ~/.local/src/InputPlumber/.git/info/exclude
+  mkdir -p ~/.local/lib/libclang
+  # 'command' skips the eza alias; head -1 picks libclang.so.$N.1 over the longer full-version name
+  ln -sf "$(command ls -1 /usr/lib/libclang.so.$N.* | sort | head -1)" ~/.local/lib/libclang/libclang.so
+  readlink ~/.local/lib/libclang/libclang.so
   cd ~/.local/src/InputPlumber
   make build
   doas make install PREFIX=/usr
   # the install also drops systemd units, which do nothing on Void
   doas rm /usr/lib/systemd/system/inputplumber*.service
   ```
-  (if the build stops on `couldn't find any valid shared libraries matching: ['libclang.so'...]`, the symlink
-  points at a libclang version that isn't installed - check with `ls -l ~/.local/lib/libclang/`; if it stops on
-  `'stddef.h' file not found`, the `-resource-dir` path in `.cargo/config.toml` doesn't match - the right folder
-  is the one above `include` in `xbps-query -f clang$N-headers | rg '/stddef\.h$'`)
 - its install adds udev rules, hwdb entries and a D-Bus system policy, which only take effect once reloaded:
   ```sh
   doas udevadm hwdb --update && doas udevadm control --reload && doas udevadm trigger
@@ -627,20 +567,20 @@ python3 -m venv ~/.local/share/discord-rpc-venv
 
 ### Flatpak (user installation)
 
-One app comes from Flathub, installed per-user. The flatpak export paths are added to `XDG_DATA_DIRS` by
+Lutris comes from Flathub, installed per-user. The flatpak export paths are added to `XDG_DATA_DIRS` by
 `/etc/profile.d/flatpak.sh`, which the package installs, so the app shows up in fuzzel after the next login.
 
 ```sh
 doas xbps-install -S flatpak
 flatpak remote-add --user --if-not-exists flathub \
     https://dl.flathub.org/repo/flathub.flatpakrepo
-flatpak install --user flathub cz.viceverse.serein
+flatpak install --user flathub net.lutris.Lutris org.gtk.Gtk3theme.Breeze-Dark
 ```
 
 ## 6. Dotfiles (chezmoi)
 
 ```sh
-# the laptop-only files must show up here - if the list only has README.md, INSTALL.md and patches,
+# the laptop-only files must show up here - if the list only has README.md and INSTALL.md,
 # the hostname isn't `void-desktop` and the laptop's TLP/kanshi/Vivado files would be applied
 chezmoi ignored
 chezmoi diff
