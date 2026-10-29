@@ -18,13 +18,20 @@ Repos:
 
 Do these first, then keep this checklist open on the laptop while installing on the PC.
 
-Last updated: 26 Oct 2026.
+Last updated: 29 Oct 2026.
 
 ### Right before the install
 - [ ] refresh the lists, pull in any config changes made since, and push:
   ```sh
   xbps-query -m > ~/.config/system-configs/packages-void.txt
   command ls /var/service > ~/.config/system-configs/services-void.txt   # 'command' skips the eza alias
+  # /etc files aren't tracked by chezmoi directly - copy them in first (doas.conf is root-only)
+  cd ~/.config/system-configs
+  cp /etc/sysctl.d/99-vm.conf /etc/sysctl.d/99-network.conf /etc/sysctl.conf /etc/rc.local .
+  cp /etc/default/grub grub
+  cp /etc/dracut.conf.d/*.conf dracut.conf.d/
+  doas cat /etc/doas.conf > doas.conf
+  cd
   chezmoi re-add
   chezmoi git -- add -A
   chezmoi git -- status
@@ -338,7 +345,8 @@ Don't install on the desktop:
   `xsettingsd`, `polkit-gnome`, `gnome-keyring`, `cliphist`, `sway-audio-idle-inhibit`
   - optional: `wl-clip-persist` keeps the clipboard after the source app closes (no history)
   - add `gnome-keyring` back if signing into apps that need a keyring
-- laptop-only apps: VS Code, ProjectLibre, Vivado, and the restricted `discord` package (Vesktop instead)
+- laptop-only apps: VS Code, ProjectLibre, Vivado, the restricted `discord` package (Vesktop instead), and
+  Spotify + Spicetify (built from `void-packages` on the laptop as a backup for spotatui)
 
 Packages the later steps rely on (still in the `system-configs` folder, for the font lists):
 
@@ -508,6 +516,9 @@ so treat it as per-game.
   ```sh
   rg -n 'local/share/Steam' ~/.config/Aurelia/scripts/
   ```
+- the Hollow Knight script (`367520.sh`) starts InputPlumber before the game and stops it on exit
+  (`doas sv up/down inputplumber` + an `EXIT` trap), so it relies on the two passwordless `sv` lines in
+  `doas.conf` (section 10)
 
 ### OpenRazer (mouse DPI and polling rate)
 - install the driver, daemon and GUI, and join the `plugdev` group (log out and back in afterwards):
@@ -516,8 +527,10 @@ so treat it as per-game.
   doas usermod -aG plugdev bradley
   ```
 - the driver is a DKMS module, so the headers for the running kernel must be installed or it won't build
-- the daemon runs as your user, not as a runit service: start it the same way as on the laptop
-- set DPI and polling rate in RazerGenie; the daemon remembers them
+- the DeathAdder V3 keeps DPI and polling rate in its onboard memory, so the daemon is only needed while
+  changing them - it's no longer autostarted (commented out in the laptop's `autostart.sh`). When needed, run it
+  as your user (not a runit service): `openrazer-daemon &`, then set DPI and polling rate in RazerGenie
+- if the mouse already has the right settings from the laptop, this whole section can be skipped
 
 ### spotatui
 - build dependencies:
@@ -829,7 +842,10 @@ Copies live in `~/.config/system-configs` (applied by chezmoi in step 6).
 | Backup file          | Restore to                    | Notes                     |
 | -------------------- | ----------------------------- | ------------------------- |
 | `99-network.conf`    | `/etc/sysctl.d/`              | BBR + fq                  |
-| `doas.conf`          | `/etc/doas.conf`              | check with `doas -C` first; `chmod 0400`; passwordless poweroff/reboot/zzz |
+| `sysctl.conf`        | `/etc/sysctl.conf`            | `vm.max_map_count=1048576` (some Proton games need it) |
+| `rc.local`           | `/etc/rc.local`               | MGLRU thrashing protection (`min_ttl_ms` 1000) - stands in for earlyoom, which isn't installed |
+| `dracut.conf.d/no-drm.conf` | `/etc/dracut.conf.d/`  | leaves `drm` (amdgpu + every AMD GPU's firmware) and the crypt modules out of the initramfs - amdgpu loads from the root filesystem instead. Rebuild after copying |
+| `doas.conf`          | `/etc/doas.conf`              | check with `doas -C` first; `chmod 0400`; passwordless poweroff/reboot, plus `sv up/down inputplumber` for the Aurelia launch scripts. `zzz` isn't passwordless any more - add `permit nopass bradley cmd zzz` back if suspending from a keybind (section 11) |
 | `nftables.conf`      | `/etc/nftables.conf`          | check with `nft -c -f` first |
 | `rc.conf`            | `/etc/rc.conf`                | template: KEYMAP `us`     |
 | `dhcpcd.conf`        | `/etc/dhcpcd.conf`            | template: Cloudflare DNS  |
@@ -849,6 +865,11 @@ cd ~/.config/system-configs
 doas -C doas.conf && doas cp doas.conf /etc/doas.conf && doas chmod 0400 /etc/doas.conf
 doas nft -c -f nftables.conf && doas cp nftables.conf /etc/nftables.conf
 doas cp 99-network.conf /etc/sysctl.d/
+doas cp sysctl.conf /etc/sysctl.conf
+doas cp rc.local /etc/rc.local        # runs at the next boot
+# smaller initramfs: rebuild every installed kernel's image (the Limine hook doesn't need re-running -
+# the file names stay the same)
+doas cp dracut.conf.d/no-drm.conf /etc/dracut.conf.d/ && doas dracut --regenerate-all --force
 doas cp rc.conf /etc/rc.conf          # KEYMAP already filled in by chezmoi
 doas cp dhcpcd.conf /etc/dhcpcd.conf   # DNS line already filled in by chezmoi
 doas cp gamemode.ini /etc/gamemode.ini # then check gpu_device (section 11)
@@ -920,7 +941,8 @@ Not backed up on purpose (machine-specific): `/etc/fstab`.
 - [ ] locate (only if you install one, e.g. `plocate`): no cron, so refresh its database by hand - `doas updatedb`
 - [ ] TRIM: manual, no job and no `discard` - run every month or so:
   `doas fstrim -av` (trims every mounted filesystem that supports it and shows how much)
-- [ ] kernel options (in the Limine hook): `loglevel=4 nowatchdog mitigations=off ipv6.disable=1`
+- [ ] kernel options (in the Limine hook): `loglevel=4 nowatchdog modprobe.blacklist=sp5100_tco mitigations=off ipv6.disable=1`
+  - `sp5100_tco` is AMD's chipset watchdog driver - blacklisted on the laptop too, alongside `nowatchdog`
 - [ ] optional, test before keeping: sched_ext scheduler (the `scx` package, e.g. `scx_lavd`) - compare frame
   times with MangoHud with and without it; only keep it if it measurably helps.
   **On the laptop (Oct 2026) `scx_lavd` 1.1.3 froze the whole system on mainline 7.2** with both `--autopower`

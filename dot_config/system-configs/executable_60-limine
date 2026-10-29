@@ -21,7 +21,7 @@ case "$0" in
 esac
 
 ROOT_UUID=$(findmnt -no UUID -T .)
-CMDLINE="root=UUID=$ROOT_UUID ro loglevel=4 nowatchdog mitigations=off ipv6.disable=1"
+CMDLINE="root=UUID=$ROOT_UUID ro loglevel=4 nowatchdog modprobe.blacklist=sp5100_tco mitigations=off ipv6.disable=1"
 
 # Kernels that have both an image and an initramfs, newest first.
 KERNELS=$(for k in boot/vmlinuz-*; do
