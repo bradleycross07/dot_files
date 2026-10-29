@@ -27,8 +27,6 @@ Last updated: 29 Oct 2026.
   ```sh
   curl -fsI https://raw.githubusercontent.com/bradleycross07/dot_files/void-linux/dot_config/system-configs/executable_60-limine | head -1
   ```
-- [ ] add `.config/Aurelia/config.json` to the `void-desktop` part of `.chezmoiignore`: it holds the laptop's
-  game library path, and the desktop's library is `~/Games/Aurelia` (set on first run - step 4)
 - [ ] bring dwl up to date with the main branch:
   ```sh
   cd ~/.local/src/dwl
@@ -642,12 +640,8 @@ doas tail /var/log/inputplumber/current
 
 ### First dwl session
 
-- [ ] start it by typing `dwl` on tty1 (a function in `.zshrc`)
-- [ ] Firefox: sign in to Firefox Sync (bookmarks, passwords, history, extensions) instead of copying the profile
-- [ ] Firefox `user.js` (Betterfox + overrides), `userChrome.css` and `userContent.css` - not applied by chezmoi
-  on the desktop, since the profile folder is named per install. Start Firefox once, open `about:profiles`
-  and note the **Root Directory** of the profile in use (on the laptop it ended in `.default-default`, not
-  `.default-release`), close Firefox completely, then copy all three:
+- [ ] Firefox `user.js` (Betterfox + overrides), `userChrome.css` and `userContent.css` - close Firefox
+  completely, then copy all three:
   ```sh
   # paste the Root Directory from about:profiles
   p=~/.config/mozilla/firefox/XXXXXXXX.default-default
@@ -656,13 +650,9 @@ doas tail /var/log/inputplumber/current
   cp "$src"/user.js "$p/"
   cp "$src"/chrome/userChrome.css "$src"/chrome/userContent.css "$p/chrome/"
   ```
-  - `user.js` already turns on `toolkit.legacyUserProfileCustomizations.stylesheets`, so there's nothing to
-    set in `about:config`
+  - `user.js` already turns on `toolkit.legacyUserProfileCustomizations.stylesheets`
   - edit `user.js` for the desktop **before** the next start: delete `user_pref("media.av1.enabled", false);` -
     that's only for the laptop's GPU, the RX 9070 decodes AV1 in hardware
-  - the `chrome` CSS is only read at startup: make sure `pgrep -a firefox` shows nothing before starting it
-  - check in `about:config`: `browser.contentblocking.category` = `standard`, `media.av1.enabled` = `true`
-  - `userChrome.css` hides the tab bar, so install Sidebery (via Sync) before relying on it
 - [ ] uBlock Origin: Settings → **Restore from file** → the backup in `~/backups` (the settings aren't in Sync)
 - [ ] Vesktop: log in to Discord (the session isn't in the dotfiles); Vencord's settings come back through its
   cloud sync
@@ -681,69 +671,34 @@ Manual:
   doas ln -s /usr/share/alsa/alsa.conf.d/50-pipewire.conf /etc/alsa/conf.d/
   doas ln -s /usr/share/alsa/alsa.conf.d/99-pipewire-default.conf /etc/alsa/conf.d/
   ```
-- [ ] pick default devices (headset sink, `easyeffects_source` as mic) - pavucontrol, or
-  `wpctl status` to find the IDs and `wpctl set-default <id>`
-- [ ] EasyEffects is for the mic only: Preferences → Audio → "Process all output streams" **off**,
-  "Process all input streams" on (saved in `easyeffects/db/`, so this should already be set). Apps then play
-  straight to the headset instead of through `easyeffects_sink`
 
 ## 9. Screen sharing (Vesktop, Firefox, OBS)
-
-On Wayland, apps can't capture the screen themselves. They ask **xdg-desktop-portal**, which hands the request to
-a backend for the compositor; for wlroots compositors like dwl that's **xdg-desktop-portal-wlr**, which captures
-the screen and streams it to the app through **PipeWire**. Nothing here needs a runit service: the portals are
-started on demand by the D-Bus session bus that `dbus-run-session` gives dwl.
-
-Needs: PipeWire running (autostart.sh), the D-Bus session bus, `XDG_RUNTIME_DIR` (turnstile - checked in step 7),
-and `XDG_CURRENT_DESKTOP=wlroots`, which `.zprofile` already exports (dwl doesn't set it, and the portal picks its
-backend from it).
 
 ```sh
 doas xbps-install -S xdg-desktop-portal xdg-desktop-portal-wlr xdg-desktop-portal-gtk
 ```
-(`-gtk` provides the file-picker dialogs - also used by Qt apps, since qt6ct is set to `xdgdesktopportal` - and
-the dark-mode setting; `-wlr` only does screen capture and screenshots)
 
-- [ ] the portals find the compositor because `~/.local/bin/autostart.sh` passes the Wayland variables to the
-  D-Bus session. It comes with the dotfiles, so just check the line is there, outside any per-machine block and
-  before anything else (`rg -n dbus-update-activation-environment ~/.local/bin/autostart.sh`):
+- [ ] the portals find the compositor because `~/.local/bin/autostart.sh` passes the session environment to
+  D-Bus first thing (`rg -n dbus-update-activation-environment ~/.local/bin/autostart.sh`):
   ```sh
-  dbus-update-activation-environment WAYLAND_DISPLAY XDG_CURRENT_DESKTOP
+  dbus-update-activation-environment --all
   ```
-  (it's a template - add it with `chezmoi edit ~/.local/bin/autostart.sh` if it's ever missing)
-- [ ] `~/.config/xdg-desktop-portal/portals.conf` (from the dotfiles) - which backend handles what:
+- [ ] `~/.config/xdg-desktop-portal/portals.conf`:
   ```ini
   [preferred]
   default=gtk
   org.freedesktop.impl.portal.ScreenCast=wlr
   org.freedesktop.impl.portal.Screenshot=wlr
   ```
-- [ ] `~/.config/xdg-desktop-portal-wlr/config` (from the dotfiles) - pick the monitor with fuzzel instead of the
-  default (`slurp`, not installed):
+- [ ] `~/.config/xdg-desktop-portal-wlr/config`:
   ```ini
   [screencast]
   max_fps=60
   chooser_type=dmenu
   chooser_cmd=fuzzel --dmenu -p "Share: "
   ```
-  (`max_fps` caps the stream, not the monitor - leave it at 60, since streams can't usefully send 360 Hz anyway)
-- [ ] test: restart dwl so the portals start, then start a screen share in Vesktop - fuzzel should pop up with
-  the monitor name. Firefox's https://mozilla.github.io/webrtc-landing/gum_test.html (Screen capture) is a quick
-  second check. If nothing appears, `pgrep -a xdg-desktop-portal` shows whether both portals started
-
-Notes:
-- whole-monitor sharing is the main use, but single windows can be shared too: dwl 0.9 exposes
-  `ext_image_copy_capture_manager_v1`, `ext_foreign_toplevel_list_v1` and
-  `ext_foreign_toplevel_image_capture_source_manager_v1` (confirmed on the laptop with
-  `wayland-info | grep -E 'ext_image_copy|ext_foreign_toplevel'`, from `wayland-utils`). Whether windows show up
-  in the fuzzel picker depends on the xdg-desktop-portal-wlr version - check with `xbps-query xdg-desktop-portal-wlr`
-- Vesktop is used (built from source with a raised stream bitrate - step 4) for 1440p 60 fps streams with Nitro.
-  Stream *audio* is still hit and miss on Linux
 
 ## 10. System configs (/etc)
-
-`dhcpcd.conf` and `rc.conf` (and `~/.local/bin/autostart.sh`) are chezmoi templates (`.tmpl` in the repo):
-their per-machine parts are filled in from the hostname. Edit them with `chezmoi edit` - `chezmoi re-add` skips templates.
 
 Copies live in `~/.config/system-configs` (applied by chezmoi in step 6).
 
@@ -794,12 +749,6 @@ doas sv restart nftables dhcpcd
 doas sysctl --system
 cd
 ```
-
-- [ ] IPv6 is disabled on the kernel command line, so any `ip6` table in `nftables.conf` or `net.ipv6.*` key in
-  `99-network.conf` will fail here: `nft -c -f` above catches the first; for the second, `doas sysctl --system`
-  prints an error per missing key - harmless, but drop those keys if you want a clean run
-
-Not backed up on purpose (machine-specific): `/etc/fstab`.
 
 ## 11. Desktop-specific
 

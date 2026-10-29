@@ -39,6 +39,9 @@ patches
 .local/share/applications/spotify.desktop
 .config/spicetify
 
+# Aurelia's config holds the laptop's game library path; the desktop sets ~/Games/Aurelia on first run
+.config/Aurelia/config.json
+
 # the firefox profile folder name is random per install, copy userContent.css, userChrome.css and user.js by hand, probably configure user.js to match desktop preferences.
 .config/mozilla
 
