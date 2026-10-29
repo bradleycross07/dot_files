@@ -752,9 +752,7 @@ cd
 
 ## 11. Desktop-specific
 
-- [ ] GPU (RX 9070, RDNA4): Mesa + `mesa-vulkan-radeon` (installed in step 2), AMD firmware, mainline kernel -
-  check with `lspci -k` that the GPU uses the `amdgpu` driver, and that it's the only GPU (iGPU disabled in the BIOS)
-- [ ] dwl `desktop` branch: monitor rule for the XG27ACDNG, 2560x1440 @ 360 Hz
+- [ ] check the dedicated GPU is the one in use: `lspci -k` (the RX 9070 with `amdgpu`)
 - [ ] machine-specific configs - they arrive with the laptop's values; edit them for this PC:
   - fastfetch (`~/.config/fastfetch/config.jsonc`): CPU line ("Ryzen 5 5500U" → 7800X3D), GPU line
     ("Lucienne" → RX 9070), memory speed ("4266 MT/s" → 6000)
@@ -762,15 +760,10 @@ cd
   - mpv (`~/.config/mpv/mpv.conf`): `gpu-api=vulkan`, heavier scalers, add `av1` to `hwdec-codecs`, and loosen
     `ytdl-format` - the laptop caps YouTube at VP9 because its decoder can't do AV1, the RX 9070 can
     (`vainfo` lists what the GPU decodes)
-  - Vesktop wrapper (`~/.local/bin/vesktop`): hardware *encoding* is disabled
-    (`--disable-features=AcceleratedVideoEncoder,VaapiVideoEncoder`). The RX 9070 encodes H.264/HEVC/AV1, so
-    optionally drop that line and add `AcceleratedVideoEncoder` to `--enable-features`, then test a 1440p 60 stream;
-    put the line back if streams look worse or won't start
-  - so chezmoi doesn't overwrite these with the laptop's values (or `re-add` the desktop's values back to the
-    laptop): template the hardware lines on `.chezmoi.hostname`, or list the files in `.chezmoiignore`
-    for `void-desktop` once they're edited
-- [ ] text/code files open in Neovim inside foot: `nvim-foot.desktop` and `mimeapps.list` come with the
-  dotfiles, so just check: `xdg-mime query default text/plain` should print `nvim-foot.desktop`
+  - Vesktop wrapper (`~/.local/bin/vesktop`): remove the
+    `--disable-features=AcceleratedVideoEncoder,VaapiVideoEncoder` line (the RX 9070 can hardware-encode)
+  - once edited, add these files to the desktop block of `.chezmoiignore`, so the laptop and desktop
+    versions don't overwrite each other
 - [ ] gaming:
   - gamemode group (exists now that the package is installed): `doas usermod -aG gamemode bradley`,
     then log out and back in and check with `id | rg gamemode`
@@ -784,33 +777,12 @@ cd
   - test: `gamemoded -t` should end with "All Tests Passed!". The governor and GPU helpers go through polkit;
     on the laptop that ran with elogind, here it doesn't. If those two tests fail with authorisation errors,
     check `polkit` is installed (gamemode should pull it in) and enable it: `doas ln -s /etc/sv/polkitd /var/service/`
-  - Aurelia launch scripts: `gamemoderun` goes in front of `gamescope`. Update the gamescope resolutions and
-    refresh rates for this monitor (`-W 2560 -H 1440 -r 360`, frame caps via `--framerate-limit`).
-    MangoHud's config comes with the dotfiles (FPS + gamemode indicator; gamescope does the frame limiting)
-  - while a game runs, `gamemoded -s` should say "gamemode is active"
 - [ ] seat management: `seatd` + `turnstile` instead of elogind
   (see https://docs.voidlinux.org/config/session-management.html)
-  - don't run elogind and seatd together
-  - poweroff/suspend: `doas poweroff`, `doas zzz` (no loginctl)
-  - polkit prompts (e.g. mounting drives in Thunar) generally need elogind - use doas instead
 - [ ] minimal service set - no TLP, zram, earlyoom, iwd, unbound, cronie or logging:
   ethernet only, 32 GB RAM, amd-pstate-epp handles the 7800X3D
-- [ ] locate (only if you install one, e.g. `plocate`): no cron, so refresh its database by hand - `doas updatedb`
-- [ ] TRIM: manual, no job and no `discard` - run every month or so:
-  `doas fstrim -av` (trims every mounted filesystem that supports it and shows how much)
 - [ ] kernel options (in the Limine hook): `loglevel=4 nowatchdog modprobe.blacklist=sp5100_tco mitigations=off ipv6.disable=1`
   - `sp5100_tco` is AMD's chipset watchdog driver - blacklisted on the laptop too, alongside `nowatchdog`
-- [ ] optional, test before keeping: sched_ext scheduler (the `scx` package, e.g. `scx_lavd`) - compare frame
-  times with MangoHud with and without it; only keep it if it measurably helps.
-  **On the laptop (Oct 2026) `scx_lavd` 1.1.3 froze the whole system on mainline 7.2** with both `--autopower`
-  and `--autopilot` (`sched_ext: ... disabled (runnable task stall)` in the kernel log) - the `scx` package was
-  older than the kernel's sched_ext interface. So:
-  - only try it once its output no longer shows `member ... not found in kernel` and the kernel log no
-    longer shows `sched_ext: Writing directly to p->scx.slice/dsq_vtime is deprecated`
-  - test by hand first (`doas scx_lavd --autopilot` in a terminal, Ctrl+C to stop) - **not** as a runit
-    service: a stalled scheduler gets kicked out once, but runit restarts it straight away and it freezes again
-  - check afterwards: `doas dmesg | rg 'runnable task stall'`
-  - the 7800X3D has a single CCD, so the "AMD 3D V-Cache optimizer" from CachyOS's wiki doesn't apply
 - [ ] move the backup off the SATA SSD: mount it with your ownership, upload the phone photos (~50 GB) and
   anything else to the uni Google Drive from Firefox, copy the rest into `~`, then unmount:
   ```sh
@@ -833,7 +805,7 @@ cd
 - [ ] once everything's set up, save the desktop's own lists:
   ```sh
   xbps-query -m > ~/.config/system-configs/packages-$(hostname).txt
-  ls /var/service > ~/.config/system-configs/services-$(hostname).txt
+  command ls /var/service > ~/.config/system-configs/services-$(hostname).txt
   ```
 
 ## 12. Theming
