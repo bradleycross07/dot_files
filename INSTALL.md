@@ -6,12 +6,6 @@ everything after it is on the desktop.
 Hardware: Ryzen 7 7800X3D, Gigabyte B850 EAGLE WIFI7 ICE, 32 GB DDR5-6000 CL30, XFX Swift RX 9070 16 GB,
 Asus ROG Strix OLED XG27ACDNG (2560x1440 @ 360 Hz), ADATA 512 GB NVMe (system), WD Green 1 TB SATA SSD (games).
 
-(look at `.chezmoiignore` to see what the desktop skips)
-
-Repos:
-- dotfiles: `github.com/bradleycross07/dot_files` (public; branch `void-linux`)
-- dwl: `github.com/bradleycross07/void-dwl-config` (private; upstream is Codeberg dwl)
-
 ---
 
 ## 0. Before starting (on the laptop)
@@ -21,21 +15,12 @@ Do these first, then keep this checklist open on the laptop while installing on 
 Last updated: 29 Oct 2026.
 
 ### Right before the install
-- [ ] refresh the lists, pull in any config changes made since, and push:
+- [ ] refresh the package and service lists, then push:
   ```sh
   xbps-query -m > ~/.config/system-configs/packages-void.txt
   command ls /var/service > ~/.config/system-configs/services-void.txt   # 'command' skips the eza alias
-  # /etc files aren't tracked by chezmoi directly - copy them in first (doas.conf is root-only)
-  cd ~/.config/system-configs
-  cp /etc/sysctl.d/99-vm.conf /etc/sysctl.d/99-network.conf /etc/sysctl.conf /etc/rc.local .
-  cp /etc/default/grub grub
-  cp /etc/dracut.conf.d/*.conf dracut.conf.d/
-  doas cat /etc/doas.conf > doas.conf
-  cd
   chezmoi re-add
-  chezmoi git -- add -A
-  chezmoi git -- status
-  chezmoi git -- commit -m "Refresh before desktop install" && chezmoi git -- push
+  chezmoi git -- commit -am "Refresh package and service lists" && chezmoi git -- push
   ```
 - [ ] check the Limine kernel hook is in the pushed repo - step 1 fetches it straight from GitHub
   (it should print `200`):
@@ -44,8 +29,7 @@ Last updated: 29 Oct 2026.
   ```
 - [ ] add `.config/Aurelia/config.json` to the `void-desktop` part of `.chezmoiignore`: it holds the laptop's
   game library path, and the desktop's library is `~/Games/Aurelia` (set on first run - step 4)
-- [ ] dwl: bring the `desktop` branch up to date with everything merged into `main` since it was created
-  (e.g. `cursorsize`), then push it - step 4 clones it fresh:
+- [ ] bring dwl up to date with the main branch:
   ```sh
   cd ~/.local/src/dwl
   # switch to it, or create it the first time
@@ -58,9 +42,7 @@ Last updated: 29 Oct 2026.
 - [ ] export the settings that aren't in the dotfiles or Firefox Sync onto the Ventoy USB (next to the SSH key
   and saves - step 4):
   - uBlock Origin: Settings → **Back up to file** (filter lists, `no-cosmetic-filtering` rules, settings)
-  - Vencord (fallback only): Vesktop → Settings → **Backup & Restore** → export. Its `settings.json` and
-    `quickCss.css` already come with the dotfiles; the export also covers plugin data stored inside Vesktop
-  - put both files in a `backups/` folder on the USB
+  - put the file in a `backups/` folder on the USB
 
 ### Backing up the old Windows drives (from the live environment, to avoid Windows altogether)
 The plan: free space on the SATA SSD (delete the Games folder), copy what's needed from the NVMe onto it,
@@ -84,8 +66,7 @@ install Void on the NVMe, sort the backup out from the finished PC, and only the
    (Windows wasn't shut down cleanly - a crash, power cut or forced restart), clear the flag and retry:
    `xbps-install -S ntfs-3g && ntfsfix -d /dev/sdXN`
 4. Delete the games from `/mnt/sata` to make room if needed
-5. Copy what's wanted from the Windows drive (`--preserve=timestamps` instead of `-a`, since NTFS can't store
-   Unix owners/permissions), e.g.
+5. Copy what's wanted from the Windows drive (`--preserve=timestamps` instead of `-a`), e.g.
    ```sh
    mkdir -p /mnt/sata/backup
    # Windows user is "Bradley"
@@ -100,8 +81,7 @@ install Void on the NVMe, sort the backup out from the finished PC, and only the
 ### Disk layout
 - NVMe: EFI 512 MiB FAT32 mounted at `/boot` (Limine reads the kernel from it)
   - ext4 root, no swap
-- SATA SSD: ext4, games (`~/Games`), formatted only after the backup is safe
-  (until then Linux reads/writes its NTFS fine via the kernel ntfs3 driver)
+- SATA SSD: ext4, games (`~/Games`)
 
 ### BIOS / UEFI
 - [ ] update the BIOS first (newest for the B850 board) - do everything below *after* the update,
@@ -181,11 +161,6 @@ printf 'ignorepkg=linux\nignorepkg=linux-headers\n' > /mnt/etc/xbps.d/mainline.c
 printf 'ignorepkg=linux-firmware-nvidia\nignorepkg=linux-firmware-intel\nignorepkg=linux-firmware-broadcom\n' \
     > /mnt/etc/xbps.d/ignore.conf
 ```
-
-(`mainline.conf`: `linux-mainline` replaces the plain `linux` kernel. `ignore.conf`: Intel, NVIDIA and Broadcom
-firmware are ignored, as this is an AMD-only system (GPU and CPU) with no Broadcom network chip;
-`linux-firmware-network` covers the rest. One package per `ignorepkg=` line - xbps reads a comma-separated list
-as a single package name and ignores none of them.)
 
 ### Install the base system
 
@@ -274,10 +249,7 @@ efibootmgr --create --disk /dev/nvme0n1 --part 1 \
 
 Copy `BOOTX64.EFI` again whenever the `limine` package updates.
 
-Kernel hook: Void's `limine` package doesn't update `limine.conf` and Limine has no wildcards, so this rewrites
-it from the kernels in `/boot` (the newest first, the one before it as a fallback entry; a kernel without an
-initramfs is skipped). It runs on kernel removal too, so `vkpurge` can't leave an entry pointing at a deleted
-kernel. Fetch it from the dotfiles (checked in step 0):
+Kernel hook:
 
 ```sh
 mkdir -p /etc/kernel.d/post-install /etc/kernel.d/post-remove
@@ -377,9 +349,6 @@ doas xbps-install -S rust cargo mold
 cargo install tree-sitter-cli
 ```
 
-`.zshrc` (which aliases `grep` to `rg`, `cat` to `bat` and so on) and the Neovim config arrive in step 6;
-lazy.nvim bootstraps itself on Neovim's first launch after that.
-
 ## 4. Built from source (`~/.local/src`)
 
 ### From the Ventoy USB: SSH key, game saves
@@ -398,7 +367,7 @@ ssh -T git@github.com
 tar -xzf /mnt/saves/unity3d.tar.gz -C ~
 # Celeste: on the laptop `Saves` linked into the game's install folder; here it's a normal folder
 tar -xzf /mnt/saves/celeste.tar.gz -C ~
-# uBlock Origin + Vencord backups (exported in step 0), restored from Firefox/Vesktop in step 7
+# uBlock Origin backup (exported in step 0), restored from Firefox in step 7
 mkdir -p ~/backups && cp /mnt/backups/* ~/backups/
 # once ssh -T has greeted you: the key doesn't stay on the USB
 rm -r /mnt/ssh-key
@@ -755,9 +724,8 @@ doas tail /var/log/inputplumber/current
   - check in `about:config`: `browser.contentblocking.category` = `standard`, `media.av1.enabled` = `true`
   - `userChrome.css` hides the tab bar, so install Sidebery (via Sync) before relying on it
 - [ ] uBlock Origin: Settings → **Restore from file** → the backup in `~/backups` (the settings aren't in Sync)
-- [ ] Vesktop: log in to Discord (the session isn't in the dotfiles). Vencord's settings and QuickCSS come with
-  the dotfiles (`~/.config/vesktop/settings/`); only if plugin data is missing, import the export from
-  `~/backups` (Settings → Backup & Restore, exported on the laptop in step 0)
+- [ ] Vesktop: log in to Discord (the session isn't in the dotfiles); Vencord's settings come back through its
+  cloud sync
 
 ## 8. Audio
 
