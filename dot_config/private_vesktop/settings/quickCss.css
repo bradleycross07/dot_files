@@ -257,6 +257,16 @@ li[class*="messageListItem"] > [class*="groupStart"] {
   line-height: 24px !important;
 }
 
+/* Quests: 11px */
+[class*="questTile"] {
+  font-size: 11px !important;
+}
+
+[class*="questTile"] :is([class*="text-"], [class*="heading-"], [class*="body-"])[class] {
+  font-size: 11px !important;
+  line-height: round(1.36em, 1px) !important;
+}
+
 /* Tags, badges and LIVE pill. Keep these after everything above. */
 :is([class*="chiplet"], [class*="botTag"], [class*="numberBadge"], [class*="textBadge"])[class] {
   font-size: 11px !important;

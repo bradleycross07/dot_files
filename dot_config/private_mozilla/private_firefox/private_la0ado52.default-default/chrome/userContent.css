@@ -126,3 +126,9 @@
     padding: 0 !important;
   }
 }
+
+@-moz-document domain("tiktok.com") {
+  html:root {
+    font-size: 14px !important;
+  }
+}

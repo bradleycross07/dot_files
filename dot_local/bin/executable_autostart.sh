@@ -4,8 +4,8 @@
 # environment: Wayland/X display, cursor theme and size, Qt/GTK settings
 dbus-update-activation-environment --all
 
-# razer
-openrazer-daemon &
+# razer - don't need it for now since razer mouse has onboard memory
+# openrazer-daemon &
 
 # gnome keyring
 gnome-keyring-daemon --start --components=secrets &
@@ -28,8 +28,8 @@ pipewire &
 # monitors
 kanshi &
 
-# XSettings for X11/XWayland apps
-xsettingsd &
+# XSettings for X11/XWayland apps - commented out for now to not run XWayland 24/7
+# xsettingsd &
 
 # night light
 gammastep &

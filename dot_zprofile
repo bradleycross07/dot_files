@@ -6,6 +6,7 @@ export PNPM_HOME="$HOME/.local/share/pnpm"
 path=(
   ~/.local/bin
   ~/.cargo/bin
+  ~/.spicetify
   $PNPM_HOME/bin
   ~/.local/opt/arm-gnu-toolchain/bin
   $path
