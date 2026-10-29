@@ -3,6 +3,7 @@
 # let D-Bus activated services (portals etc.) inherit the full session
 # environment: Wayland/X display, cursor theme and size, Qt/GTK settings
 dbus-update-activation-environment --all
+{{- if eq .chezmoi.hostname "void" }}
 
 # razer - don't need it for now since razer mouse has onboard memory
 # openrazer-daemon &
@@ -12,6 +13,7 @@ gnome-keyring-daemon --start --components=secrets &
 
 # polkit authentication agent
 /usr/libexec/polkit-gnome-authentication-agent-1 &
+{{- end }}
 
 # audio (pipewire starts wireplumber and pipewire-pulse via ~/.config/pipewire/pipewire.conf.d)
 pipewire &
@@ -22,8 +24,11 @@ pipewire &
     n=$((n + 1)); [ "$n" -ge 150 ] && exit 1
     sleep 0.2
   done
+{{- if eq .chezmoi.hostname "void" }}
     sway-audio-idle-inhibit >/dev/null 2>&1 &
+{{- end }}
     easyeffects --gapplication-service ) &
+{{- if eq .chezmoi.hostname "void" }}
 
 # monitors
 kanshi &
@@ -37,6 +42,7 @@ gammastep &
 # clipboard history
 wl-paste --type text --watch cliphist store &
 wl-paste --type image --watch cliphist store &
+{{- end }}
 
 # idling: lock at 10 min, screen off at 15, power off after 3 h
 swayidle -w \

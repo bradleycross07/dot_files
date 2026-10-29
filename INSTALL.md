@@ -1,7 +1,7 @@
 # Void Linux + dwl install checklist: desktop (`void-desktop`)
 
-Setting up the new PC with the same Void + dwl setup as the laptop (`void`). Section 0 is done on the laptop;
-everything after it is on the desktop.
+Setting up the new PC with the same Void + dwl setup as the laptop (`void`). Section 0 starts on the laptop, then
+moves to the new PC for the BIOS and the backup (from the live ISO); everything after it is on the desktop.
 
 Hardware: Ryzen 7 7800X3D, Gigabyte B850 EAGLE WIFI7 ICE, 32 GB DDR5-6000 CL30, XFX Swift RX 9070 16 GB,
 Asus ROG Strix OLED XG27ACDNG (2560x1440 @ 360 Hz), ADATA 512 GB NVMe (system), WD Green 1 TB SATA SSD (games).
@@ -37,10 +37,29 @@ Last updated: 29 Oct 2026.
   # back to main, or the laptop's next `make` builds the desktop config
   git switch main
   ```
-- [ ] export the settings that aren't in the dotfiles or Firefox Sync onto the Ventoy USB (next to the SSH key
-  and saves - step 4):
-  - uBlock Origin: Settings → **Back up to file** (filter lists, `no-cosmetic-filtering` rules, settings)
-  - put the file in a `backups/` folder on the USB
+- [ ] uBlock Origin: Settings → **Back up to file** (it's not in the dotfiles or Firefox Sync; saves to `~/Downloads`)
+- [ ] copy the SSH key, game saves and uBlock backup onto the Ventoy USB's data partition - step 4 restores them:
+  ```sh
+  doas mount -o uid=1000,gid=1000 /dev/sdX1 /mnt
+  mkdir -p /mnt/ssh-key /mnt/saves /mnt/backups
+  cp ~/.ssh/{github-void,github-void.pub,config} /mnt/ssh-key/
+  # Hollow Knight + Silksong
+  tar -czf /mnt/saves/unity3d.tar.gz -C ~ .config/unity3d
+  # Celeste: -h stores what the Saves link points at, so the desktop gets a normal folder
+  tar -czhf /mnt/saves/celeste.tar.gz -C ~ .local/share/Celeste
+  cp ~/Downloads/my-ublock-backup_*.txt /mnt/backups/
+  doas umount /mnt
+  ```
+
+### BIOS / UEFI
+- [ ] update the BIOS first (newest for the B850 board) - do everything below *after* the update,
+  since updating resets the settings
+- [ ] UEFI only: CSM off, Secure Boot off, TPM off
+- [ ] disable the 7800X3D's integrated graphics (Integrated Graphics: Disabled) - the RX 9070 is the only GPU,
+  so dwl can't end up compositing on the iGPU, and gamemode's `gpu_device` is unambiguous
+- [ ] EXPO on for the DDR5-6000 CL30 kit - the first boot can sit on a black screen for a few
+  minutes while the RAM trains
+- [ ] Resizable BAR (and Above 4G Decoding) on for the RX 9070
 
 ### Backing up the old Windows drives (from the live environment, to avoid Windows altogether)
 The plan: free space on the SATA SSD (delete the Games folder), copy what's needed from the NVMe onto it,
@@ -80,16 +99,6 @@ install Void on the NVMe, sort the backup out from the finished PC, and only the
 - NVMe: EFI 512 MiB FAT32 mounted at `/boot` (Limine reads the kernel from it)
   - ext4 root, no swap
 - SATA SSD: ext4, games (`~/Games`)
-
-### BIOS / UEFI
-- [ ] update the BIOS first (newest for the B850 board) - do everything below *after* the update,
-  since updating resets the settings
-- [ ] UEFI only: CSM off, Secure Boot off, TPM off
-- [ ] disable the 7800X3D's integrated graphics (Integrated Graphics: Disabled) - the RX 9070 is the only GPU,
-  so dwl can't end up compositing on the iGPU, and gamemode's `gpu_device` is unambiguous
-- [ ] EXPO on for the DDR5-6000 CL30 kit - the first boot can sit on a black screen for a few
-  minutes while the RAM trains
-- [ ] Resizable BAR (and Above 4G Decoding) on for the RX 9070
 
 ## 1. Base install
 
@@ -478,8 +487,8 @@ Proton games still on X11: try `PROTON_ENABLE_WAYLAND=1`.
 - needs pnpm (standalone installer) and Node.js, which on the laptop is managed by pnpm itself
   (`pnpm ls -g` shows `node@26` as a global) rather than Void's `nodejs` package:
   ```sh
-  # writes a pnpm block to ~/.zshrc - step 6 replaces that file with
-  # the dotfiles' .zshrc, which has the same block
+  # writes a pnpm block to ~/.zshrc - step 6 replaces that file, and the
+  # dotfiles' .zprofile sets PNPM_HOME and PATH instead
   curl -fsSL https://get.pnpm.io/install.sh | sh -
   # reload so PNPM_HOME/PATH apply
   exec zsh
@@ -616,15 +625,15 @@ doas powerprofilesctl set performance
 ```
 
 InputPlumber (built in step 4): restore its DualSense config (`persist: true`, so the virtual Xbox pad survives
-a replug) and its service, then enable it. The log service writes its own log with svlogd to
-`/var/log/inputplumber`, so it works without socklog - keep it. Check it's that version first:
+a replug) and its service, then enable it. The laptop's log service uses `vlogger` (socklog), which the desktop
+doesn't run, so swap it for svlogd writing to `/var/log/inputplumber`:
 
 ```sh
-# should be: exec svlogd -tt /var/log/inputplumber  (not vlogger)
-cat ~/.config/system-configs/sv-inputplumber/log/run
 doas mkdir -p /etc/inputplumber/devices.d
 doas cp ~/.config/system-configs/inputplumber/*.yaml /etc/inputplumber/devices.d/
 doas cp -r ~/.config/system-configs/sv-inputplumber /etc/sv/inputplumber
+printf '#!/bin/sh\nexec svlogd -tt /var/log/inputplumber\n' | doas tee /etc/sv/inputplumber/log/run
+doas mkdir -p /var/log/inputplumber
 doas ln -s /etc/sv/inputplumber /var/service/
 # with the DualSense plugged in: it should be detected and blocked, with a virtual Xbox 360 pad created
 doas tail /var/log/inputplumber/current
@@ -708,7 +717,7 @@ Copies live in `~/.config/system-configs` (applied by chezmoi in step 6).
 | `sysctl.conf`        | `/etc/sysctl.conf`            | `vm.max_map_count=1048576` (some Proton games need it) |
 | `rc.local`           | `/etc/rc.local`               | MGLRU thrashing protection (`min_ttl_ms` 1000) - stands in for earlyoom, which isn't installed |
 | `dracut.conf.d/no-drm.conf` | `/etc/dracut.conf.d/`  | leaves `drm` (amdgpu + every AMD GPU's firmware) and the crypt modules out of the initramfs - amdgpu loads from the root filesystem instead. Rebuild after copying |
-| `doas.conf`          | `/etc/doas.conf`              | check with `doas -C` first; `chmod 0400`; passwordless poweroff/reboot, plus `sv up/down inputplumber` for the Aurelia launch scripts. `zzz` isn't passwordless any more - add `permit nopass bradley cmd zzz` back if suspending from a keybind (section 11) |
+| `doas.conf`          | `/etc/doas.conf`              | check with `doas -C` first; `chmod 0400`; passwordless poweroff/reboot, plus `sv up/down inputplumber` for the Aurelia launch scripts. `zzz` isn't passwordless any more - add `permit nopass bradley cmd zzz` back if suspending from a keybind |
 | `nftables.conf`      | `/etc/nftables.conf`          | check with `nft -c -f` first |
 | `rc.conf`            | `/etc/rc.conf`                | template: KEYMAP `us`     |
 | `dhcpcd.conf`        | `/etc/dhcpcd.conf`            | template: Cloudflare DNS  |
@@ -806,6 +815,8 @@ cd
   ```sh
   xbps-query -m > ~/.config/system-configs/packages-$(hostname).txt
   command ls /var/service > ~/.config/system-configs/services-$(hostname).txt
+  chezmoi add ~/.config/system-configs/{packages,services}-$(hostname).txt
+  chezmoi git -- commit -m "Desktop package and service lists" && chezmoi git -- push
   ```
 
 ## 12. Theming
@@ -828,8 +839,9 @@ doas xbps-install -S gsettings-desktop-schemas dconf
   curl -fLO "$base/Bibata-Modern-Classic.tar.xz"
   tar -xf Bibata-Modern-Classic.tar.xz && rm Bibata-Modern-Classic.tar.xz
   ```
-- [ ] `~/.config/assets` is a symlink to `/usr/share/themes/Breeze-Dark/assets` (used by the GTK 4 theme) -
-  check it resolves now that Breeze-Dark is installed: `ls ~/.config/assets/ | head`
+- [ ] GTK 4: `~/.config/gtk-4.0/gtk.css` links to Breeze-Dark's, which loads its images from `../assets` - so
+  that path has to exist next to it (it's no longer in the dotfiles):
+  `ln -s /usr/share/themes/Breeze-Dark/assets ~/.config/assets && ls ~/.config/assets/ | head`
 - [ ] gsettings - GTK apps on Wayland read these, and they live in the binary `~/.config/dconf/user`,
   which isn't in the repo. dconf saves through dwl's D-Bus session bus, so run these **in foot inside dwl** -
   from the bare tty the values silently don't save:
