@@ -12,7 +12,7 @@ Asus ROG Strix OLED XG27ACDNG (2560x1440 @ 360 Hz), ADATA 512 GB NVMe (system), 
 
 Do these first, then keep this checklist open on the laptop while installing on the PC.
 
-Last updated: 29 Oct 2026.
+Last updated: 30 Oct 2026.
 
 ### Right before the install
 - [ ] refresh the package and service lists, then push:
@@ -52,6 +52,8 @@ Last updated: 29 Oct 2026.
   ```
 
 ### BIOS / UEFI
+- [ ] plug the monitor into the RX 9070, not the motherboard - its video outputs go dead once the iGPU is
+  disabled below
 - [ ] update the BIOS first (newest for the B850 board) - do everything below *after* the update,
   since updating resets the settings
 - [ ] UEFI only: CSM off, Secure Boot off, TPM off
@@ -60,6 +62,14 @@ Last updated: 29 Oct 2026.
 - [ ] EXPO on for the DDR5-6000 CL30 kit - the first boot can sit on a black screen for a few
   minutes while the RAM trains
 - [ ] Resizable BAR (and Above 4G Decoding) on for the RX 9070
+- [ ] 7800X3D: CPPC and CPPC Preferred Cores **Enabled** (amd-pstate needs CPPC - without it Linux falls back to
+  acpi-cpufreq); Global C-states left on (idle cores give the busy ones boost headroom)
+- [ ] after EXPO: check UCLK runs 1:1 with the memory clock (UCLK = MCLK) and FCLK is around 2000 - usually right on Auto
+- [ ] Memory Context Restore on (skips RAM retraining every boot - turn it back off if it causes memory errors)
+- [ ] don't raise SoC voltage above ~1.3 V
+- [ ] onboard Wi-Fi and Bluetooth off (wired only), and Gigabyte's "APP Center Download & Install" off (Windows-only)
+- [ ] later, once stable: Curve Optimizer (under PBO) with a negative all-core offset - step down gradually and
+  stress-test between steps
 
 ### Backing up the old Windows drives (from the live environment, to avoid Windows altogether)
 The plan: free space on the SATA SSD (delete the Games folder), copy what's needed from the NVMe onto it,
@@ -320,7 +330,7 @@ reference to pick from, not something to install wholesale. Build dependencies a
 Don't install on the desktop:
 - laptop power/memory/network: `tlp`, `zramen`, `iwd`, `wifi-firmware`, `unbound`, `wireguard-tools`
 - `grub-x86_64-efi` (Limine instead), `elogind` (seatd + turnstile instead), `cronie`, `socklog-void`, `yarn`
-- laptop session extras (autostart.sh doesn't run them on the desktop): `kanshi`, `wlr-randr`, `gammastep`,
+- laptop session extras (autostart.sh doesn't run them on the desktop): `kanshi`, `gammastep`,
   `xsettingsd`, `polkit-gnome`, `gnome-keyring`, `cliphist`, `sway-audio-idle-inhibit`
   - optional: `wl-clip-persist` keeps the clipboard after the source app closes (no history)
   - add `gnome-keyring` back if signing into apps that need a keyring
@@ -432,7 +442,11 @@ export ELECTRON_OZONE_PLATFORM_HINT=auto
 Proton games still on X11: try `PROTON_ENABLE_WAYLAND=1`.
 
 ### Aurelia
-- needs `rust cargo mold` (and possibly `openssl-devel` - it's on the laptop's list)
+- build dependency: `dbus-devel` (its keyring support builds against libdbus; gcc and pkg-config came with the
+  dwl step, and it uses rustls, so no openssl):
+  ```sh
+  doas xbps-install -S dbus-devel
+  ```
 - bubblewrap, for the launch scripts:
   ```sh
   doas xbps-install -S bubblewrap
@@ -762,6 +776,18 @@ cd
 ## 11. Desktop-specific
 
 - [ ] check the dedicated GPU is the one in use: `lspci -k` (the RX 9070 with `amdgpu`)
+- [ ] check the monitor is running at 360 Hz inside dwl: `doas xbps-install -S wlr-randr && wlr-randr`. dwl's
+  monitor rules can't set a mode - it uses the monitor's preferred one. If that isn't 360 Hz, add the mode to
+  the desktop part of `autostart.sh` (`chezmoi edit ~/.local/bin/autostart.sh`), with the output name
+  `wlr-randr` printed:
+  ```sh
+  {{- if ne .chezmoi.hostname "void" }}
+  wlr-randr --output DP-1 --mode 2560x1440@360Hz
+  {{- end }}
+  ```
+- [ ] USB layout: put the mouse and keyboard on a different USB controller from the headset and anything
+  high-traffic, ideally rear ports wired to the CPU rather than front-panel or hub ports. `lsusb -t` shows
+  which bus (controller) each device is on
 - [ ] machine-specific configs - they arrive with the laptop's values; edit them for this PC:
   - fastfetch (`~/.config/fastfetch/config.jsonc`): CPU line ("Ryzen 5 5500U" → 7800X3D), GPU line
     ("Lucienne" → RX 9070), memory speed ("4266 MT/s" → 6000)
