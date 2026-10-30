@@ -393,6 +393,13 @@ rm -r /mnt/ssh-key
 doas umount /mnt
 ```
 
+### Updating your changes to the latest upstream
+
+Each repo below is cloned with your commits on top of whatever upstream version they were last based on. Rebase
+them onto the newest upstream as you clone, so the install starts current. If a rebase stops on a conflict: fix the
+file, `git add` it, `git rebase --continue`; if the conflicting commit is one upstream has since merged (like dwl's
+lock-screen fixes), `git rebase --skip` drops it. Push the result back afterwards, as each section shows.
+
 ### Rust builds
 
 ```sh
@@ -417,7 +424,13 @@ cd ~/.local/src/dwl
 git remote add upstream https://codeberg.org/dwl/dwl.git
 # merged with main and pushed in step 0
 git checkout desktop
+# onto the newest dwl release (skipped if desktop already contains it)
+git fetch upstream --tags
+latest=$(git tag -l 'v*' --sort=-v:refname | grep -v -- - | head -1)
+git merge-base --is-ancestor "$latest" HEAD || git rebase --onto "$latest" "$(git merge-base HEAD upstream/main)"
+# a new release may need a newer wlroots: check config.mk's wlroots-0.xx matches the -devel installed above
 make && doas make install
+git push --force-with-lease origin desktop
 ```
 - the `desktop` branch: monitor rule, no brightness keys, no Mod+v clipboard picker
 - dwl runs `~/.local/bin/autostart.sh` at startup (a template): PipeWire, EasyEffects (mic for Vesktop) and swayidle
@@ -466,12 +479,15 @@ Proton games still on X11: try `PROTON_ENABLE_WAYLAND=1`.
   git remote add backup git@github.com:bradleycross07/aurelia-local.git
   git fetch backup
   git switch -c local --track backup/local
+  # onto the latest upstream main - the same thing update-aurelia does later
+  git rebase origin/main
   ```
-- build, install, then clean:
+- build, install, clean, then push the rebased branch:
   ```sh
   cargo build --release
   cp target/release/aurelia ~/.local/bin/
   cargo clean
+  git push --force-with-lease backup local
   ```
 
 ### spotatui
@@ -488,6 +504,9 @@ Proton games still on X11: try `PROTON_ENABLE_WAYLAND=1`.
   cd ~/.local/src/spotatui
   git remote add upstream https://github.com/LargeModGames/spotatui.git
   git fetch upstream --tags
+  # onto the newest release (skipped if the branch already contains it)
+  latest=$(git tag -l 'v*' --sort=-v:refname | grep -v -- - | head -1)
+  git merge-base --is-ancestor "$latest" HEAD || git rebase --onto "$latest" "$(git merge-base HEAD upstream/main)"
   ```
 - build with only the features in use (`self-update` would replace the patched binary with an official
   release; the macOS/Windows media features don't build on Linux anyway), install, clean:
@@ -495,6 +514,7 @@ Proton games still on X11: try `PROTON_ENABLE_WAYLAND=1`.
   cargo build --release --no-default-features --features tui,streaming,discord-rpc,mpris,cover-art,scripting
   cp target/release/spotatui ~/.local/bin/
   cargo clean
+  git push --force-with-lease origin local
   ```
 
 ### Vesktop
@@ -519,12 +539,17 @@ Proton games still on X11: try `PROTON_ENABLE_WAYLAND=1`.
   git remote add backup git@github.com:bradleycross07/vesktop-local.git
   git fetch backup
   git switch -c local --track backup/local
+  # onto the newest release (skipped if the branch already contains it)
+  git fetch origin --tags
+  latest=$(git tag -l 'v*' --sort=-v:refname | grep -v -- - | head -1)
+  git merge-base --is-ancestor "$latest" HEAD || git rebase --onto "$latest" "$(git merge-base HEAD origin/main)"
   pnpm install --frozen-lockfile
   # unpacked build in dist/linux-unpacked
   pnpm package:dir
   rm -rf ~/.local/opt/Vesktop
   mkdir -p ~/.local/opt
   cp -r dist/linux-unpacked ~/.local/opt/Vesktop
+  git push --force-with-lease backup local
   ```
 
 ### InputPlumber
