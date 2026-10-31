@@ -489,7 +489,7 @@ Proton games still on X11: try `PROTON_ENABLE_WAYLAND=1`.
   ```sh
   doas xbps-install -S rust cargo mold pkg-config alsa-lib-devel dbus-devel openssl-devel
   ```
-- clone the private repo (its `local` branch is the latest release plus the local patches), and add upstream
+- clone your repo (its `local` branch is the latest release plus the local patches), and add upstream
   for updates - the same remotes as on the laptop:
   ```sh
   git clone -b local git@github.com:bradleycross07/spotatui-local.git ~/.local/src/spotatui
@@ -526,7 +526,7 @@ Proton games still on X11: try `PROTON_ENABLE_WAYLAND=1`.
   pnpm env use --global 26
   node --version
   ```
-- clone, get the raised-bitrate `local` branch from the private backup, build, install into `~/.local/opt/Vesktop`:
+- clone, get the raised-bitrate `local` branch from your `vesktop-local` repo, build, install into `~/.local/opt/Vesktop`:
   ```sh
   git clone https://github.com/Vencord/Vesktop.git ~/.local/src/Vesktop
   cd ~/.local/src/Vesktop
