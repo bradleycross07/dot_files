@@ -1,22 +1,32 @@
 [EffectsPipelines]
+inactivityTimerEnable=false
+linkDelay=250
 processAllInputs=false
 processAllOutputs=false
 
+[Spectrum]
+state=false
+
 [StreamInputs]
-inputDevice=alsa_input.usb-Kingston_HyperX_Cloud_Stinger_Wireless-00.mono-fallback
-plugins=compressor#0,rnnoise#0,gate#0
-pluginsListWidth=288
+inputDevice=alsa_input.usb-Apple__Inc._EarPods_CW7FH70479-00.mono-fallback
+plugins=rnnoise#0,compressor#0
+pluginsListWidth=371
 visiblePage=pluginsPage
-visiblePlugin=gate#0
+visiblePlugin=compressor#0
 
 [StreamOutputs]
-outputDevice=alsa_output.usb-Kingston_HyperX_Cloud_Stinger_Wireless-00.analog-stereo
+outputDevice=alsa_output.usb-Apple__Inc._EarPods_CW7FH70479-00.analog-stereo
 visiblePage=pluginsPage
+
+[Style]
+forceBreezeTheme=false
 
 [Window]
 autostartOnLogin=true
-height=1046
+databaseAutosaveInterval=50000
+height=1406
+presetsAutoloadInterval=1500
 reducePluginsListControls=true
 showTrayIcon=false
 visiblePage=inputPage
-width=1030
+width=1382

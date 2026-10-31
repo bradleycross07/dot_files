@@ -1,5 +1,5 @@
 [sie][Gate#0]
-attack=5
-curveThreshold=-55
-reduction=-10
-release=150
+attack=10
+bypass=true
+reduction=-23.95
+sidechainListen=true
