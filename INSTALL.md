@@ -372,7 +372,7 @@ cargo install tree-sitter-cli
 
 ### From the Ventoy USB: SSH key, game saves
 
-The SSH key comes first: dwl, spotatui and the Aurelia/Vesktop backups are private repos.
+The SSH key comes first: it signs commits and pushes your rebased branches back to GitHub.
 
 ```sh
 doas mount -o uid=1000,gid=1000 /dev/sdX1 /mnt
@@ -469,25 +469,19 @@ Proton games still on X11: try `PROTON_ENABLE_WAYLAND=1`.
   doas xbps-install -S void-repo-multilib
   doas xbps-install -S mesa-dri-32bit vulkan-loader-32bit mesa-vulkan-radeon-32bit
   ```
-- clone upstream as `origin` (`update-aurelia` rebases onto `origin/main`), then the `local` branch with the
-  tweaks from the private backup:
+- clone upstream, plus a `local` branch tracking `origin/main` (what `update-aurelia` switches to):
   ```sh
   git clone https://github.com/Drackrath/Aurelia.git ~/.local/src/Aurelia
   chezmoi apply ~/.local/src/Aurelia/.cargo/config.toml
   echo ".cargo/" >> ~/.local/src/Aurelia/.git/info/exclude
   cd ~/.local/src/Aurelia
-  git remote add backup git@github.com:bradleycross07/aurelia-local.git
-  git fetch backup
-  git switch -c local --track backup/local
-  # onto the latest upstream main - the same thing update-aurelia does later
-  git rebase origin/main
+  git switch -c local --track origin/main
   ```
-- build, install, clean, then push the rebased branch:
+- build, install, then clean:
   ```sh
   cargo build --release
   cp target/release/aurelia ~/.local/bin/
   cargo clean
-  git push --force-with-lease backup local
   ```
 
 ### spotatui
