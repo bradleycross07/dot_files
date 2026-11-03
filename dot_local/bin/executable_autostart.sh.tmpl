@@ -39,9 +39,10 @@ kanshi &
 # night light
 gammastep &
 
-# clipboard history
-wl-paste --type text --watch cliphist store &
-wl-paste --type image --watch cliphist store &
+# clipboard history: fresh database every session, capped at 200 entries
+rm -f "${XDG_CACHE_HOME:-$HOME/.cache}/cliphist/db"
+wl-paste --type text --watch cliphist -max-items 200 store &
+wl-paste --type image --watch cliphist -max-items 200 store &
 {{- end }}
 
 # idling: lock at 10 min, screen off at 15, power off after 3 h

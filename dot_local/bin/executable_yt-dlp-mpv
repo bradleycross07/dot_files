@@ -1,0 +1,9 @@
+#!/bin/sh
+# mpv's ytdl_hook opens stream URLs immediately, but YouTube 403s them until
+# each format's available_at time. Wait only as long as needed, then pass the JSON on.
+out=$(yt-dlp "$@") || exit
+wait=$(printf '%s' "$out" | jq -r '
+  [.requested_formats[]?.available_at // empty, .available_at // empty]
+  | max // 0 | . - now | ceil | if . > 0 then . else 0 end' 2>/dev/null)
+[ "${wait:-0}" -gt 0 ] && sleep "$wait"
+printf '%s\n' "$out"

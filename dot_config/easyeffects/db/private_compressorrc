@@ -1,5 +1,6 @@
 [sie][Compressor#0]
-knee=-8
-makeup=4
-ratio=3
-threshold=-20
+knee=-5
+makeup=16
+ratio=2.5
+threshold=-15
+wet=-1

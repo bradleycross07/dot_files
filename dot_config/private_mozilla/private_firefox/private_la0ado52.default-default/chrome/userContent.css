@@ -3,11 +3,6 @@
 /* No fake bold */
 * { font-synthesis-weight: none !important; }
 
-/* Wider word gaps for Pixelify Sans */
-:where(body) {
-  word-spacing: 3px !important;
-}
-
 /* Code: Departure Mono at 11px */
 :where(code, kbd, samp, pre, pre *) {
   font-family: monospace !important;
