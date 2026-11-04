@@ -63,3 +63,4 @@ application/x-extension-xhtml=firefox.desktop;
 application/x-extension-xht=firefox.desktop;
 application/pdf=firefox.desktop;
 application/xml=userapp-cheatengine-x86_64-D07NX3.desktop;
+application/x-shellscript=code.desktop;

@@ -1,11 +1,11 @@
 {
     "autoUpdate": true,
     "autoUpdateNotification": true,
-    "useQuickCss": true,
+    "useQuickCss": false,
     "themeLinks": [],
     "eagerPatches": false,
     "enabledThemes": [],
-    "enableReactDevtools": false,
+    "enableReactDevtools": true,
     "frameless": false,
     "transparent": false,
     "winCtrlQ": false,
@@ -180,10 +180,11 @@
             "enabled": false
         },
         "FixCodeblockGap": {
-            "enabled": false
+            "enabled": true
         },
         "FixImagesQuality": {
-            "enabled": false
+            "enabled": true,
+            "originalImagesInChat": false
         },
         "FixSpotifyEmbeds": {
             "enabled": true
@@ -618,6 +619,9 @@
         },
         "ExpressionManager": {
             "enabled": false
+        },
+        "MutedServersActivityBadge": {
+            "enabled": false
         }
     },
     "uiElements": {
@@ -642,7 +646,7 @@
         "authenticated": true,
         "url": "https://api.vencord.dev/",
         "settingsSync": true,
-        "settingsSyncVersion": 1793310678337
+        "settingsSyncVersion": 1793753385363
     },
     "nativeTitleBar": false
 }

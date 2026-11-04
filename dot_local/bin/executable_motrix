@@ -1,2 +1,5 @@
 #!/bin/sh
-exec "$HOME/.local/opt/Motrix/AppRun" --ozone-platform-hint=auto "$@"
+exec "$HOME/.local/opt/Motrix/AppRun" \
+  --enable-features=UseOzonePlatform \
+  --ozone-platform=wayland \
+  "$@"
