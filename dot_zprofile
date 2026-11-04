@@ -36,6 +36,7 @@ export GTK_A11Y=none
 
 # --- graphics ---
 export MESA_SHADER_CACHE_MAX_SIZE=15G
+export QT_FONT_DPI=144
 
 # --- default apps ---
 export BROWSER=firefox

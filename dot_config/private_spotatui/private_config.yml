@@ -40,6 +40,7 @@ keybindings:
   like_track: F
   generate_recap: R
 behavior:
+  language: auto
   seek_milliseconds: 5000
   volume_increment: 5
   tick_rate_milliseconds: 100
@@ -66,18 +67,12 @@ behavior:
   paused_icon: ⏸
   set_window_title: false
   visualizer_style: Cava
+  player_bar_visualizer: spectrum
   relay_server_url: wss://spotatui-party.spotatui.workers.dev/ws
   stop_after_current_track: false
   startup_behavior: continue
   disable_auto_update: true
   auto_update_delay: '0'
-  draw_cover_art: true
-  draw_cover_art_forced: false
-  playbar_cover_art_size_percent: 200
-  cover_art_theme: false
-  cover_art_dither: false
-  cover_art_dither_algorithm: atkinson
-  cover_art_dither_pixel_scale: 1
   keepawake_enabled: true
   enable_media_keys: false
   enable_streaming: true
@@ -91,6 +86,9 @@ behavior:
   subsonic_username: null
   subsonic_password: null
   ytdlp_path: null
+  playback_engine: librespot
+  soloist_path: null
+  soloist_audio_quality: lossless
   qobuz_quality: 6
   gauge_filled_icon: ⋮
   gauge_unfilled_icon: ·
@@ -113,6 +111,13 @@ behavior:
   playbar_position: bottom
   small_terminal_width: 150
   small_terminal_height: 45
+  draw_cover_art: true
+  draw_cover_art_forced: false
+  playbar_cover_art_size_percent: 200
+  cover_art_theme: false
+  cover_art_dither: false
+  cover_art_dither_algorithm: atkinson
+  cover_art_dither_pixel_scale: 1
 theme:
   preset: Custom
   active: 246, 242, 175

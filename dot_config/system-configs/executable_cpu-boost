@@ -1,0 +1,5 @@
+#!/bin/sh
+case "$1" in
+  0|1) echo "$1" > /sys/devices/system/cpu/cpufreq/boost ;;
+  *) exit 1 ;;
+esac
