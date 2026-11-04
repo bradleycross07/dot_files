@@ -1,3 +1,4 @@
 #!/bin/sh
+export AVALONIA_USE_WAYLAND=1
 cd ~/.local/opt/Lumafly || exit 1
 exec ./Lumafly "$@"
