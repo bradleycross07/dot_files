@@ -1,0 +1,10 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Name=STM32CubeMX
+Comment=STM32CubeMX Interpreter
+Terminal=false
+Type=Application
+Icon=/home/bradley/.local/opt/STM32CubeMX/help/STM32CubeMX.png
+Exec=/home/bradley/.local/bin/stm32cubemx
+X-Desktop-File-Install-Version=0.28

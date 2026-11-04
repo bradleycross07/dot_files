@@ -1,0 +1,3 @@
+#!/bin/sh
+export GDK_BACKEND=x11
+exec "$HOME/.local/opt/STM32CubeIDE/stm32cubeide" "$@"

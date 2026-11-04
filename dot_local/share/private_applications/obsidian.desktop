@@ -2,7 +2,7 @@
 Type=Application
 Name=Obsidian
 Comment=Knowledge base
-Exec=obsidian --enable-features=UseOzonePlatform --ozone-platform=wayland --ozone-platform-hint=auto --enable-blink-features=MiddleClickAutoscroll %U
+Exec=/home/bradley/.local/bin/obsidian %U
 Icon=obsidian
 Terminal=false
 MimeType=x-scheme-handler/obsidian;

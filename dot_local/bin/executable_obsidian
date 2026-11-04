@@ -1,2 +1,6 @@
 #!/bin/sh
-exec "$HOME/.local/opt/Obsidian/AppRun" --ozone-platform-hint=auto --disable-font-subpixel-positioning "$@"
+exec "$HOME/.local/opt/Obsidian/AppRun" \
+  --ozone-platform-hint=auto \
+  --disable-font-subpixel-positioning \
+  --enable-blink-features=MiddleClickAutoscroll \
+  "$@"

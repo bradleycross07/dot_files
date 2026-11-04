@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=STM32CubeIDE
+Comment=STM32 integrated development environment
+Exec=/home/bradley/.local/bin/stm32cubeide
+Icon=/home/bradley/.local/opt/STM32CubeIDE/icon.png
+Terminal=false
+Categories=Development;IDE;

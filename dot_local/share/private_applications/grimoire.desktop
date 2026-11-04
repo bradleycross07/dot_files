@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Grimoire
+Comment=Deadlock mod manager
+Exec=/home/bradley/.local/bin/grimoire %u
+Icon=/home/bradley/.local/opt/Grimoire/usr/share/icons/hicolor/1024x1024/apps/grimoire.png
+Type=Application
+Categories=Game;
+MimeType=x-scheme-handler/grimoire;
+StartupWMClass=Grimoire
