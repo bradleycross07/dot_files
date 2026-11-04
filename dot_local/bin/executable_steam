@@ -1,0 +1,4 @@
+#!/bin/sh
+# make the OLED the main monitor for notifications
+xrandr --output HDMI-A-1 --primary >/dev/null 2>&1
+exec /usr/bin/steam "$@"

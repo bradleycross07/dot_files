@@ -1,0 +1,3 @@
+#!/bin/sh
+export FONTCONFIG_FILE="$HOME/.config/fontconfig/protonup-qt.conf"
+exec "$HOME/.local/opt/ProtonUp-Qt/AppRun" "$@"
