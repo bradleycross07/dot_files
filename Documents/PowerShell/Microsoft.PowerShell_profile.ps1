@@ -9,3 +9,7 @@ function ff {
 
 # show fastfetch when a new terminal opens
 ff
+
+# clear the screen, then show fastfetch (like the zsh alias)
+Remove-Item Alias:clear -Force -ErrorAction SilentlyContinue
+function clear { Clear-Host; ff }
