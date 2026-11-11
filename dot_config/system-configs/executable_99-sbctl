@@ -1,0 +1,6 @@
+#!/bin/sh
+# Secure Boot: sign the newly installed kernel, then re-sign everything sbctl tracks (GRUB etc.)
+VERSION="$2"
+[ -f "/boot/vmlinuz-${VERSION}" ] && sbctl sign -s "/boot/vmlinuz-${VERSION}"
+sbctl sign-all
+exit 0
