@@ -1,6 +1,7 @@
 [EffectsPipelines]
-inactivityTimerEnable=false
+inputInactivityTimerEnable=false
 linkDelay=250
+outputInactivityTimerEnable=false
 processAllInputs=false
 processAllOutputs=false
 
@@ -11,7 +12,7 @@ state=false
 inputDevice=alsa_input.usb-Kingston_HyperX_Cloud_Stinger_Wireless-00.mono-fallback
 listenToMicVolume=2
 plugins=rnnoise#0,compressor#0
-pluginsListWidth=371
+pluginsListWidth=346
 visiblePage=pluginsPage
 visiblePlugin=compressor#0
 
@@ -25,9 +26,9 @@ forceBreezeTheme=false
 [Window]
 autostartOnLogin=true
 databaseAutosaveInterval=50000
-height=1406
+height=955
 presetsAutoloadInterval=1500
 reducePluginsListControls=true
 showTrayIcon=false
 visiblePage=inputPage
-width=1382
+width=1701

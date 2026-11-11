@@ -1,6 +1,7 @@
 [sie][Compressor#0]
 knee=-5
-makeup=16
+makeup=6
 ratio=2.5
+release=99.99
 threshold=-15
 wet=-1

@@ -213,7 +213,7 @@
   "calloutIcon": "highlighter",
   "highlightBacklinksInEmbed": false,
   "highlightBacklinksInHoverPopover": false,
-  "highlightBacklinksInCanvas": true,
+  "highlightBacklinksInCanvas": false,
   "clickPDFInternalLinkWithModifierKey": true,
   "clickOutlineItemWithModifierKey": true,
   "clickThumbnailWithModifierKey": true,

@@ -1,0 +1,33 @@
+#!/bin/sh
+set -eu
+
+dest="$HOME/.local/opt/Grimoire"
+tmp=$(mktemp -d)
+trap 'rm -rf "$tmp"' EXIT
+
+release=$(curl -fsSL https://api.github.com/repos/Slush97/grimoire/releases/latest)
+
+ver=$(printf '%s' "$release" | jq -r .tag_name | sed 's/^v//')
+url=$(printf '%s' "$release" | jq -r '.assets[]
+      | select(.name | test("^Grimoire-.*\\.AppImage$"))
+      | .browser_download_url' | head -n1)
+
+[ -n "$ver" ] && [ "$ver" != null ] || { echo "Couldn't get latest version" >&2; exit 1; }
+[ -n "$url" ] || { echo "No AppImage found for Grimoire $ver" >&2; exit 1; }
+
+if [ -f "$dest/.version" ] && [ "$(cat "$dest/.version")" = "$ver" ]; then
+    echo "Grimoire $ver already installed"
+    exit 0
+fi
+
+echo "Installing Grimoire $ver"
+cd "$tmp"
+curl -fL -o grimoire.AppImage "$url"
+chmod +x grimoire.AppImage
+./grimoire.AppImage --appimage-extract >/dev/null
+echo "$ver" > squashfs-root/.version
+
+rm -rf "$dest.old"
+[ -d "$dest" ] && mv "$dest" "$dest.old"
+mv squashfs-root "$dest"
+echo "Done. Old version kept at $dest.old"
