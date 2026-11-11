@@ -55,3 +55,19 @@ INSTALL.md
 .config/system-configs/unbound.conf
 
 {{- end }}
+
+# Windows: only take the cross-platform configs
+{{- if eq .chezmoi.os "windows" }}
+.zshrc
+.zprofile
+.cargo
+.local
+.config/*
+!.config/nvim
+!.config/starship.toml
+{{- end }}
+
+# PowerShell profile is Windows-only
+{{- if ne .chezmoi.os "windows" }}
+Documents
+{{- end }}
