@@ -149,7 +149,7 @@
         "keyColor": "#E4C558",
         "outputColor": "#E4C558",
 {{- if eq .chezmoi.os "windows" }}
-        "text": "pwsh -NoProfile -Command \"'{0} days' -f ((Get-Date) - (Get-Item C:\\).CreationTime).Days\""
+        "text": "echo %OS_AGE_DAYS% days"
 {{- else }}
         "text": "birth_install=$(stat -c %W /); current=$(date +%s); time_progression=$((current - birth_install)); days_difference=$((time_progression / 86400)); echo $days_difference days"
 {{- end }}
