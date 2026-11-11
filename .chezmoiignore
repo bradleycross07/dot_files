@@ -65,6 +65,7 @@ INSTALL.md
 .config/*
 !.config/nvim
 !.config/starship.toml
+!.config/fastfetch
 {{- end }}
 
 # PowerShell profile is Windows-only

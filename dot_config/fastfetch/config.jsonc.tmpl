@@ -32,16 +32,26 @@
 	"outputColor": "#B8916B"
     },
     { 
+{{- if eq .chezmoi.os "windows" }}
+	"type": "cpu",
+        "key": "│ ├󰻠:",
+{{- else }}
 	"type": "command",
         "key": "│ ├󰻠:",
 	"text": "printf 'AMD Ryzen 5 5500U @ %s GHz' \"$(awk '{sum+=$1; n++} END {printf \"%.2f\", sum/n/1000000}' /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq)\"",
+{{- end }}
 	"keyColor": "#B8916B",
 	"outputColor": "#B8916B"
     },
     { 
+{{- if eq .chezmoi.os "windows" }}
+	"type": "gpu",
+        "key": "│ ├󰍹:",
+{{- else }}
 	"type": "command",
         "key": "│ ├󰍹:",
 	"text": "for h in /sys/class/hwmon/hwmon*; do [ \"$(cat $h/name)\" = amdgpu ] && printf 'AMD Lucienne Integrated @ %dMHz' $(($(cat $h/freq1_input)/1000000)) && break; done",
+{{- end }}
 	"keyColor": "#BD9769",
 	"outputColor": "#BD9769"
     },
@@ -138,7 +148,11 @@
         "key": "  › OS Age      :",
         "keyColor": "#E4C558",
         "outputColor": "#E4C558",
+{{- if eq .chezmoi.os "windows" }}
+        "text": "pwsh -NoProfile -Command \"'{0} days' -f ((Get-Date) - (Get-Item C:\\).CreationTime).Days\""
+{{- else }}
         "text": "birth_install=$(stat -c %W /); current=$(date +%s); time_progression=$((current - birth_install)); days_difference=$((time_progression / 86400)); echo $days_difference days"
+{{- end }}
     },
     {
         "type": "uptime",
