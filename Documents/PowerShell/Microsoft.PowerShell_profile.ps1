@@ -1,3 +1,8 @@
+# ~\Documents\PowerShell\Microsoft.PowerShell_profile.ps1 - pwsh 7 equivalent of ~/.zshrc
+
+# --- environment (the ~/.zprofile part) ---
+$env:EDITOR = 'nvim'
+
 # --- PSReadLine: zsh-style editing ---
 Set-PSReadLineOption -PredictionSource History -PredictionViewStyle InlineView   # autosuggestions
 Set-PSReadLineOption -MaximumHistoryCount 10000 -HistoryNoDuplicates
@@ -24,20 +29,37 @@ function ff {
 }
 function clear { Clear-Host; [Console]::Write("`e[3J"); ff }
 
-# --- integrations (init scripts cached; rebuilt when the tool is updated) ---
+# --- init script cache ---
+# Generated init/completion scripts are saved to ~\.cache\pwsh and only regenerated when the
+# tool is updated. Returns the cache path, or nothing if the tool isn't installed.
 function Get-InitCache($tool, [scriptblock]$generate) {
+    $exe = (Get-Command $tool -ErrorAction SilentlyContinue).Source
+    if (-not $exe) { return }
     $file = "$HOME\.cache\pwsh\$tool-init.ps1"
-    $exe  = (Get-Command $tool -ErrorAction SilentlyContinue).Source
-    if ($exe -and (-not (Test-Path $file) -or (Get-Item $exe).LastWriteTime -gt (Get-Item $file).LastWriteTime)) {
+    # Scoop shim exes keep a fixed timestamp; the .shim next to them is rewritten on each update
+    $stamp = [IO.Path]::ChangeExtension($exe, 'shim')
+    if (-not (Test-Path $stamp)) { $stamp = $exe }
+    if (-not (Test-Path $file) -or (Get-Item $stamp).LastWriteTime -gt (Get-Item $file).LastWriteTime) {
         New-Item -ItemType Directory (Split-Path $file) -Force | Out-Null
         & $generate | Set-Content $file
     }
     $file
 }
-. (Get-InitCache starship { starship init powershell --print-full-init })
-. (Get-InitCache zoxide   { zoxide init powershell })
 
-# fzf: PSFzf loads on first Ctrl+R / Ctrl+T instead of at startup
+# --- integrations ---
+# dot-sourced here (not inside a function) so what they define stays in the session
+if ($f = Get-InitCache starship { starship init powershell --print-full-init }) { . $f }
+if ($f = Get-InitCache zoxide   { zoxide init powershell }) { . $f }
+
+# --- completions (the compinit part) ---
+if ($f = Get-InitCache gh      { gh completion -s powershell }) { . $f }
+if ($f = Get-InitCache chezmoi { chezmoi completion powershell }) { . $f }
+if ($f = Get-InitCache rustup  { rustup completions powershell }) { . $f }
+if ($f = Get-InitCache rg      { rg --generate complete-powershell }) { . $f }
+if ($f = Get-InitCache fd      { fd --gen-completions powershell }) { . $f }
+Remove-Variable f
+
+# --- fzf: PSFzf loads on first Ctrl+R / Ctrl+T instead of at startup ---
 function Enable-PSFzf {
     Import-Module PSFzf
     Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
