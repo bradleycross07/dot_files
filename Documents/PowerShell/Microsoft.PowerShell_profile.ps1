@@ -24,13 +24,26 @@ function ff {
 }
 function clear { Clear-Host; [Console]::Write("`e[3J"); ff }
 
-# --- integrations ---
-Invoke-Expression (&starship init powershell)
-if (Get-Module -ListAvailable PSFzf) {
+# --- integrations (init scripts cached; rebuilt when the tool is updated) ---
+function Get-InitCache($tool, [scriptblock]$generate) {
+    $file = "$HOME\.cache\pwsh\$tool-init.ps1"
+    $exe  = (Get-Command $tool -ErrorAction SilentlyContinue).Source
+    if ($exe -and (-not (Test-Path $file) -or (Get-Item $exe).LastWriteTime -gt (Get-Item $file).LastWriteTime)) {
+        New-Item -ItemType Directory (Split-Path $file) -Force | Out-Null
+        & $generate | Set-Content $file
+    }
+    $file
+}
+. (Get-InitCache starship { starship init powershell --print-full-init })
+. (Get-InitCache zoxide   { zoxide init powershell })
+
+# fzf: PSFzf loads on first Ctrl+R / Ctrl+T instead of at startup
+function Enable-PSFzf {
     Import-Module PSFzf
     Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+t' -PSReadlineChordReverseHistory 'Ctrl+r'
 }
-Invoke-Expression (& { (zoxide init powershell | Out-String) })
+Set-PSReadLineKeyHandler -Chord 'Ctrl+r' -ScriptBlock { Enable-PSFzf; Invoke-FzfPsReadlineHandlerHistory }
+Set-PSReadLineKeyHandler -Chord 'Ctrl+t' -ScriptBlock { Enable-PSFzf; Invoke-FzfPsReadlineHandlerProvider }
 
 # --- startup ---
 ff
