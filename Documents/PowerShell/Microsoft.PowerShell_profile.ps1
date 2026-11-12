@@ -2,6 +2,7 @@
 
 # --- environment ---
 $env:EDITOR = 'nvim'
+$env:BAT_CONFIG_PATH = "$HOME\.config\bat\config"
 
 # --- zsh-style editing ---
 Set-PSReadLineOption -PredictionSource History -PredictionViewStyle InlineView   # autosuggestions
@@ -27,7 +28,6 @@ function ff {
     $env:OS_AGE_DAYS = ((Get-Date) - (Get-Item C:\).CreationTime).Days
     fastfetch -c "$HOME\.config\fastfetch\config.jsonc" @args
 }
-function clear { Clear-Host; [Console]::Write("`e[3J"); ff }
 
 # --- init script cache ---
 # generated init/completion scripts are saved to ~\.cache\pwsh
