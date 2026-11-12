@@ -47,15 +47,27 @@ function Get-InitCache($tool, [scriptblock]$generate) {
 
 # --- integrations ---
 if ($f = Get-InitCache starship { starship init powershell --print-full-init }) { . $f }
-if ($f = Get-InitCache zoxide   { zoxide init powershell }) { . $f }
 
-# --- completions ---
-if ($f = Get-InitCache gh      { gh completion -s powershell }) { . $f }
-if ($f = Get-InitCache chezmoi { chezmoi completion powershell }) { . $f }
-if ($f = Get-InitCache rustup  { rustup completions powershell }) { . $f }
-if ($f = Get-InitCache rg      { rg --generate complete-powershell }) { . $f }
-if ($f = Get-InitCache fd      { fd --gen-completions powershell }) { . $f }
-Remove-Variable f
+# --- completions (loaded on first Tab, not at startup) ---
+$global:LazyCompletions = @{
+    gh      = { gh completion -s powershell }
+    chezmoi = { chezmoi completion powershell }
+    rustup  = { rustup completions powershell }
+    rg      = { rg --generate complete-powershell }
+    fd      = { fd --gen-completions powershell }
+}
+foreach ($name in $LazyCompletions.Keys) {
+    Register-ArgumentCompleter -Native -CommandName $name -ScriptBlock {
+        param($wordToComplete, $commandAst, $cursorPosition)
+        $tool = $commandAst.GetCommandName()
+        if (-not ($file = Get-InitCache $tool $global:LazyCompletions[$tool])) { return }
+        # load as a global module so the script's helper functions stay available
+        New-Module -Name "$tool-completion" -ScriptBlock ([scriptblock]::Create((Get-Content -Raw $file))) | Import-Module -Global
+        # the real completer has replaced this one; ask it for this Tab press
+        (TabExpansion2 -inputScript $commandAst.Extent.Text -cursorColumn ($cursorPosition - $commandAst.Extent.StartOffset)).CompletionMatches
+    }
+}
+Remove-Variable f, name
 
 # --- fzf ---
 function Enable-PSFzf {
