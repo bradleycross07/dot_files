@@ -19,22 +19,24 @@ INSTALL.md
 # lid close handling
 .local/bin/lid-handler.sh
 
+# steam wrapper makes the laptop's HDMI-A-1 the XWayland primary - single monitor on the desktop
+.local/bin/steam
+.local/share/applications/steam.desktop
+.local/share/applications/Deadlock.desktop
+
 # session extras the desktop's autostart.sh doesn't run
 .local/bin/clipboard-picker.sh
 .config/gammastep
 .config/xsettingsd
 
-# laptop-only: vs code, ProjectLibre, vivado stuff, spotify and spicetify
+# laptop-only: vs code, ProjectLibre, vivado, spotify and spicetify
 .local/bin/update-vscode
 .local/bin/code
 .local/bin/vivado
 .local/share/applications/code.desktop
 .local/share/applications/projectlibre.desktop
+.local/share/applications/vivado.desktop
 .local/share/icons/hicolor/128x128/apps/projectlibre.png
-.local/share/applications/*2023.2*.desktop
-.local/share/applications/Documentation Navigator_*.desktop
-.local/share/applications/Uninstall *.desktop
-.local/share/applications/Xilinx Information Center_*.desktop
 .local/share/applications/spotify.desktop
 .config/spicetify
 .local/bin/spotify
