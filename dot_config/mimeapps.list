@@ -41,6 +41,7 @@ application/xml=nvim-foot.desktop
 application/yaml=nvim-foot.desktop
 application/x-yaml=nvim-foot.desktop
 application/json=nvim-foot.desktop
+application/x-shellscript=nvim-foot.desktop
 text/markdown=nvim-foot.desktop
 text/x-python=nvim-foot.desktop
 text/x-shellscript=nvim-foot.desktop
@@ -50,4 +51,3 @@ x-scheme-handler/discord=Vesktop.desktop
 
 [Added Associations]
 application/schema+json=nvim-foot.desktop;
-application/x-shellscript=nvim-foot.desktop
