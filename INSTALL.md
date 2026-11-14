@@ -658,18 +658,20 @@ doas powerprofilesctl set performance
 ```
 
 InputPlumber (built in step 4): restore its DualSense config (`persist: true`, so the virtual Xbox pad survives
-a replug) and its service, then enable it. The laptop's log service uses `vlogger` (socklog), which the desktop
-doesn't run, so swap it for svlogd writing to `/var/log/inputplumber`:
+a replug) and its service, then enable it. The service's `log/run` already logs with svlogd to
+`/var/log/inputplumber` (creating the folder itself), and its `down` file keeps it off at boot - the Aurelia
+launch scripts start and stop it with `doas sv up/down inputplumber`:
 
 ```sh
 doas mkdir -p /etc/inputplumber/devices.d
 doas cp ~/.config/system-configs/inputplumber/*.yaml /etc/inputplumber/devices.d/
 doas cp -r ~/.config/system-configs/sv-inputplumber /etc/sv/inputplumber
-printf '#!/bin/sh\nexec svlogd -tt /var/log/inputplumber\n' | doas tee /etc/sv/inputplumber/log/run
-doas mkdir -p /var/log/inputplumber
 doas ln -s /etc/sv/inputplumber /var/service/
+# 'down' means linking it doesn't start it - start it once to test (status should say "normally down")
+doas sv up inputplumber && doas sv status inputplumber
 # with the DualSense plugged in: it should be detected and blocked, with a virtual Xbox 360 pad created
 doas tail /var/log/inputplumber/current
+doas sv down inputplumber
 ```
 
 - [ ] log out and back in on tty1, then check `echo $XDG_RUNTIME_DIR` prints `/run/user/1000` -
