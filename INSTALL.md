@@ -505,7 +505,7 @@ Proton games still on X11: try `PROTON_ENABLE_WAYLAND=1`.
 - build with only the features in use (`self-update` would replace the patched binary with an official
   release; the macOS/Windows media features don't build on Linux anyway), install, clean:
   ```sh
-  cargo build --release --no-default-features --features tui,streaming,discord-rpc,mpris,cover-art,scripting
+  cargo build --release --no-default-features --features tui,streaming,mpris,cover-art,scripting
   cp target/release/spotatui ~/.local/bin/
   cargo clean
   git push --force-with-lease origin local
