@@ -29,28 +29,6 @@ function ff {
     fastfetch -c "$HOME\.config\fastfetch\config.jsonc" @args
 }
 
-# --- obsidian ---
-# Windows version of `ln -s ~/.local/share/obsidian-template/.obsidian <vault>/.obsidian`
-# a junction instead of a symlink: no admin or Developer Mode needed, and Obsidian reads it as a normal folder
-function obsidian-link([string]$Vault = '.') {
-    $template = "$HOME\.local\share\obsidian-template\.obsidian"
-    if (-not (Test-Path -LiteralPath $template -PathType Container)) {
-        Write-Error "$template is missing - run chezmoi apply first"; return
-    }
-    $link = Join-Path (Resolve-Path -LiteralPath $Vault) '.obsidian'
-    $item = Get-Item -LiteralPath $link -Force -ErrorAction SilentlyContinue
-    if ($item -and $item.LinkType) {
-        if ([IO.Path]::GetFullPath($item.Target) -eq [IO.Path]::GetFullPath($template)) { "already linked: $link"; return }
-        $item.Delete()   # a link to somewhere else (e.g. a /home/... symlink from Linux): removes the link only
-    } elseif ($item -and -not $item.PSIsContainer) {
-        Remove-Item -LiteralPath $link -Force   # a Linux symlink checked out by git as a text file
-    } elseif ($item) {
-        Write-Error "$link is a real folder - move or delete it first"; return
-    }
-    New-Item -ItemType Junction -Path $link -Target $template | Out-Null
-    "linked: $link -> $template"
-}
-
 # --- init script cache ---
 # generated init/completion scripts are saved to ~\.cache\pwsh
 function Get-InitCache($tool, [scriptblock]$generate) {
