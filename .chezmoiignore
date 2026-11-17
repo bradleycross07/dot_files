@@ -63,7 +63,10 @@ INSTALL.md
 .zshrc
 .zprofile
 .cargo
-.local
+.local/*
+!.local/share
+.local/share/*
+!.local/share/obsidian-template
 .config/*
 !.config/nvim
 !.config/starship.toml
