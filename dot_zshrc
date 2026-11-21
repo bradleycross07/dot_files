@@ -1,7 +1,6 @@
 # ~/.zshrc
 
 # --- plugins and completion ---
-fpath=(~/.local/share/zsh/site-functions $fpath)   # spotatui completions
 source ~/.local/share/zinit/zinit.git/zinit.zsh
 
 autoload -Uz compinit

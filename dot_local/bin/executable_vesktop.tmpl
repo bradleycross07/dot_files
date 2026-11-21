@@ -4,5 +4,7 @@ exec "$HOME/.local/opt/Vesktop/vesktop" \
   --disable-font-subpixel-positioning \
   --enable-gpu-rasterization \
   --enable-features=AcceleratedVideoDecoder,AcceleratedVideoDecodeLinuxGL,VaapiVideoDecodeLinuxGL,AcceleratedVideoDecodeLinuxZeroCopyGL,VaapiIgnoreDriverChecks \
+{{- if ne .chezmoi.hostname "void-desktop" }}
   --disable-features=AcceleratedVideoEncoder,VaapiVideoEncoder \
+{{- end }}
   "$@"

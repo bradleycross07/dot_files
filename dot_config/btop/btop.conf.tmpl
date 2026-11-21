@@ -174,7 +174,7 @@ clock_format = "%X"
 background_update = true
 
 #* Custom cpu model name, empty string to disable.
-custom_cpu_name = "Ryzen 5 5500U"
+custom_cpu_name = "{{ if eq .chezmoi.hostname "void-desktop" }}Ryzen 7 7800X3D{{ else }}Ryzen 5 5500U{{ end }}"
 
 #* Optional filter for shown disks, should be full path of a mountpoint, separate multiple values with whitespace " ".
 #* Only disks matching the filter will be shown. Prepend exclude= to only show disks not matching the filter. Examples: disks_filter="/boot /home/user", disks_filter="exclude=/boot /home/user"
@@ -272,7 +272,7 @@ gpu_mirror_graph = true
 shown_gpus = "nvidia amd intel apple"
 
 #* Custom gpu0 model name, empty string to disable.
-custom_gpu_name0 = "Ryzen 5 5500U iGPU"
+custom_gpu_name0 = "{{ if eq .chezmoi.hostname "void-desktop" }}Radeon RX 9070{{ else }}Ryzen 5 5500U iGPU{{ end }}"
 
 #* Custom gpu1 model name, empty string to disable.
 custom_gpu_name1 = ""

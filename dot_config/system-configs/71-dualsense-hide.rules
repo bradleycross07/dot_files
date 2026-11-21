@@ -1,3 +1,0 @@
-# root only, so games only see the virtual pad LIBINPUT_IGNORE_DEVICE stops dwl/libinput picking up the touchpad on replug
-SUBSYSTEM=="input", KERNEL=="event*|js*", ATTRS{idVendor}=="054c", ATTRS{idProduct}=="0ce6", MODE="0600", GROUP="root", TAG-="uaccess", ENV{LIBINPUT_IGNORE_DEVICE}="1"
-SUBSYSTEM=="hidraw", ATTRS{idVendor}=="054c", ATTRS{idProduct}=="0ce6", MODE="0600", GROUP="root", TAG-="uaccess"

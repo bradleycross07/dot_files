@@ -334,8 +334,8 @@ Don't install on the desktop:
   `xsettingsd`, `polkit-gnome`, `gnome-keyring`, `cliphist`, `sway-audio-idle-inhibit`
   - optional: `wl-clip-persist` keeps the clipboard after the source app closes (no history)
   - add `gnome-keyring` back if signing into apps that need a keyring
-- laptop-only apps: VS Code, ProjectLibre, Vivado, the restricted `discord` package (Vesktop instead), and
-  Spotify + Spicetify (built from `void-packages` on the laptop as a backup for spotatui)
+- laptop-only apps: VS Code, Vivado and the restricted `discord` package (Vesktop instead). Spotify is
+  built with `xbps-src` at the end of step 6
 
 Packages the later steps rely on (still in the `system-configs` folder, for the font lists):
 
@@ -460,10 +460,6 @@ Proton games still on X11: try `PROTON_ENABLE_WAYLAND=1`.
   ```sh
   doas xbps-install -S dbus-devel
   ```
-- bubblewrap, for the launch scripts:
-  ```sh
-  doas xbps-install -S bubblewrap
-  ```
 - 32-bit graphics libraries for Wine/Proton games (older 32-bit games need them):
   ```sh
   doas xbps-install -S void-repo-multilib
@@ -482,33 +478,6 @@ Proton games still on X11: try `PROTON_ENABLE_WAYLAND=1`.
   cargo build --release
   cp target/release/aurelia ~/.local/bin/
   cargo clean
-  ```
-
-### spotatui
-- build dependencies:
-  ```sh
-  doas xbps-install -S rust cargo mold pkg-config alsa-lib-devel dbus-devel openssl-devel
-  ```
-- clone your repo (its `local` branch is the latest release plus the local patches), and add upstream
-  for updates - the same remotes as on the laptop:
-  ```sh
-  git clone -b local git@github.com:bradleycross07/spotatui-local.git ~/.local/src/spotatui
-  chezmoi apply ~/.local/src/spotatui/.cargo/config.toml
-  echo ".cargo/" >> ~/.local/src/spotatui/.git/info/exclude
-  cd ~/.local/src/spotatui
-  git remote add upstream https://github.com/LargeModGames/spotatui.git
-  git fetch upstream --tags
-  # onto the newest release (skipped if the branch already contains it)
-  latest=$(git tag -l 'v*' --sort=-v:refname | grep -v -- - | head -1)
-  git merge-base --is-ancestor "$latest" HEAD || git rebase --onto "$latest" "$(git merge-base HEAD upstream/main)"
-  ```
-- build with only the features in use (`self-update` would replace the patched binary with an official
-  release; the macOS/Windows media features don't build on Linux anyway), install, clean:
-  ```sh
-  cargo build --release --no-default-features --features tui,streaming,mpris,cover-art,scripting
-  cp target/release/spotatui ~/.local/bin/
-  cargo clean
-  git push --force-with-lease origin local
   ```
 
 ### Vesktop
@@ -546,38 +515,6 @@ Proton games still on X11: try `PROTON_ENABLE_WAYLAND=1`.
   git push --force-with-lease backup local
   ```
 
-### InputPlumber
-- build dependencies (`libclang<N>` matches the LLVM version Mesa already uses):
-  ```sh
-  N=$(xbps-query -x mesa-libgallium | sed -n 's/^libllvm\([0-9]*\).*/\1/p')
-  # 22 in Oct 2026 - if it's changed, bump the 22s in .cargo/config.toml first (laptop too)
-  echo "$N"
-  doas xbps-install -S rust cargo pkg-config eudev-libudev-devel libclang$N
-  ```
-- clone, add the build config, link libclang where `.cargo/config.toml` expects it, build as your user,
-  install as root:
-  ```sh
-  git clone https://github.com/ShadowBlip/InputPlumber.git ~/.local/src/InputPlumber
-  chezmoi apply ~/.local/src/InputPlumber/.cargo/config.toml
-  echo ".cargo/" >> ~/.local/src/InputPlumber/.git/info/exclude
-  mkdir -p ~/.local/lib/libclang
-  # 'command' skips the eza alias; head -1 picks libclang.so.$N.1 over the longer full-version name
-  ln -sf "$(command ls -1 /usr/lib/libclang.so.$N.* | sort | head -1)" ~/.local/lib/libclang/libclang.so
-  readlink ~/.local/lib/libclang/libclang.so
-  cd ~/.local/src/InputPlumber
-  make build
-  doas make install PREFIX=/usr
-  # the install also drops systemd units, which do nothing on Void
-  doas rm /usr/lib/systemd/system/inputplumber*.service
-  ```
-- its install adds udev rules, hwdb entries and a D-Bus system policy, which only take effect once reloaded:
-  ```sh
-  doas udevadm hwdb --update && doas udevadm control --reload && doas udevadm trigger
-  # picks up org.shadowblip.InputPlumber.conf, so the service may claim its name
-  doas sv reload dbus
-  ```
-- its DualSense config and runit service come from the dotfiles - restored in step 7
-
 ## 5. Manually installed apps (`~/.local/opt`)
 
 Each has a small `exec` wrapper in `~/.local/bin`; the wrappers and update scripts arrive with the dotfiles in
@@ -588,21 +525,11 @@ step 6. The apps themselves are downloaded fresh into the paths below. Vesktop i
 | Obsidian      | `~/.local/opt/Obsidian`          | AppImage extracted; install/update with `update-obsidian` |
 | Vesktop       | `~/.local/opt/Vesktop`           | built from `~/.local/src/Vesktop` (step 4) |
 | Motrix        | `~/.local/opt/Motrix`            | AppImage extracted; wrapper runs `AppRun` |
-| Archipelago   | `~/.local/opt/Archipelago`       | wrapper runs `ArchipelagoLauncher`      |
-| Lumafly       | `~/.local/opt/Lumafly`           | wrapper `cd`s into the folder first     |
 
 Obsidian - `update-obsidian` isn't on `PATH` yet, so run it from the dotfiles clone:
 
 ```sh
 sh "$(chezmoi source-path)/dot_local/bin/executable_update-obsidian"
-```
-
-`discord-rpc-wrap` (used by the Aurelia launch scripts to show games in Discord) runs from its own Python venv:
-
-```sh
-doas xbps-install -S python3
-python3 -m venv ~/.local/share/discord-rpc-venv
-~/.local/share/discord-rpc-venv/bin/pip install pypresence
 ```
 
 ### Flatpak (user installation)
@@ -644,6 +571,40 @@ chezmoi apply
 - [ ] switch the chezmoi remote to SSH to push from this machine:
   `chezmoi git -- remote set-url origin git@github.com:bradleycross07/dot_files.git`
 
+### Spotify + Spicetify
+
+Spotify is a restricted package (Void can't ship the binary), so it's built locally with `xbps-src`. The
+Spicetify config, the `spotify` wrapper and the desktop entry came with the dotfiles above.
+
+```sh
+# void-packages, at the same path as the laptop, plus the ~/void-packages link xbps-checkvers expects
+git clone --depth 1 https://github.com/void-linux/void-packages.git ~/.local/src/void-packages
+ln -s ~/.local/src/void-packages ~/void-packages
+cd ~/void-packages
+./xbps-src binary-bootstrap
+echo XBPS_ALLOW_RESTRICTED=yes >> etc/conf
+./xbps-src pkg spotify
+doas xbps-install -R hostdir/binpkgs/nonfree spotify
+cd
+```
+
+Spicetify (`~/.spicetify` is already on `PATH` from `.zprofile`):
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/spicetify/cli/main/install.sh | sh
+# the installer may append its own PATH line to ~/.zshrc - put the dotfiles' version back
+chezmoi apply ~/.zshrc
+# Spicetify patches Spotify's own files, so give your user write access to them
+doas chmod a+wr /usr/libexec/spotify
+doas chmod -R a+wr /usr/libexec/spotify/Apps
+# open Spotify once and log in (so ~/.config/spotify/prefs exists), close it, then:
+spicetify backup apply
+```
+
+`Themes` and `CustomApps` aren't in the repo: install the Marketplace
+(`curl -fsSL https://raw.githubusercontent.com/spicetify/marketplace/main/resources/install.sh | sh`) and get the
+`blackout` theme back from it. After a Spotify update, run `spicetify backup apply` again.
+
 ## 7. Services (runit)
 
 ```sh
@@ -655,23 +616,6 @@ for s in chronyd nftables rtkit seatd turnstiled power-profiles-daemon acpid; do
 done
 # once runit has started it (a few seconds) - remembered across reboots:
 doas powerprofilesctl set performance
-```
-
-InputPlumber (built in step 4): restore its DualSense config (`persist: true`, so the virtual Xbox pad survives
-a replug) and its service, then enable it. The service's `log/run` already logs with svlogd to
-`/var/log/inputplumber` (creating the folder itself), and its `down` file keeps it off at boot - the Aurelia
-launch scripts start and stop it with `doas sv up/down inputplumber`:
-
-```sh
-doas mkdir -p /etc/inputplumber/devices.d
-doas cp ~/.config/system-configs/inputplumber/*.yaml /etc/inputplumber/devices.d/
-doas cp -r ~/.config/system-configs/sv-inputplumber /etc/sv/inputplumber
-doas ln -s /etc/sv/inputplumber /var/service/
-# 'down' means linking it doesn't start it - start it once to test (status should say "normally down")
-doas sv up inputplumber && doas sv status inputplumber
-# with the DualSense plugged in: it should be detected and blocked, with a virtual Xbox 360 pad created
-doas tail /var/log/inputplumber/current
-doas sv down inputplumber
 ```
 
 - [ ] log out and back in on tty1, then check `echo $XDG_RUNTIME_DIR` prints `/run/user/1000` -
@@ -752,17 +696,15 @@ Copies live in `~/.config/system-configs` (applied by chezmoi in step 6).
 | `sysctl.conf`        | `/etc/sysctl.conf`            | `vm.max_map_count=1048576` (some Proton games need it) |
 | `rc.local`           | `/etc/rc.local`               | MGLRU thrashing protection (`min_ttl_ms` 1000) - stands in for earlyoom, which isn't installed |
 | `dracut.conf.d/no-drm.conf` | `/etc/dracut.conf.d/`  | leaves `drm` (amdgpu + every AMD GPU's firmware) and the crypt modules out of the initramfs - amdgpu loads from the root filesystem instead. Rebuild after copying |
-| `doas.conf`          | `/etc/doas.conf`              | check with `doas -C` first; `chmod 0400`; passwordless poweroff/reboot, plus `sv up/down inputplumber` for the Aurelia launch scripts. `zzz` isn't passwordless any more - add `permit nopass bradley cmd zzz` back if suspending from a keybind |
+| `doas.conf`          | `/etc/doas.conf`              | check with `doas -C` first; `chmod 0400`; passwordless poweroff/reboot, `zzz` isn't passwordless any more - add `permit nopass bradley cmd zzz` back if suspending from a keybind |
 | `nftables.conf`      | `/etc/nftables.conf`          | check with `nft -c -f` first |
 | `rc.conf`            | `/etc/rc.conf`                | template: KEYMAP `us`     |
 | `dhcpcd.conf`        | `/etc/dhcpcd.conf`            | template: Cloudflare DNS  |
 | `gamemode.ini`       | `/etc/gamemode.ini`           | set `gpu_device` for this PC (section 11) |
 | `dhcpcd.exit-hook`   | `/etc/dhcpcd.exit-hook`       | sets the fq qdisc on the interface when dhcpcd binds (pairs with BBR in `99-network.conf`) |
-| `99-local.rules`     | `/etc/udev/rules.d/`          | HyperX volume keys ignored by libinput. **No DualSense lines** - a `MODE="0666"` hidraw rule here would run after `71-dualsense-hide.rules` and reopen the raw controller to games |
-| `71-dualsense-hide.rules` | `/etc/udev/rules.d/`     | raw DualSense nodes root-only (only InputPlumber opens them), hidden from libinput/dwl |
+| `99-local.rules`     | `/etc/udev/rules.d/`          | HyperX volume keys and the DualSense touchpad ignored by libinput (the touchpad no longer moves the cursor) |
 | `dualsense-no-audio.conf` | `/etc/modprobe.d/`       | `snd_usb_audio` refuses the DualSense's sound card - no audio-device hotplug, no game stutter on replug. Applies after a reboot |
 | `99-nofile.conf`     | `/etc/security/limits.d/`     | raised open-files limit; applies at next login |
-| `inputplumber/*.yaml`| `/etc/inputplumber/devices.d/`| DualSense device config - already restored in step 7 |
 | `60-limine`          | `/etc/kernel.d/post-install/` | `chmod +x`, plus a symlink to it in `post-remove/`; already in place from step 1 (fetched from the repo) - only for a future reinstall |
 | `xbps.d/*.conf`      | `/etc/xbps.d/`                | mirrors restored in step 2. The pins (`ignore.conf`, `mainline.conf`) were already written in step 1, before anything was installed - nothing to restore |
 
@@ -781,9 +723,7 @@ doas cp rc.conf /etc/rc.conf          # KEYMAP already filled in by chezmoi
 doas cp dhcpcd.conf /etc/dhcpcd.conf   # DNS line already filled in by chezmoi
 doas cp gamemode.ini /etc/gamemode.ini # then check gpu_device (section 11)
 doas cp dhcpcd.exit-hook /etc/dhcpcd.exit-hook
-# 99-local.rules must not contain a DualSense (054c) line - this should print nothing:
-rg -n 054c 99-local.rules
-doas cp 99-local.rules 71-dualsense-hide.rules /etc/udev/rules.d/
+doas cp 99-local.rules /etc/udev/rules.d/
 doas udevadm control --reload && doas udevadm trigger
 # takes effect at the next reboot (check then: `doas dmesg | rg 054c` says "device (054c:0ce6) is disabled")
 doas cp dualsense-no-audio.conf /etc/modprobe.d/
@@ -809,17 +749,15 @@ cd
 - [ ] USB layout: put the mouse and keyboard on a different USB controller from the headset and anything
   high-traffic, ideally rear ports wired to the CPU rather than front-panel or hub ports. `lsusb -t` shows
   which bus (controller) each device is on
-- [ ] machine-specific configs - they arrive with the laptop's values; edit them for this PC:
-  - fastfetch (`~/.config/fastfetch/config.jsonc`): CPU line ("Ryzen 5 5500U" → 7800X3D), GPU line
-    ("Lucienne" → RX 9070), memory speed ("4266 MT/s" → 6000)
-  - btop (`~/.config/btop/btop.conf`): `custom_cpu_name`, `custom_gpu_name0`, `show_battery`
-  - mpv (`~/.config/mpv/mpv.conf`): `gpu-api=vulkan`, heavier scalers, add `av1` to `hwdec-codecs`, and loosen
-    `ytdl-format` - the laptop caps YouTube at VP9 because its decoder can't do AV1, the RX 9070 can
-    (`vainfo` lists what the GPU decodes)
-  - Vesktop wrapper (`~/.local/bin/vesktop`): remove the
-    `--disable-features=AcceleratedVideoEncoder,VaapiVideoEncoder` line (the RX 9070 can hardware-encode)
-  - once edited, add these files to the desktop block of `.chezmoiignore`, so the laptop and desktop
-    versions don't overwrite each other
+- [ ] machine-specific configs are chezmoi templates that switch on the hostname (`void-desktop`), so they
+  already have this PC's values - check they look right, and change them with `chezmoi edit`, not by hand:
+  - fastfetch (`~/.config/fastfetch/config.jsonc`): "Desktop", 7800X3D, RX 9070, 6000 MT/s
+  - btop (`~/.config/btop/btop.conf`): CPU and GPU names. btop rewrites its config when you change a setting
+    in its menu - copy those changes into the template with `chezmoi edit`, since `re-add` skips templates
+  - mpv (`~/.config/mpv/mpv.conf`): `gpu-api=vulkan`, heavier scalers, `av1` in `hwdec-codecs` and no VP9-only
+    `ytdl-format` (`vainfo` lists what the GPU decodes)
+  - Vesktop wrapper (`~/.local/bin/vesktop`): no `--disable-features=...VideoEncoder` line (the RX 9070 can
+    hardware-encode)
 - [ ] gaming:
   - gamemode group (exists now that the package is installed): `doas usermod -aG gamemode bradley`,
     then log out and back in and check with `id | rg gamemode`

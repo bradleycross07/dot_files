@@ -29,15 +29,12 @@ INSTALL.md
 .config/gammastep
 .config/xsettingsd
 
-# laptop-only: vs code, vivado, spotify and spicetify
+# laptop-only: vs code and vivado
 .local/bin/update-vscode
 .local/bin/code
 .local/bin/vivado
 .local/share/applications/code.desktop
 .local/share/applications/vivado.desktop
-.local/share/applications/spotify.desktop
-.config/spicetify
-.local/bin/spotify
 
 
 # aurelia's config holds the laptop's game library path; the desktop sets ~/Games/Aurelia on first run

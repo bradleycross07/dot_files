@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Lumafly
-Exec=/home/bradley/.local/bin/lumafly %u
-Path=/home/bradley/.local/share/lumafly
-Icon=lumafly
-Terminal=false
-MimeType=x-scheme-handler/lumafly;x-scheme-handler/scarab;
-Categories=Game;

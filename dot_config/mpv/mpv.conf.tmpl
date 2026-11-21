@@ -1,17 +1,26 @@
 # youtube wrapper delay
 script-opts-append=ytdl_hook-ytdl_path=/home/bradley/.local/bin/yt-dlp-mpv
 
+{{ if eq .chezmoi.hostname "void-desktop" -}}
+# hardware decoding - RX 9070 (decodes AV1 too)
+hwdec=vaapi
+hwdec-codecs=h264,hevc,vp9,av1,mpeg2video,vc1
+
+# youtube: any codec the GPU decodes, up to the monitor's 1440p
+ytdl-format=bestvideo[height<=1440][dynamic_range=SDR]+bestaudio/bestvideo[height<=1440]+bestaudio/best
+{{ else -}}
 # hardware decoding - AMD 5500U iGPU
 hwdec=vaapi
 hwdec-codecs=h264,hevc,vp9,mpeg2video,vc1
 
 # youtube with VP9 decoder
 ytdl-format=bestvideo[vcodec~='^vp0?9'][height<=1440][dynamic_range=SDR]+bestaudio/bestvideo[vcodec~='^vp0?9'][height<=1440]+bestaudio/best
+{{ end -}}
 save-position-on-quit=yes
 
 # native wayland output
 vo=gpu-next
-gpu-api=opengl
+gpu-api={{ if eq .chezmoi.hostname "void-desktop" }}vulkan{{ else }}opengl{{ end }}
 gpu-context=wayland
 
 # fill the whole window and letterbox inside it, instead of shrinking
@@ -26,7 +35,12 @@ ao=pipewire
 
 # scaling
 scale=ewa_lanczossharp
+{{- if eq .chezmoi.hostname "void-desktop" }}
+cscale=lanczos
+dscale=mitchell
+{{- else }}
 cscale=hermite
+{{- end }}
 
 # HDR tone mapping
 tone-mapping=auto
@@ -55,7 +69,7 @@ screenshot-template="%F-%wH.%wM.%wS"
 msg-level=ffmpeg=no
 
 [yt4k]
-ytdl-format=bestvideo[vcodec~='^vp0?9'][height<=2160][dynamic_range=SDR]+bestaudio/best
+ytdl-format={{ if eq .chezmoi.hostname "void-desktop" }}bestvideo[height<=2160][dynamic_range=SDR]+bestaudio/best{{ else }}bestvideo[vcodec~='^vp0?9'][height<=2160][dynamic_range=SDR]+bestaudio/best{{ end }}
 cscale=lanczos
 dscale=hermite
 deband=yes

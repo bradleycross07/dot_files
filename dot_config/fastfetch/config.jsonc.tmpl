@@ -27,7 +27,7 @@
     { 
 	"type": "host",
 	"format": "{name}",
-	"key": "󰌢 Laptop:",
+	"key": "󰌢 {{ if eq .chezmoi.hostname "void-desktop" }}Desktop{{ else }}Laptop{{ end }}:",
 	"keyColor": "#B8916B",
 	"outputColor": "#B8916B"
     },
@@ -38,7 +38,7 @@
 {{- else }}
 	"type": "command",
         "key": "│ ├󰻠:",
-	"text": "printf 'AMD Ryzen 5 5500U @ %s GHz' \"$(awk '{sum+=$1; n++} END {printf \"%.2f\", sum/n/1000000}' /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq)\"",
+	"text": "printf 'AMD {{ if eq .chezmoi.hostname "void-desktop" }}Ryzen 7 7800X3D{{ else }}Ryzen 5 5500U{{ end }} @ %s GHz' \"$(awk '{sum+=$1; n++} END {printf \"%.2f\", sum/n/1000000}' /sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq)\"",
 {{- end }}
 	"keyColor": "#B8916B",
 	"outputColor": "#B8916B"
@@ -50,14 +50,14 @@
 {{- else }}
 	"type": "command",
         "key": "│ ├󰍹:",
-	"text": "for h in /sys/class/hwmon/hwmon*; do [ \"$(cat $h/name)\" = amdgpu ] && printf 'AMD Lucienne Integrated @ %dMHz' $(($(cat $h/freq1_input)/1000000)) && break; done",
+	"text": "for h in /sys/class/hwmon/hwmon*; do [ \"$(cat $h/name)\" = amdgpu ] && printf 'AMD {{ if eq .chezmoi.hostname "void-desktop" }}Radeon RX 9070{{ else }}Lucienne Integrated{{ end }} @ %dMHz' $(($(cat $h/freq1_input)/1000000)) && break; done",
 {{- end }}
 	"keyColor": "#BD9769",
 	"outputColor": "#BD9769"
     },
     { 
 	"type": "memory",
-	"format": "{used} / {total} @ 4266 MT/s",	
+	"format": "{used} / {total} @ {{ if eq .chezmoi.hostname "void-desktop" }}6000{{ else }}4266{{ end }} MT/s",	
         "key": "│ ├󰑭:",
 	"keyColor": "#C29D67",
 	"outputColor": "#C29D67"
