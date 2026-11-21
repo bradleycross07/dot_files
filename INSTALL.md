@@ -401,8 +401,8 @@ doas umount /mnt
 
 ### Updating your changes to the latest upstream
 
-Each repo below is cloned with your commits on top of whatever upstream version they were last based on. Rebase
-them onto the newest upstream as you clone, so the install starts current. If a rebase stops on a conflict: fix the
+dwl is cloned with your commits on top of whatever upstream version they were last based on. Rebase them onto the
+newest upstream as you clone, so the install starts current. If a rebase stops on a conflict: fix the
 file, `git add` it, `git rebase --continue`; if the conflicting commit is one upstream has since merged (like dwl's
 lock-screen fixes), `git rebase --skip` drops it. Push the result back afterwards, as each section shows.
 
@@ -496,24 +496,18 @@ Proton games still on X11: try `PROTON_ENABLE_WAYLAND=1`.
   pnpm env use --global 26
   node --version
   ```
-- clone, get the raised-bitrate `local` branch from your `vesktop-local` repo, build, install into `~/.local/opt/Vesktop`:
+- clone, build the newest release, install into `~/.local/opt/Vesktop`:
   ```sh
   git clone https://github.com/Vencord/Vesktop.git ~/.local/src/Vesktop
   cd ~/.local/src/Vesktop
-  git remote add backup git@github.com:bradleycross07/vesktop-local.git
-  git fetch backup
-  git switch -c local --track backup/local
-  # onto the newest release (skipped if the branch already contains it)
-  git fetch origin --tags
   latest=$(git tag -l 'v*' --sort=-v:refname | grep -v -- - | head -1)
-  git merge-base --is-ancestor "$latest" HEAD || git rebase --onto "$latest" "$(git merge-base HEAD origin/main)"
+  git switch -c local "$latest"
   pnpm install --frozen-lockfile
   # unpacked build in dist/linux-unpacked
   pnpm package:dir
   rm -rf ~/.local/opt/Vesktop
   mkdir -p ~/.local/opt
   cp -r dist/linux-unpacked ~/.local/opt/Vesktop
-  git push --force-with-lease backup local
   ```
 
 ## 5. Manually installed apps (`~/.local/opt`)
