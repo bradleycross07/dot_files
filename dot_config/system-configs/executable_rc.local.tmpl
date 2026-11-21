@@ -6,5 +6,5 @@
 echo 1000 > /sys/kernel/mm/lru_gen/min_ttl_ms
 {{- if eq .chezmoi.hostname "void" }}
 ryzenadj --apu-skin-temp=45 >/dev/null 2>&1
-insmod /home/bradley/.local/src/acer-wmi-battery/acer-wmi-battery.ko enable_health_mode=1 2>/dev/null
+modprobe acer-wmi-battery enable_health_mode=1 2>/dev/null
 {{- end }}
