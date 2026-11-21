@@ -1,0 +1,3 @@
+#!/bin/sh
+sbctl remove-file "/boot/vmlinuz-$2" 2>/dev/null
+exit 0

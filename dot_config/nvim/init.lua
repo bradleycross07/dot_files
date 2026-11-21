@@ -36,3 +36,6 @@ vim.opt.number = true
 
 -- cursor
 vim.opt.cursorline = true
+
+-- clipboard everywhere
+vim.opt.clipboard = 'unnamedplus'
