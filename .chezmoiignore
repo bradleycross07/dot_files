@@ -36,6 +36,25 @@ INSTALL.md
 .local/share/applications/code.desktop
 .local/share/applications/vivado.desktop
 
+# laptop-only for now: emulators, grimoire and the STM32 tools - decide on the desktop
+.local/bin/duckstation
+.local/bin/update-duckstation
+.local/share/applications/org.duckstation.DuckStation.desktop
+.local/bin/pcsx2
+.local/bin/update-pcsx2
+.local/share/applications/net.pcsx2.PCSX2.desktop
+.local/bin/grimoire
+.local/bin/update-grimoire
+.local/share/applications/grimoire.desktop
+.local/bin/stm32cubeide
+.local/bin/stm32cubemx
+.local/share/applications/cubeide-launcher.desktop
+.local/share/applications/com-st-microxplorer-maingui-STM32CubeMX.desktop
+
+# Secure Boot hooks (sbctl) - the desktop has Secure Boot off and boots with Limine
+.config/system-configs/99-sbctl
+.config/system-configs/99-sbctl-remove
+
 
 # aurelia's config holds the laptop's game library path; the desktop sets ~/Games/Aurelia on first run
 .config/Aurelia/config.json

@@ -12,7 +12,7 @@ Asus ROG Strix OLED XG27ACDNG (2560x1440 @ 360 Hz), ADATA 512 GB NVMe (system), 
 
 Do these first, then keep this checklist open on the laptop while installing on the PC.
 
-Last updated: 30 Oct 2026.
+Last updated: 21 Nov 2026.
 
 ### Right before the install
 - [ ] refresh the package and service lists, then push:
@@ -33,6 +33,11 @@ Last updated: 30 Oct 2026.
   # switch to it, or create it the first time
   git switch desktop 2>/dev/null || git switch -c desktop
   git merge main
+  ```
+  The first time only: in `config.h`, delete the Mod+v line (`clipboard-picker.sh` isn't on the desktop) and the
+  two `XF86MonBrightness` lines, then commit (`git commit -am "desktop: no clipboard picker or brightness keys"`).
+  The default monitor rule (`NULL`, scale 1) already fits the single 1440p monitor. Then push:
+  ```sh
   git push -u origin desktop
   # back to main, or the laptop's next `make` builds the desktop config
   git switch main
@@ -340,7 +345,8 @@ Don't install on the desktop:
 Packages the later steps rely on (still in the `system-configs` folder, for the font lists):
 
 ```sh
-doas xbps-install -S chrony nftables rtkit turnstile power-profiles-daemon
+# runit-nftables provides the nftables service enabled in step 7 (nftables alone has none)
+doas xbps-install -S chrony nftables runit-nftables rtkit turnstile power-profiles-daemon
 doas xbps-install -S pipewire wireplumber alsa-pipewire easyeffects pavucontrol \
     swayidle waylock wlopm wl-clipboard foot fuzzel qt6-wayland
 doas xbps-install -S mesa-dri mesa-vulkan-radeon vulkan-loader
@@ -400,15 +406,9 @@ them onto the newest upstream as you clone, so the install starts current. If a 
 file, `git add` it, `git rebase --continue`; if the conflicting commit is one upstream has since merged (like dwl's
 lock-screen fixes), `git rebase --skip` drops it. Push the result back afterwards, as each section shows.
 
-### Rust builds
+### `~/.local/bin`
 
-```sh
-# after `git clone ... ~/.local/src/<name>`:
-chezmoi apply ~/.local/src/<name>/.cargo/config.toml
-echo ".cargo/" >> ~/.local/src/<name>/.git/info/exclude
-```
-
-The binaries go in `~/.local/bin`, which `.zprofile` puts on `PATH` from step 6:
+The binaries built below go in `~/.local/bin`, which `.zprofile` puts on `PATH` from step 6:
 
 ```sh
 mkdir -p ~/.local/bin
@@ -432,7 +432,8 @@ git merge-base --is-ancestor "$latest" HEAD || git rebase --onto "$latest" "$(gi
 make && doas make install
 git push --force-with-lease origin desktop
 ```
-- the `desktop` branch: monitor rule, no brightness keys, no Mod+v clipboard picker
+- the `desktop` branch: no brightness keys and no Mod+v clipboard picker (made in step 0); everything else
+  matches `main`
 - dwl runs `~/.local/bin/autostart.sh` at startup (a template): PipeWire, EasyEffects (mic for Vesktop) and swayidle
   (lock after 10 min, screen off after 15 - protects the OLED)
 - quitting dwl stops everything autostart.sh started (the autostart patch kills its process group)
@@ -525,12 +526,43 @@ step 6. The apps themselves are downloaded fresh into the paths below. Vesktop i
 | Obsidian      | `~/.local/opt/Obsidian`          | AppImage extracted; install/update with `update-obsidian` |
 | Vesktop       | `~/.local/opt/Vesktop`           | built from `~/.local/src/Vesktop` (step 4) |
 | Motrix        | `~/.local/opt/Motrix`            | AppImage extracted; wrapper runs `AppRun` |
+| ProtonUp-Qt   | `~/.local/opt/ProtonUp-Qt`       | AppImage extracted; wrapper runs `AppRun` |
+
+DuckStation, PCSX2, Grimoire and the STM32 tools are laptop-only in `.chezmoiignore` for now - take their lines
+out of it if you want them here, then install them with their `update-*` scripts (STM32: ST's installers).
 
 Obsidian - `update-obsidian` isn't on `PATH` yet, so run it from the dotfiles clone:
 
 ```sh
 sh "$(chezmoi source-path)/dot_local/bin/executable_update-obsidian"
 ```
+
+ProtonUp-Qt - the newest AppImage from its GitHub releases, extracted like the others (no FUSE needed):
+
+```sh
+cd /tmp
+url=$(curl -fsSL https://api.github.com/repos/DavidoTek/ProtonUp-Qt/releases/latest \
+    | jq -r '.assets[] | select(.name | test("x86_64.*AppImage$")) | .browser_download_url' | head -1)
+# empty = the latest release has no AppImage attached: download it by hand from the releases page instead
+echo "$url"
+curl -fL -o protonup-qt.AppImage "$url"
+chmod +x protonup-qt.AppImage && ./protonup-qt.AppImage --appimage-extract >/dev/null
+rm -rf ~/.local/opt/ProtonUp-Qt && mv squashfs-root ~/.local/opt/ProtonUp-Qt
+rm protonup-qt.AppImage
+cd
+```
+
+### Steam
+
+Nonfree, with its 32-bit libraries from multilib (both repos were enabled in steps 2 and 4; the 32-bit Mesa and
+Vulkan packages came with the Aurelia step):
+
+```sh
+doas xbps-install -S steam libgcc-32bit libstdc++-32bit libdrm-32bit libglvnd-32bit
+```
+
+First launch is inside dwl (step 7). The library on `~/Games` is added in section 11, once the SATA SSD is
+mounted; Proton versions (GE-Proton etc.) come from ProtonUp-Qt after Steam has run once.
 
 ### Flatpak (user installation)
 
@@ -593,6 +625,7 @@ Spicetify (`~/.spicetify` is already on `PATH` from `.zprofile`):
 ```sh
 curl -fsSL https://raw.githubusercontent.com/spicetify/cli/main/install.sh | sh
 # the installer may append its own PATH line to ~/.zshrc - put the dotfiles' version back
+# (chezmoi asks because the file changed: choose overwrite)
 chezmoi apply ~/.zshrc
 # Spicetify patches Spotify's own files, so give your user write access to them
 doas chmod a+wr /usr/libexec/spotify
@@ -628,6 +661,8 @@ doas powerprofilesctl set performance
 
 ### First dwl session
 
+- [ ] start it from tty1 with `dwl` - a zsh function from `.zshrc` that runs it under `dbus-run-session` and
+  logs errors to `~/.local/share/dwl.log` (check there if it drops back to the tty)
 - [ ] Firefox `user.js` (Betterfox + overrides), `userChrome.css` and `userContent.css` - close Firefox
   completely, then copy all three:
   ```sh
@@ -649,9 +684,10 @@ doas powerprofilesctl set performance
 
 Already handled by the dotfiles:
 - `~/.config/pipewire/pipewire.conf.d/` - rates + symlinks that make PipeWire launch WirePlumber and pipewire-pulse
-- EasyEffects mic chain: `~/.config/easyeffects/db/` (gate, compressor, rnnoise)
 
 Manual:
+- [ ] EasyEffects mic chain (gate, compressor, noise reduction) - not in the dotfiles, set up and tune it for
+  this machine's mic
 - [ ] route ALSA through PipeWire, so apps and games that only talk ALSA play through PipeWire instead of
   grabbing the sound card directly ("Device default ... Busy"); needs `alsa-pipewire`:
   ```sh
@@ -696,7 +732,7 @@ Copies live in `~/.config/system-configs` (applied by chezmoi in step 6).
 | `sysctl.conf`        | `/etc/sysctl.conf`            | `vm.max_map_count=1048576` (some Proton games need it) |
 | `rc.local`           | `/etc/rc.local`               | MGLRU thrashing protection (`min_ttl_ms` 1000) - stands in for earlyoom, which isn't installed |
 | `dracut.conf.d/no-drm.conf` | `/etc/dracut.conf.d/`  | leaves `drm` (amdgpu + every AMD GPU's firmware) and the crypt modules out of the initramfs - amdgpu loads from the root filesystem instead. Rebuild after copying |
-| `doas.conf`          | `/etc/doas.conf`              | check with `doas -C` first; `chmod 0400`; passwordless poweroff/reboot, `zzz` isn't passwordless any more - add `permit nopass bradley cmd zzz` back if suspending from a keybind |
+| `doas.conf`          | `/etc/doas.conf`              | check with `doas -C` first; `chmod 0400`; passwordless poweroff/reboot; `zzz` isn't passwordless any more - add `permit nopass bradley cmd zzz` back if suspending from a keybind |
 | `nftables.conf`      | `/etc/nftables.conf`          | check with `nft -c -f` first |
 | `rc.conf`            | `/etc/rc.conf`                | template: KEYMAP `us`     |
 | `dhcpcd.conf`        | `/etc/dhcpcd.conf`            | template: Cloudflare DNS  |
@@ -771,12 +807,13 @@ cd
   - test: `gamemoded -t` should end with "All Tests Passed!". The governor and GPU helpers go through polkit;
     on the laptop that ran with elogind, here it doesn't. If those two tests fail with authorisation errors,
     check `polkit` is installed (gamemode should pull it in) and enable it: `doas ln -s /etc/sv/polkitd /var/service/`
-- [ ] seat management: `seatd` + `turnstile` instead of elogind
-  (see https://docs.voidlinux.org/config/session-management.html)
-- [ ] minimal service set - no TLP, zram, earlyoom, iwd, unbound, cronie or logging:
-  ethernet only, 32 GB RAM, amd-pstate-epp handles the 7800X3D
-- [ ] kernel options (in the Limine hook): `loglevel=4 nowatchdog modprobe.blacklist=sp5100_tco mitigations=off ipv6.disable=1`
-  - `sp5100_tco` is AMD's chipset watchdog driver - blacklisted on the laptop too, alongside `nowatchdog`
+- notes - already done in earlier steps, nothing to do here:
+  - seat management is `seatd` + `turnstile` instead of elogind (steps 1 and 7;
+    see https://docs.voidlinux.org/config/session-management.html)
+  - minimal service set - no TLP, zram, earlyoom, iwd, unbound, cronie or logging: ethernet only, 32 GB RAM,
+    amd-pstate-epp handles the 7800X3D
+  - kernel options are set in the Limine hook (step 1): `loglevel=4 nowatchdog modprobe.blacklist=sp5100_tco
+    mitigations=off ipv6.disable=1` - `sp5100_tco` is AMD's chipset watchdog driver, blacklisted on the laptop too
 - [ ] move the backup off the SATA SSD: mount it with your ownership, upload the phone photos (~50 GB) and
   anything else to the uni Google Drive from Firefox, copy the rest into `~`, then unmount:
   ```sh
@@ -796,11 +833,14 @@ cd
       | doas tee -a /etc/fstab
   doas mount ~/Games && doas chown bradley:bradley ~/Games
   ```
+- [ ] Steam: Settings → Storage → add a library in `~/Games` and make it the default
 - [ ] once everything's set up, save the desktop's own lists:
   ```sh
   xbps-query -m > ~/.config/system-configs/packages-$(hostname).txt
   command ls /var/service > ~/.config/system-configs/services-$(hostname).txt
   chezmoi add ~/.config/system-configs/{packages,services}-$(hostname).txt
+  # chezmoi add copies them into the repo but doesn't stage them for git
+  chezmoi git -- add -A
   chezmoi git -- commit -m "Desktop package and service lists" && chezmoi git -- push
   ```
 
