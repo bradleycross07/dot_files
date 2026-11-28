@@ -1,5 +1,5 @@
 7zip-26.06_1
-ImageMagick-7.1.2.35_3
+ImageMagick-7.1.2.36_1
 MangoHud-0.8.4_1
 RyzenAdj-0.17.0_1
 StyLua-2.5.2_1
@@ -19,10 +19,12 @@ bind-utils-9.20.29_1
 breeze-gtk-6.7.5_1
 breeze-qt6-6.7.5_1
 brightnessctl-0.5.1_1
+bsdtar-3.8.11_1
 btop-1.4.8_1
 cargo-1.99.0_1
 chezmoi-2.74.1_1
 chrony-4.9_1
+clang-21_3
 cliphist-0.7.0_2
 cmake-4.2.2_3
 cronie-1.7.2_2

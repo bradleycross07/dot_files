@@ -49,9 +49,15 @@ dwl() {
 }
 
 # --- integrations ---
+export FZF_DEFAULT_COMMAND='fd -H -t f --exclude .git'
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
 eval "$(starship init zsh)"
 source <(fzf --zsh)
 eval "$(zoxide init zsh)"
+
+# make `**<Tab>` completion (e.g. `nvim **<Tab>`, `cd **<Tab>`) use fd instead of find
+_fzf_compgen_path() { fd -H --exclude .git . "$1" }
+_fzf_compgen_dir()  { fd -H -t d --exclude .git . "$1" }
 
 # --- startup ---
 fastfetch

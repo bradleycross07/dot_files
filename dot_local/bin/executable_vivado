@@ -1,5 +1,7 @@
 #!/bin/sh
 cd ~/VivadoProjects || exit 1
-_JAVA_AWT_WM_NONREPARENTING=1 \
-QT_QPA_PLATFORM=xcb \
+rm -rf "$HOME/.java/fonts"
+export _JAVA_AWT_WM_NONREPARENTING=1
+export _JAVA_OPTIONS="-Dawt.useSystemAAFontSettings=on -Dswing.aatext=true"
+export FONTCONFIG_FILE="$HOME/.config/fontconfig/vivado.conf"
 exec /tools/Xilinx/Vivado/2023.2/bin/vivado "$@"
